@@ -902,3 +902,24 @@ The cursor: default; property value restores the browser's default cursor style 
 
 
 }
+
+.border-tab {
+  border-width: 1px;
+  border-radius: 6px 6px 0 0;
+}
+
+.tabs-menu {
+  height: 3rem;
+}
+
+.chat-btn {
+  transition: all .15s;
+}
+
+.chat-path {
+  transition: all .15s;
+}
+
+.chat-btn:hover .chat-path {
+  fill: white;
+}

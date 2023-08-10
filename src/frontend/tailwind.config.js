@@ -85,7 +85,7 @@ module.exports = {
         "success-background": "var(--success-background)",
         "success-foreground": "var(--success-foreground)",
 
-        white: "var(--white)",
+        white: "#FFFFFF",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

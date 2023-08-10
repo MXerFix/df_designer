@@ -22,11 +22,12 @@ import { Menu } from "lucide-react";
 export default function ExtraSidebar() {
   const { data } = useContext(typesContext);
   const { openPopUp } = useContext(PopUpContext);
-  const { flows, tabId, uploadFlow, tabsState, saveFlow, save } =
+  const { flows, tabId, uploadFlow, tabsState, saveFlow, save, setTabId } =
     useContext(TabsContext);
   const { setSuccessData, setErrorData } = useContext(alertContext);
   const [dataFilter, setFilterData] = useState(data);
   const [search, setSearch] = useState("");
+  const [activeFlow, setActiveFlow] = useState(tabId)
   const isPending = tabsState[tabId]?.isPending;
   function onDragStart(
     event: React.DragEvent<any>,
@@ -140,6 +141,7 @@ export default function ExtraSidebar() {
       </div>
 
       <div className="side-bar-components-div-arrangement">
+        <h5 className="mb-2 ml-2"> Nodes </h5>
         {Object.keys(dataFilter)
           .sort()
           .map((d: keyof APIObjectType, i) =>
@@ -159,42 +161,42 @@ export default function ExtraSidebar() {
                       // console.log(d, t)
                       return (
                         <ShadTooltip
-                        content={data[d][t].display_name}
-                        side="right"
-                        key={data[d][t].display_name}
-                      >
-                        <div key={k} data-tooltip-id={t}>
-                          <div
-                            draggable
-                            className={"side-bar-components-border"}
-                            style={{
-                              borderLeftColor:
-                                titleNodeColors[t] ?? nodeColors.unknown,
-                            }}
-                            onDragStart={(event) => {
-                              onDragStart(event, {
-                                type: t,
-                                node: data[d][t],
-                              })
-                            }
-                            }
-                            onDragEnd={() => {
-                              document.body.removeChild(
-                                document.getElementsByClassName(
-                                  "cursor-grabbing"
-                                )[0]
-                              );
-                            }}
-                          >
-                            <div className="side-bar-components-div-form">
-                              <span className="side-bar-components-text">
-                                {data[d][t].display_name}
-                              </span>
-                              <Menu className="side-bar-components-icon " />
+                          content={data[d][t].display_name}
+                          side="right"
+                          key={data[d][t].display_name}
+                        >
+                          <div key={k} data-tooltip-id={t}>
+                            <div
+                              draggable
+                              className={"side-bar-components-border"}
+                              style={{
+                                borderLeftColor:
+                                  titleNodeColors[t] ?? nodeColors.unknown,
+                              }}
+                              onDragStart={(event) => {
+                                onDragStart(event, {
+                                  type: t,
+                                  node: data[d][t],
+                                })
+                              }
+                              }
+                              onDragEnd={() => {
+                                document.body.removeChild(
+                                  document.getElementsByClassName(
+                                    "cursor-grabbing"
+                                  )[0]
+                                );
+                              }}
+                            >
+                              <div className="side-bar-components-div-form">
+                                <span className="side-bar-components-text">
+                                  {data[d][t].display_name}
+                                </span>
+                                <Menu className="side-bar-components-icon " />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </ShadTooltip>
+                        </ShadTooltip>
                       )
                     })}
                 </div>
@@ -203,6 +205,18 @@ export default function ExtraSidebar() {
               <div key={i}></div>
             )
           )}
+        <div className="mt-8">
+          <h5 className="mb-2  ml-2"> Active flows </h5>
+          {flows.map((flow) => {
+            return (
+              <button
+                onClick={e => setTabId(flow.id)}
+                className={` ${flow.id == tabId && 'bg-slate-200'} py-2.5 px-3 text-sm bg-node-back components-disclosure-arrangement`}>
+                {flow.name}
+              </button>
+            )
+          })}
+        </div>
       </div>
     </div>
   );

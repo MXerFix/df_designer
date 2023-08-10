@@ -463,6 +463,18 @@ export const taskTypeMap: { [key: string]: string } = {
   MULTICLASS_CLASSIFICATION: "Multiclass Classification",
 };
 
+
+export const nodeTransitionTypes = {
+  manual: 'default',
+  forward: 'forward',
+  backward: 'backward',
+  repeat: 'repeat',
+  previous: 'previous',
+  to_start: 'to start',
+  to_fallback: 'to fallback'
+}
+
+
 const charWidths: { [char: string]: number } = {
   " ": 0.2,
   "!": 0.2,

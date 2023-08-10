@@ -166,8 +166,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
         start_node: start_node,
         fallback_node: fallback_node
       }
-
-      console.log(flows)
+      
 
       const default_link: APIClassType = {
         display_name: "default_link",

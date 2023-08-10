@@ -31,6 +31,8 @@ import { PersonIcon } from "../../../../icons/PersonIcon";
 import { ChangeConditionIcon } from "../../../../icons/ChangeConditionIcon";
 import * as TransitionIcons from '../../../../icons/TransitionIcons/index'
 import { ConditionClassType } from "../../../../types/api";
+import { TransitionComponent } from "./components/transitionComponent";
+import { TransitionList } from "./components/transitionsList";
 
 export default function ParameterComponent({
   left,
@@ -290,17 +292,7 @@ export default function ParameterComponent({
                 {forwardsItem}
                 <span className="ml-1">{HandleTypeIcon(forwardsItem)}</span>
               </div>
-              <div className={(forwardsMenu ? 'opacity-100 scale-100 transition-all origin-left' : 'opacity-0 scale-0 transition-all origin-left') + ' ' + 'absolute z-20 bg-node-back px-2 py-1 w-max h-max rounded-lg left-96 -bottom-20 ml-0'}>
-                {/*  TODO: REFACTOR THIS  */}
-                <span className="text-sm text-neutral-400" >Choose transition</span>
-                <div className="text-xs flex flex-row items-center py-1 px-2 cursor-pointer font-semibold hover:bg-slate-100 rounded" onClick={() => { handleConditionType('default') }}>manual</div>
-                <div className="text-xs flex flex-row items-center py-1 px-2 cursor-pointer font-semibold hover:bg-slate-100 rounded" onClick={() => { handleConditionType('forward'); setEdges(reactFlowInstance.getEdges().filter((edge) => edge.sourceHandle != id)) }}>forward <TransitionIcons.forward className="ml-2" /> </div>
-                <div className="text-xs flex flex-row items-center py-1 px-2 cursor-pointer font-semibold hover:bg-slate-100 rounded" onClick={() => { handleConditionType('backward'); setEdges(reactFlowInstance.getEdges().filter((edge) => edge.sourceHandle != id)) }}>backward <TransitionIcons.backward className="ml-2" /></div>
-                <div className="text-xs flex flex-row items-center py-1 px-2 cursor-pointer font-semibold hover:bg-slate-100 rounded" onClick={() => { handleConditionType('repeat'); setEdges(reactFlowInstance.getEdges().filter((edge) => edge.sourceHandle != id)) }}>repeat <TransitionIcons.repeat className="ml-2" /></div>
-                <div className="text-xs flex flex-row items-center py-1 px-2 cursor-pointer font-semibold hover:bg-slate-100 rounded" onClick={() => { handleConditionType('previous'); setEdges(reactFlowInstance.getEdges().filter((edge) => edge.sourceHandle != id)) }}>previous <TransitionIcons.previous className="ml-2" /></div>
-                <div className="text-xs flex flex-row items-center py-1 px-2 cursor-pointer font-semibold hover:bg-slate-100 rounded" onClick={() => { handleConditionType('to start'); setEdges(reactFlowInstance.getEdges().filter((edge) => edge.sourceHandle != id)) }}>to start <TransitionIcons.to_start className="ml-2" /></div>
-                <div className="text-xs flex flex-row items-center py-1 px-2 cursor-pointer font-semibold hover:bg-slate-100 rounded" onClick={() => { handleConditionType('to fallback'); setEdges(reactFlowInstance.getEdges().filter((edge) => edge.sourceHandle != id)) }}>to fallback <TransitionIcons.to_fallback className="ml-2" /></div>
-              </div>
+              <TransitionList forwardsMenu={forwardsMenu} handleConditionType={handleConditionType} id={id} />
             </div>
           </div>
 

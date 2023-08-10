@@ -243,3 +243,9 @@ dmypy.json
 .testenv/*
 langflow.db
 langchain.db
+
+devcontainer
+vscode
+tests
+scripts
+
