@@ -8,7 +8,10 @@ import { getExamples } from "../../controllers/API";
 import { FlowType } from "../../types/flow";
 import { CardComponent } from "../../components/cardComponent";
 import { useNavigate } from "react-router-dom";
+import { PopUpContext } from "../../contexts/popUpContext";
+import AddFlowModal from "../../modals/addFlowModal";
 export default function CommunityPage() {
+  const { openPopUp } = useContext(PopUpContext)
   const { flows, setTabId, downloadFlows, uploadFlows, addFlow } =
     useContext(TabsContext);
   useEffect(() => {

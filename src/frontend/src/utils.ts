@@ -53,6 +53,7 @@ import { VertexAIIcon } from "./icons/VertexAI";
 import { Start_node } from './icons/start_node';
 import { End_node } from './icons/end_node';
 import { Nodes_sidebar } from './icons/NodesSidebarIcon';
+import { LLM_node } from './icons/LLMIcon';
 
 export function classNames(...classes: Array<string>) {
   return classes.filter(Boolean).join(" ");
@@ -64,6 +65,77 @@ export enum TypeModal {
   TEXT = 1,
   PROMPT = 2,
 }
+
+export const condition_intents = [
+  'Keywords',
+  'Keyphrase',
+]
+
+export const condition_actions = [
+  'are',
+  'no',
+  'action_3_cond',
+  'action_4_cond',
+]
+
+export const condition_variables = [
+  'Hello',
+  'Omg where is my pants',
+  'variables_3_cond',
+  'variables_4_cond',
+]
+
+export const condition_llms = [
+  'gpt-3',
+  'gpt-3.5-turbo',
+  'gpt-4',
+]
+
+export const node_preresponses = [
+  "fn_1_pre_re","fn_2_pre_re","fn_3_pre_re","fn_4_pre_re"
+]
+
+export const node_pretransitions = [
+  "fn_1_pre_tr","fn_2_pre_tr","fn_3_pre_tr","fn_4_pre_tr"
+]
+
+// export const node_preresponses = [
+//   {
+//     name: "pre-re1",
+//     function: "fn_1_pre_re"
+//   },
+//   {
+//     name: "pre-re2",
+//     function: "fn_2_pre_re"
+//   },
+//   {
+//     name: "pre-re3",
+//     function: "fn_3_pre_re"
+//   },
+//   {
+//     name: "pre-re4",
+//     function: "fn_4_pre_re"
+//   },
+// ]
+
+// export const node_pretransitions = [
+//   {
+//     name: "pre-tr1",
+//     function: "fn_1_pre_tr"
+//   },
+//   {
+//     name: "pre-tr2",
+//     function: "fn_2_pre_tr"
+//   },
+//   {
+//     name: "pre-tr3",
+//     function: "fn_3_pre_tr"
+//   },
+//   {
+//     name: "pre-tr4",
+//     function: "fn_4_pre_tr"
+//   },
+// ]
 
 export const textColors = {
   white: "text-white",
@@ -115,14 +187,27 @@ export const titleNodeColors: { [char: string]: string } = {
   default_node: "#198BF6",
   fallback_node: "#FF3434",
   start_node: "#00CC99",
-  default_link: "#F5B85A"
+  default_link: "#F5B85A",
+  llm_node: "#7000FF"
 }
+
+export const flow_colors: string[] = [
+  "#F01805",
+  "#FB5607",
+  "#FFBE0B",
+  "#07DA35",
+  "#3A86FF",
+  "#4125D0",
+  "#8338EC",
+  "#FF70AE"
+]
 
 export const titleTextNodeColors: { [char: string]: string } = {
   default_node: "#fff",
   fallback_node: "#fff",
   start_node: "#fff",
-  default_link: "#fff"
+  default_link: "#fff",
+  llm_node: "#fff"
 }
 
 export const nodeColors: { [char: string]: string } = {
@@ -153,7 +238,7 @@ export const nodeNames: { [char: string]: string } = {
   chains: "Chains",
   agents: "Agents",
   tools: "Tools",
-  default_nodes: "Default nodes",
+  default_nodes: "Nodes",
   links: "Links",
   samples: "samples",
   memories: "Memories",
@@ -190,9 +275,12 @@ export const nodeIconsLucide: {
   default_nodes: Nodes_sidebar as React.ForwardRefExoticComponent<
     ComponentType<SVGProps<SVGSVGElement>>
   >,
+  llm_node: LLM_node as React.ForwardRefExoticComponent<
+    ComponentType<SVGProps<SVGSVGElement>>
+  >,
   links: Links_ as React.ForwardRefExoticComponent<
-  ComponentType<SVGProps<SVGSVGElement>>
->,
+    ComponentType<SVGProps<SVGSVGElement>>
+  >,
   AirbyteJSONLoader: AirbyteIcon as React.ForwardRefExoticComponent<
     ComponentType<SVGProps<SVGSVGElement>>
   >,
@@ -978,4 +1066,10 @@ export function getRandomKeyByssmm(): string {
   const seconds = String(now.getSeconds()).padStart(2, "0");
   const milliseconds = String(now.getMilliseconds()).padStart(3, "0");
   return seconds + milliseconds + Math.abs(Math.floor(Math.random() * 10001));
+}
+
+export const findUnPickedColor = (flows: FlowType[]) => {
+  const picked_colors = flows.map(({ color }) => color)
+  const unpicked_colors = flow_colors.filter((color) => !picked_colors.includes(color))
+  return unpicked_colors
 }

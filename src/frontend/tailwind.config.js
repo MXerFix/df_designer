@@ -84,6 +84,7 @@ module.exports = {
         "status-yellow": "var(--status-yellow)",
         "success-background": "var(--success-background)",
         "success-foreground": "var(--success-foreground)",
+        "res-trans-add": "#8D96B5",
 
         white: "#FFFFFF",
         border: "hsl(var(--border))",

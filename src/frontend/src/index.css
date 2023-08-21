@@ -246,7 +246,7 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply h-full w-full overflow-hidden
   }
   .logspace-page-icon {
-    @apply absolute bottom-2 left-7 flex h-6 cursor-pointer flex-col items-center justify-start overflow-hidden rounded-lg bg-foreground px-2 text-center font-sans text-xs tracking-wide text-secondary transition-all duration-500 ease-in-out
+    @apply absolute bottom-2 left-2 flex h-6 cursor-pointer flex-col items-center justify-start overflow-hidden rounded-lg bg-foreground px-2 text-center font-sans text-xs tracking-wide text-secondary transition-all duration-500 ease-in-out
   }
 
   .logspace-page-icon:hover {
@@ -922,4 +922,28 @@ The cursor: default; property value restores the browser's default cursor style 
 
 .chat-btn:hover .chat-path {
   fill: white;
+}
+
+.extra-title {
+  font-weight: 600;
+}
+
+.in-modal-input {
+  outline: none;
+  border: 1px solid rgba(39, 39, 39, 0.15);
+}
+
+.in-modal-input:focus {
+  border-color: black;
+}
+
+.cond-textarea {
+  border: 1px solid hsl(var(--ring));
+  padding: 12px;
+  outline-color: #999;
+}
+
+.edge-cust text {
+  font-weight: 400 !important;
+  stroke-width: 0;
 }

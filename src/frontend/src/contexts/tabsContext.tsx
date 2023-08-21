@@ -5,6 +5,7 @@ import {
   useRef,
   ReactNode,
   useContext,
+  useId,
 } from "react";
 import { FlowType, NodeType } from "../types/flow";
 import { TabsContextType, TabsState } from "../types/tabs";
@@ -13,6 +14,8 @@ import {
   updateTemplate,
   getRandomDescription,
   getRandomName,
+  flow_colors,
+  findUnPickedColor,
 } from "../utils";
 import { alertContext } from "./alertContext";
 import { typesContext } from "./typesContext";
@@ -251,10 +254,10 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       if (edge.source === node.id) {
         edge.sourceHandle = edge.sourceHandle
         // FIXME: TAKE CARE WITH THIS
-          // .split("|")
-          // .slice(0, 2)
-          // .concat(template["base_classes"])
-          // .join("|");
+        // .split("|")
+        // .slice(0, 2)
+        // .concat(template["base_classes"])
+        // .join("|");
       }
     });
   }
@@ -489,7 +492,8 @@ export function TabsProvider({ children }: { children: ReactNode }) {
 
   const addFlow = async (
     flow?: FlowType,
-    newProject?: Boolean
+    newProject?: Boolean,
+    newFlowData?: any
   ): Promise<String> => {
     if (newProject) {
       let flowData = extractDataFromFlow(flow);
@@ -498,7 +502,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       }
 
       // Create a new flow with a default name if no flow is provided.
-      const newFlow = createNewFlow(flowData, flow);
+      const newFlow = createNewFlow(flowData, flow, newFlowData);
       processFlowEdges(newFlow);
       processFlowNodes(newFlow);
 
@@ -575,11 +579,13 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       }
     });
   };
+  
 
-  const createNewFlow = (flowData, flow) => ({
-    description: flowData.description,
-    name: flow?.name ?? getRandomName(),
+  const createNewFlow = (flowData, flow, newFlow) => ({
+    description: newFlow?.description ? newFlow.description : flowData.description,
+    name: newFlow?.name ? newFlow.name : flows.find(({ name }) => name === `Flow ${flows.length}`) ? `Flow ${flows.length + 1}` : `Flow ${flows.length}`,
     data: flowData.data,
+    color: newFlow?.color ? newFlow.color : findUnPickedColor(flows)[0],
     id: "",
   });
 
@@ -601,6 +607,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
         newFlows[index].description = newFlow.description ?? "";
         newFlows[index].data = newFlow.data;
         newFlows[index].name = newFlow.name;
+        newFlows[index].color = newFlow.color ?? "";
       }
       return newFlows;
     });
@@ -619,6 +626,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
             newFlows[index].description = newFlow.description ?? "";
             newFlows[index].data = newFlow.data;
             newFlows[index].name = newFlow.name;
+            newFlows[index].color = newFlow.color ?? ""
           }
           return newFlows;
         });

@@ -29,6 +29,7 @@ import { ConditionClassType } from "../../types/api";
 import { LinkComponent } from "./components/linkComponent";
 import { TabsContext } from "../../contexts/tabsContext";
 import { LinksListComponent } from "./components/linksListComponent";
+import EditConditionModal from "../../modals/editConditionModal";
 
 export default function GenericNode({
   data,
@@ -48,7 +49,7 @@ export default function GenericNode({
   const { setErrorData } = useContext(alertContext);
   const showError = useRef(true);
   const { types, deleteNode } = useContext(typesContext);
-  const { flows } = useContext(TabsContext)
+  const { flows, tabId } = useContext(TabsContext)
 
   const [links, setLinks] = useState<any>(data.node.links ? (
     <LinksListComponent data={data} links={data.node.links} />
@@ -60,9 +61,7 @@ export default function GenericNode({
         nodeColors[types[data.node.template["response"].type]] ??
         nodeColors.unknown
       }
-      title={
-        `Condition ${idx}`
-      }
+      title={condition.name}
       info={''}
       name={condition.name}
       tooltipTitle={data.node.template["response"].type}
@@ -76,10 +75,33 @@ export default function GenericNode({
       transitionType={condition.transitionType}
     />
   }) : [])
+  useEffect(() => {
+    setConditions(data.node.conditions ? data.node.conditions.map((condition, idx) => {
+      return <ParameterComponent
+        data={data}
+        color={
+          nodeColors[types[data.node.template["response"].type]] ??
+          nodeColors.unknown
+        }
+        title={condition.name}
+        info={''}
+        name={condition.name}
+        tooltipTitle={data.node.template["response"].type}
+        required={data.node.template["response"].required}
+        id={data.node.template["response"].type + "|" + `condition${idx}` + "|" + data.id}
+        left={condition.left}
+        type={`condition`}
+        key={data.node.template["response"].display_name + `${idx}`}
+        priority={condition.priority}
+        conditionID={condition.conditionID}
+        transitionType={condition.transitionType}
+      />
+    }) : [])
+  }, [flows])
   const [conditionCounter, setConditionCounter] = useState(conditions.length)
 
   const { closePopUp, openPopUp } = useContext(PopUpContext);
-  const [name, setName] = useState(data.node.display_name)
+  const [name, setName] = useState('')
   const [nameInput, setNameInput] = useState(false)
   // any to avoid type conflict
   const Icon: any =
@@ -88,11 +110,24 @@ export default function GenericNode({
   // State for outline color
   const { sseData, isBuilding } = useSSE();
   const refHtml = useRef(null);
+  const [pre_responses, setPre_responses] = useState(data.node?.pre_responses?.length ? data.node.pre_responses : [])
+  const [pre_transitions, setPre_transitions] = useState(data.node?.pre_transitions?.length ? data.node.pre_transitions : [])
+
+  useEffect(() => {
+    setPre_responses(data.node?.pre_responses?.length ? data.node.pre_responses : [])
+    setPre_transitions(data.node?.pre_transitions?.length ? data.node.pre_transitions : [])
+  }, [data.node?.pre_responses?.length, data.node?.pre_transitions?.length])
 
   useOnClickOutside(refHtml, () => {
     setNameInput(false)
   })
 
+  useEffect(() => {
+    setName(data.node.display_name)
+  }, [])
+
+  // const _data = flows.find((flow) => flow.id == tabId)?.data.nodes?.find((node) => node.id == data.id).data
+  // console.log(_data);
 
 
 
@@ -128,29 +163,11 @@ export default function GenericNode({
 
   useEffect(() => { }, [closePopUp, data.node.template]);
 
-  const tempNodeParamsList = Object.keys(data.node.template)
+
+  const [nodeParamsList, setNodeParamsList] = useState(Object.keys(data.node.template)
     .filter((t) => t.charAt(0) !== "_")
     .map((t: string, idx) => (
       <div key={idx}>
-        {/* {idx === 0 ? (
-                    <div
-                        className={classNames(
-                            "px-5 py-2 mt-2 text-center",
-                            Object.keys(data.node.template).filter(
-                                (key) =>
-                                    !key.startsWith("_") &&
-                                    data.node.template[key].show &&
-                                    !data.node.template[key].advanced
-                            ).length === 0
-                                ? "hidden"
-                                : ""
-                        )}
-                    >
-                        Inputs
-                    </div>
-                ) : (
-                    <></>
-                )} */}
         {data.node.template[t].show &&
           !data.node.template[t].advanced && data.node.template[t].name == 'response' ? (
           <>
@@ -159,17 +176,17 @@ export default function GenericNode({
               {data.node.display_name == 'default_node' &&
                 <div className="flex flex-row flex-nowrap h-full w-max items-center">
                   <Info_Small_Icon />
-                  <PreArrowIcon className="h-full" width="9" height="13" viewbox="24 24" />
+                  <PreArrowIcon className="" width="9" height="13" viewbox="24 24" />
                 </div>
               }
               <div className="flex flex-wrap flex-row items-center">
-                {data.node.pre_responses && data.node.template[t].name == 'response' ? data.node.pre_responses.map((pre, idx) => <span onClick={(e) => {
-                  if (!activePreRes.includes(pre)) {
-                    setActivePreRes((prev) => [...prev, pre])
-                  } else if (activePreRes.includes(pre)) {
-                    setActivePreRes((prev) => prev.filter((item) => item !== pre))
-                  }
-                }} className={"px-1 rounded-md bg-res-trans-color mx-1 mb-1" + ' ' + (activePreRes.includes(pre) ? 'bg-black' : '')}> {pre} </span>) : <></>}
+                {pre_responses.length && data.node.template[t].name == 'response' ? pre_responses.map((pre: { name: string; func: string }, idx) => <span key={pre.name} onClick={(e) => {
+                  // if (!activePreRes.includes(pre)) {
+                  //   setActivePreRes((prev) => [...prev, pre])
+                  // } else if (activePreRes.includes(pre)) {
+                  //   setActivePreRes((prev) => prev.filter((item) => item !== pre))
+                  // }
+                }} className={"px-1 rounded-md bg-res-trans-color mx-1 mb-1" + ' ' + (activePreRes.includes(pre.name) ? 'bg-black' : '')}> {pre.name} </span>) : <></>}
               </div>
             </div>
             <ParameterComponent
@@ -201,14 +218,14 @@ export default function GenericNode({
                 </div>
               }
               <div className="flex flex-wrap flex-row items-center">
-                {data.node.pre_transitions && data.node.template[t].name == 'response' ? data.node.pre_transitions.map((pre: string, idx) => <span onClick={(e) => {
-                  if (!activePreTrans.includes(pre)) {
-                    setActivePreTrans((prev) => [...prev, pre])
-                    // console.log(activePreRes)
-                  } else if (activePreTrans.includes(pre)) {
-                    setActivePreTrans(activePreTrans.filter((item) => { return item != pre }))
-                  }
-                }} className={"px-1 rounded-md bg-res-trans-color mx-1 mb-1" + ' ' + (activePreTrans.includes(pre) ? 'bg-slate-500' : '')}> {pre} </span>) : <></>}
+                {pre_transitions.length && data.node.template[t].name == 'response' ? pre_transitions.map((pre: { name: string; func: string }, idx) => <span key={pre.name} onClick={(e) => {
+                  // if (!activePreTrans.includes(pre)) {
+                  //   setActivePreTrans((prev) => [...prev, pre])
+                  //   // console.log(activePreRes)
+                  // } else if (activePreTrans.includes(pre)) {
+                  //   setActivePreTrans(activePreTrans.filter((item) => { return item != pre }))
+                  // }
+                }} className={"px-1 rounded-md bg-res-trans-color mx-1 mb-1" + ' ' + (activePreTrans.includes(pre.name) ? 'bg-slate-500' : '')}> {pre.name} </span>) : <></>}
               </div>
             </div>
           </>
@@ -216,13 +233,85 @@ export default function GenericNode({
           <></>
         )}
       </div>
-    ))
-  const [nodeParamsList, setNodeParamsList] = useState(tempNodeParamsList)
+    )))
+
+    useEffect(() => {
+      setNodeParamsList((Object.keys(data.node.template)
+      .filter((t) => t.charAt(0) !== "_")
+      .map((t: string, idx) => (
+        <div key={idx}>
+          {data.node.template[t].show &&
+            !data.node.template[t].advanced && data.node.template[t].name == 'response' ? (
+            <>
+  
+              <div className="flex flex-row flex-nowrap px-4 items-center ">
+                {data.node.display_name == 'default_node' &&
+                  <div className="flex flex-row flex-nowrap h-full w-max items-center">
+                    <Info_Small_Icon />
+                    <PreArrowIcon className="" width="9" height="13" viewbox="24 24" />
+                  </div>
+                }
+                <div className="flex flex-wrap flex-row items-center">
+                  {pre_responses.length && data.node.template[t].name == 'response' ? pre_responses.map((pre: { name: string; func: string }, idx) => <span key={pre.name} onClick={(e) => {
+                    // if (!activePreRes.includes(pre)) {
+                    //   setActivePreRes((prev) => [...prev, pre])
+                    // } else if (activePreRes.includes(pre)) {
+                    //   setActivePreRes((prev) => prev.filter((item) => item !== pre))
+                    // }
+                  }} className={"px-1 rounded-md bg-res-trans-color mx-1 mb-1" + ' ' + (activePreRes.includes(pre.name) ? 'bg-black' : '')}> {pre.name} </span>) : <></>}
+                </div>
+              </div>
+              <ParameterComponent
+                data={data}
+                color={
+                  nodeColors[types[data.node.template[t].type]] ??
+                  nodeColors.unknown
+                }
+                title={
+                  data.node.template[t].display_name
+                    ? data.node.template[t].display_name
+                    : data.node.template[t].name
+                      ? toTitleCase(data.node.template[t].name)
+                      : toTitleCase(t)
+                }
+                info={data.node.template[t].info}
+                name={t}
+                tooltipTitle={data.node.template[t].type}
+                required={data.node.template[t].required}
+                id={data.node.template[t].type + "|" + t + "|" + data.id}
+                left={data.node.display_name === "start_node" && data.node.template[t].name !== "response" ? false : true}
+                type={data.node.template[t].type}
+              />
+              <div className="flex flex-row flex-nowrap px-4 items-center ">
+                {data.node.display_name == 'default_node' &&
+                  <div className="flex flex-row flex-nowrap h-full w-max items-center">
+                    <Info_Small_Icon />
+                    <PreArrowIcon className="h-full" width="9" height="13" viewbox="24 24" />
+                  </div>
+                }
+                <div className="flex flex-wrap flex-row items-center">
+                  {pre_transitions.length && data.node.template[t].name == 'response' ? pre_transitions.map((pre: { name: string; func: string }, idx) => <span key={pre.name} onClick={(e) => {
+                    // if (!activePreTrans.includes(pre)) {
+                    //   setActivePreTrans((prev) => [...prev, pre])
+                    //   // console.log(activePreRes)
+                    // } else if (activePreTrans.includes(pre)) {
+                    //   setActivePreTrans(activePreTrans.filter((item) => { return item != pre }))
+                    // }
+                  }} className={"px-1 rounded-md bg-res-trans-color mx-1 mb-1" + ' ' + (activePreTrans.includes(pre.name) ? 'bg-slate-500' : '')}> {pre.name} </span>) : <></>}
+                </div>
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
+        </div>
+      ))))
+    }, [pre_responses, pre_transitions, closePopUp])
 
 
-  useEffect(() => {
-    // console.log(nameInput)
-  }, [name])
+  // useEffect(() => {
+  //   console.log(data.node.display_name)
+  // }, [name])
 
 
 
@@ -259,11 +348,11 @@ export default function GenericNode({
                 content={data.node.display_name}
               >
                 <div ref={refHtml} onClick={(e) => { setNameInput(true); e.stopPropagation() }} className="generic-node-tooltip-div text-primary">
-                  <span style={{ backgroundColor: titleNodeColors[data.node.display_name], borderRadius: "6px", padding: "2px 4px", color: titleTextNodeColors[data.node.display_name] }}>{nameInput ? '' : (name == '' ? data.node.display_name : name)}</span>
+                  {!nameInput && (<span style={{ backgroundColor: titleNodeColors[data.node.base_classes[0]], borderRadius: "6px", padding: "2px 4px", color: titleTextNodeColors[data.node.base_classes[0]] }}>{nameInput ? '' : (name == '' ? data.node.display_name : name)}</span>)}
                   {nameInput ?
                     <div className="relative">
-                      <InputComponent placeholder="Enter new node name" value="" password={false} onChange={(e) => setName(e)} />
-                      <button className="absolute top-1 right-1 p-1 hover:bg-slate-200 rounded-md " onClick={(e) => { setNameInput(false); e.stopPropagation(); e.preventDefault() }} > OK </button>
+                      <InputComponent placeholder="Enter new node name" value="" password={false} onChange={(e) => { setName(e) }} />
+                      <button className="absolute top-1 right-1 p-1 hover:bg-slate-200 rounded-md " onClick={(e) => { setNameInput(false); e.stopPropagation(); e.preventDefault(); data.node.display_name = name }} > OK </button>
                     </div>
                     : <></>}
                 </div>
@@ -381,9 +470,7 @@ export default function GenericNode({
                         nodeColors[types[data.node.template["response"].type]] ??
                         nodeColors.unknown
                       }
-                      title={
-                        `Condition ${conditionCounter}`
-                      }
+                      title={newCondition.name}
                       info={''}
                       name={newCondition.name}
                       tooltipTitle={data.node.template["response"].type}
@@ -396,6 +483,7 @@ export default function GenericNode({
                       conditionID={conditionCounter}
                       transitionType={newCondition.transitionType}
                     />
+                  openPopUp(<EditConditionModal conditionID={newCondition.conditionID} data={data} />)
                   data.node.conditions.push(newCondition)
                   setConditions(prev => [...prev, newConditionJSX])
                   setConditionCounter(prev => prev + 1)

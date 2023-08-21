@@ -3,6 +3,7 @@ import Page from "./components/PageComponent";
 import { TabsContext } from "../../contexts/tabsContext";
 import { useParams } from "react-router-dom";
 import { getVersion } from "../../controllers/API";
+import { NewLogo } from "../../icons/NewLogo";
 
 export default function FlowPage() {
   const { flows, tabId, setTabId } = useContext(TabsContext);
@@ -19,12 +20,12 @@ export default function FlowPage() {
   }, [id]);
 
   // Initialize state variable for the version
-  const [version, setVersion] = useState("");
-  useEffect(() => {
-    getVersion().then((data) => {
-      setVersion(data.version);
-    });
-  }, []);
+  const [version, setVersion] = useState("0.0.2b");
+  // useEffect(() => {
+  //   getVersion().then((data) => {
+  //     setVersion(data.version);
+  //   });
+  // }, []);
 
   return (
     <div className="flow-page-positioning">
@@ -35,11 +36,11 @@ export default function FlowPage() {
         )}
       <a
         target={"_blank"}
-        href="https://logspace.ai/"
+        href="https://deeppavlov.ai/"
         className="logspace-page-icon"
       >
-        {version && <div className="mt-1">⛓️ Langflow v{version}</div>}
-        <div className={version ? "mt-2" : "mt-1"}>Created by Logspace</div>
+        {version && <div className="mt-1 flex flex-row gap-2"> <NewLogo className="w-4 h-4" /> df_designer v{version}</div>}
+        <div className={"mt-1"}>Created by df_designer team </div>
       </a>
     </div>
   );

@@ -84,8 +84,9 @@ export function TypesProvider({ children }: { children: ReactNode }) {
         description: "test default node",
         display_name: "default_node",
         documentation: "test field",
-        pre_responses: ["pre1", "pre2", "pre3"],
-        pre_transitions: ["pre_tr1", "pre_tr2", "pre_tr3", "pre_tr4", "pre_tr5", "pre_tr6"],
+        pre_responses: [],
+        pre_transitions: [],
+        name: "default_node",
         conditions: [
           {
             conditionID: 0,
@@ -94,7 +95,10 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             priority: 1,
             required: true,
             type: `condition`,
-            transitionType: 'default'
+            transitionType: 'default',
+            intent: '',
+            action: '',
+            variables: ''
           },
         ],
         template: {
@@ -125,7 +129,10 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             priority: 1,
             required: true,
             type: 'start_condition',
-            transitionType: 'default'
+            transitionType: 'default',
+            intent: '',
+            action: '',
+            variables: ''
           }
         ],
         template: {
@@ -161,10 +168,52 @@ export function TypesProvider({ children }: { children: ReactNode }) {
           },
         }
       }
+      const llm_node: APIClassType = {
+        base_classes: ["llm_node"],
+        description: "test llm_node",
+        display_name: "llm_node",
+        documentation: "test field",
+        template: {
+          model_name: {
+            placeholder: "Model name",
+            name: "model_name",
+            list: false,
+            required: true,
+            show: true,
+            type: "str",
+            multiline: false,
+            value: "",
+            display_name: "Model name"
+          },
+          prompt: {
+            placeholder: "Prompt",
+            name: "prompt",
+            list: false,
+            required: true,
+            show: true,
+            type: "str",
+            multiline: false,
+            value: "",
+            display_name: "Prompt"
+          },
+          exit: {
+            placeholder: "Exit",
+            name: "exit",
+            list: false,
+            required: true,
+            show: true,
+            type: "str",
+            multiline: false,
+            value: "",
+            display_name: "Exit"
+          },
+        }
+      }
       const default_nodes = {
         default_node: default_node,
         start_node: start_node,
-        fallback_node: fallback_node
+        fallback_node: fallback_node,
+        llm_node: llm_node,
       }
       
 

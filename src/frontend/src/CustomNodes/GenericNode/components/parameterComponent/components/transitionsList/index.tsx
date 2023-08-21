@@ -9,6 +9,8 @@ type TransitionListType = {
   forwardsMenu: boolean
 }
 
+console.log('transitions update');
+
 export const TransitionList = ({ id, handleConditionType, forwardsMenu }: TransitionListType) => {
   return (
     <div className={(forwardsMenu ? 'opacity-100 scale-100 transition-all origin-left' : 'opacity-0 scale-0 transition-all origin-left') + ' ' + 'absolute z-20 bg-node-back px-2 py-1 w-max h-max rounded-lg left-96 -bottom-20 ml-0'}>

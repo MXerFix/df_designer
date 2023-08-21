@@ -17,6 +17,7 @@ export type APIClassType = {
   pre_transitions?: any[]
   conditions?: ConditionClassType[]
   links?: LinkClassType[]
+  name?: string
   [key: string]: Array<string> | string | APITemplateType | ConditionClassType[] | LinkClassType[];
 };
 
@@ -38,6 +39,12 @@ export type ConditionClassType = {
   name: string
   priority: number
   transitionType: "default" | "forward" | "backward" | "repeat" | "previous" | "to start" | "to fallback" | string
+  intent?: string
+  action?: string
+  variables?: string
+  llm_model?: string
+  APIKey?: string
+  prompt?: string
 }
 
 export type DefaultLinkClassType = {

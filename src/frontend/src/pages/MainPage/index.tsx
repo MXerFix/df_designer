@@ -5,7 +5,10 @@ import { Button } from "../../components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { CardComponent } from "../../components/cardComponent";
 import { USER_PROJECTS_HEADER } from "../../constants";
+import AddFlowModal from "../../modals/addFlowModal";
+import { PopUpContext } from "../../contexts/popUpContext";
 export default function HomePage() {
+  const { openPopUp } = useContext(PopUpContext)
   const { flows, setTabId, downloadFlows, uploadFlows, addFlow, removeFlow } =
     useContext(TabsContext);
   useEffect(() => {
@@ -41,9 +44,10 @@ export default function HomePage() {
           <Button
             variant="primary"
             onClick={() => {
-              addFlow(null, true).then((id) => {
-                navigate("/flow/" + id);
-              });
+              // addFlow(null, true).then((id) => {
+              //   navigate("/flow/" + id);
+              // });
+              openPopUp(<AddFlowModal />)
             }}
           >
             <Plus className="main-page-nav-button" />

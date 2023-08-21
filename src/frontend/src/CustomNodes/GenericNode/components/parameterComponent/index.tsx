@@ -6,7 +6,7 @@ import {
   isValidConnection,
   nodeIconsLucide,
 } from "../../../../utils";
-import { useContext, useEffect, useRef, useState } from "react";
+import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import InputComponent from "../../../../components/inputComponent";
 import InputListComponent from "../../../../components/inputListComponent";
 import TextAreaComponent from "../../../../components/textAreaComponent";
@@ -33,6 +33,8 @@ import * as TransitionIcons from '../../../../icons/TransitionIcons/index'
 import { ConditionClassType } from "../../../../types/api";
 import { TransitionComponent } from "./components/transitionComponent";
 import { TransitionList } from "./components/transitionsList";
+import EditConditionModal from "../../../../modals/editConditionModal";
+import useTraceUpdate from "../../../../hooks/useTraceUpdate";
 
 export default function ParameterComponent({
   left,
@@ -54,13 +56,13 @@ export default function ParameterComponent({
   const infoHtml = useRef(null);
   const updateNodeInternals = useUpdateNodeInternals();
   const [position, setPosition] = useState(0);
-  const { closePopUp } = useContext(PopUpContext);
+  const { closePopUp, openPopUp } = useContext(PopUpContext);
   const { setTabsState, tabId, save, saveFlow, updateFlow } = useContext(TabsContext);
   let { flows } = useContext(TabsContext)
   const { setEdges } = useReactFlow()
-  const [actualTitle, setActualTitle] = useState(title)
   const [forwardsMenu, setForwardsMenu] = useState(false)
-  const [wait, setWait] = useState(false)
+
+
 
 
   useEffect(() => {
@@ -78,7 +80,8 @@ export default function ParameterComponent({
     data.node.template[name]?.value ?? false
   );
 
-  useEffect(() => { }, [closePopUp, data.node.template]);
+  useEffect(() => {
+  }, [closePopUp, data.node.template]);
 
   const { reactFlowInstance } = useContext(typesContext);
   let disabled =
@@ -108,8 +111,9 @@ export default function ParameterComponent({
     e.preventDefault()
     setForwardsMenu(true)
   };
+  
 
-  const HandleTypeIcon = (transitionType) => {
+  const HandleTypeIcon = (transitionType: string) => {
     switch (transitionType) {
       case "default": return ''; break;
       case "forward": return <TransitionIcons.forward />; break;
@@ -118,24 +122,14 @@ export default function ParameterComponent({
       case "previous": return <TransitionIcons.previous />; break;
       case "to start": return <TransitionIcons.to_start />; break;
       case "to fallback": return <TransitionIcons.to_fallback />; break;
+        return -1
     }
+    return -1
   }
 
-  useEffect(() => {
-    infoHtml.current = (
-      <div className="h-full w-full break-words">
-        {info.split("\n").map((line, i) => (
-          <p key={i} className="block">
-            {line}
-          </p>
-        ))}
-      </div>
-    );
-  }, [info]);
 
   useEffect(() => {
     const groupedObj = groupByFamily(myData, tooltipTitle);
-
     refHtml.current = groupedObj.map((item, i) => (
       <span
         key={getRandomKeyByssmm()}
@@ -174,22 +168,17 @@ export default function ParameterComponent({
     ));
   }, [tooltipTitle]);
 
+
+
+
   const [forwardsItem, setForwardsItem] = useState(transitionType ? transitionType : '')
+  const [iconType, setIconType] = useState<ReactNode>()
+  useEffect(() => {
+    setIconType(HandleTypeIcon(forwardsItem))
+  }, [forwardsItem])
   const forwardsItemRef = useRef(transitionType ? transitionType : '')
 
-  // console.log(transitionType, forwardsItem);
-  const ourCondition = (data.node.conditions ? data.node.conditions.find((condition) => condition.name == name) : null)
-  // console.log(ourCondition ? ourCondition.transitionType : 'no type');
 
-  // console.log(id.split('|').slice(2).join())
-
-  const flow = flows.find((flow) => flow.id === tabId)
-
-  const saveNewConditionTypes = () => {
-    // flows.filter((flow) => flow.id === tabId)[0].data.nodes.filter((node) => node.id == id.split('|').slice(2).join())[0].data.node.conditions.filter((condition: ConditionClassType) => condition.name == name)[0]['transitionType'] = forwardsItem
-    // console.log(flows.filter((flow) => flow.id === tabId)[0].data.nodes.filter((node) => node.id == id.split('|').slice(2).join())[0].data.node.conditions.filter((condition: ConditionClassType) => condition.name == name)[0].transitionType);
-    // console.log(flows);
-  }
 
   const setNewConditionType = () => {
     const _flows = flows
@@ -207,18 +196,8 @@ export default function ParameterComponent({
     setNewConditionType()
   }
 
-  // useEffect(() => {
-  //   if (ourCondition) {
-  //     // transitionType = forwardsItem
-  //     // data.node.conditions.find((condition) => condition.name == name).transitionType = forwardsItem
-  //     // flows = saveNewConditionTypes()
-  //     // console.log(data.node.conditions.find((condition) => condition.name == name).transitionType)
-  //     // setNewConditionType()
-  //     // console.log(flows.filter((flow) => flow.id === tabId)[0].data.nodes.filter((node) => node.id == id.split('|').slice(2).join())[0].data.node.conditions.filter((condition: ConditionClassType) => condition.name == name)[0].transitionType);
-  //   }
-  // }, [forwardsItem])
 
-  const flowsOptions = flows.map((flow) => flow.name)
+  // const flowsOptions = flows.map((flow) => flow.name)
 
 
   return (
@@ -227,31 +206,33 @@ export default function ParameterComponent({
       className={"my-1 flex w-full flex-wrap items-center justify-between bg-node-back px-5" + ' ' + (name == 'response' ? "mb-2" : 'mb-1') + ' ' + (type == 'condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
     >
       <>
-        {name == 'response' ? <div></div> :
-          <div
-            className={
-              "w-full justify-between ml-1 flex flex-row truncate text-sm " +
-              (left ? "" : "") +
-              (info !== "" ? " flex items-center" : "")
-            }
-          >
-            <div className="flex flex-row items-center">
-              {type == `condition` ? <PersonIcon className="mr-2" /> : <></>}
-              {actualTitle}
-              {/* <span className="text-destructive">{required ? " *" : ""}</span> */}
-            </div>
-            <div className="flex flex-row items-center">
-              <span className="text-neutral-400"> {priority} </span>
-              <button> <ChangeConditionIcon className="ml-8" /> </button>
-              <div className="">
-                {info !== "" && (
-                  <ShadTooltip content={infoHtml.current}>
-                    <Info className="relative bottom-0.5 ml-2 h-3 w-3" />
-                  </ShadTooltip>
-                )}
+        {
+          name == 'response' ? <div></div> :
+            <div
+              className={
+                "w-full justify-between ml-1 flex flex-row truncate text-sm " +
+                (left ? "" : "") +
+                (info !== "" ? " flex items-center" : "")
+              }
+            >
+              <div className="flex flex-row items-center">
+                {type == `condition` ? <PersonIcon className="mr-2" /> : <></>}
+                {title}
+                {/* <span className="text-destructive">{required ? " *" : ""}</span> */}
+              </div>
+              <div className="flex flex-row items-center">
+                <span className="text-neutral-400"> {priority} </span>
+                <button onClick={e => openPopUp(<EditConditionModal data={data} conditionID={conditionID} />)}> <ChangeConditionIcon className="ml-8" /> </button>
+                <div className="">
+                  {info !== "" && (
+                    <ShadTooltip content={infoHtml.current}>
+                      <Info className="relative bottom-0.5 ml-2 h-3 w-3" />
+                    </ShadTooltip>
+                  )}
+                </div>
               </div>
             </div>
-          </div>}
+        }
         {left &&
           (type === "str" ||
             type === "bool" ||
@@ -290,7 +271,7 @@ export default function ParameterComponent({
             <div className="relative">
               <div onContextMenu={(e) => handleClick(e)} style={{ borderColor: '#FF9500' }} className={classNames(forwardsItem != 'default' ? '' : 'hidden', 'absolute flex flex-row items-center justify-center w-max left-80 ml-8 bg-node-back px-2 text-xs font-semibold rounded -top-5 border-2')}>
                 {forwardsItem}
-                <span className="ml-1">{HandleTypeIcon(forwardsItem)}</span>
+                <span className="ml-1">{iconType}</span>
               </div>
               <TransitionList forwardsMenu={forwardsMenu} handleConditionType={handleConditionType} id={id} />
             </div>
@@ -360,7 +341,7 @@ export default function ParameterComponent({
           data.node.template[name].options ? (
           <div className="mt-2 w-full">
             <Dropdown
-              options={data.node.display_name == "Link" ? flowsOptions : []}
+              options={[]}
               onSelect={handleOnNewValue}
               value={data.node.template[name].value ?? "Choose an option"}
             ></Dropdown>

@@ -41,6 +41,8 @@ export default function ExportModal() {
   const [description, setDescription] = useState(
     flows.find((f) => f.id === tabId).description,
   );
+  const [color, setColor] = useState(flows.find((f) => f.id === tabId).color ? flows.find((f) => f.id === tabId).color : '')
+
   return (
     <Dialog open={true} onOpenChange={setModalOpen}>
       <DialogTrigger asChild></DialogTrigger>
@@ -65,6 +67,7 @@ export default function ExportModal() {
           setName={setName}
           setDescription={setDescription}
           updateFlow={updateFlow}
+          setColor={setColor}
         />
         <div className="flex items-center space-x-2">
           <Checkbox

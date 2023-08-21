@@ -32,9 +32,17 @@ import {
 } from "../../components/ui/dialog";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { Variable } from "lucide-react";
+import { Text, Variable } from "lucide-react";
+import { Switch } from "@radix-ui/react-switch";
+import { DeleteIcon } from "../../icons/DeleteIcon";
+import { DragIcon } from "../../icons/DragIcon";
+import { TabsContext } from "../../contexts/tabsContext";
+import EditPreModal from "../addeditPreModal";
+import { HelpBtn } from "../../components/ui/helpbtn";
+
 
 export default function EditNodeModal({ data }: { data: NodeDataType }) {
+  const { openPopUp } = useContext(PopUpContext)
   const [open, setOpen] = useState(true);
   const [nodeLength, setNodeLength] = useState(
     Object.keys(data.node.template).filter(
@@ -52,9 +60,11 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
   );
   const [nodeValue, setNodeValue] = useState(null);
   const { closePopUp } = useContext(PopUpContext);
+  const { tabId, flows, saveFlow } = useContext(TabsContext)
   const { types } = useContext(typesContext);
   const ref = useRef();
   const [enabled, setEnabled] = useState(null);
+  const [quote, setQuote] = useState(false);
   if (nodeLength == 0) {
     closePopUp();
   }
@@ -66,7 +76,15 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
     }
   }
 
-  useEffect(() => {}, [closePopUp, data.node.template]);
+  function handleClick() {
+    let savedFlow = flows.find((f) => f.id === tabId);
+    data.node.pre_responses = data.node.pre_responses
+    data.node.pre_transitions = data.node.pre_transitions
+    saveFlow(savedFlow);
+    closePopUp();
+  }
+
+  useEffect(() => { }, [closePopUp, data.node.template]);
 
   function changeAdvanced(node): void {
     Object.keys(data.node.template).filter((n, i) => {
@@ -78,17 +96,62 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
     setNodeValue(!nodeValue);
   }
 
+
+  const response = data.node.template?.response ? data.node.template?.response : null
+  const conditions = data.node.conditions.length ? data.node.conditions : null
+  const pre_responses = data.node.pre_responses.length ? data.node.pre_responses : null
+  const pre_transitions = data.node.pre_transitions.length ? data.node.pre_transitions : null
+
+  // console.log(conditions);
+
+  const [conditionsState, setConditionsState] = useState(conditions)
+
   return (
     <Dialog open={true} onOpenChange={setModalOpen}>
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className="sm:max-w-[600px] lg:max-w-[700px]">
+        <DialogTitle className="flex items-center">
+          <span className="pr-2">{data.type}</span>
+          <Badge variant="secondary">ID: {data.id}</Badge>
+        </DialogTitle>
+        <div>
+          {response && (
+            <>
+              <label className="flex flex-row" htmlFor="">
+                <span className={`${quote && 'text-neutral-400'}`}>Quote</span>
+                <ToggleShadComponent
+                  enabled={quote}
+                  setEnabled={(e) => { setQuote(prev => !prev) }
+                  }
+                  disabled={false}
+                  size="small" />
+                <span className={`${!quote && 'text-neutral-400'}`}>Description</span>
+              </label>
+              {!quote ? (
+                <label htmlFor="">
+                  <span></span>
+                  <InputComponent
+                    onChange={value => response.value = value}
+                    placeholder='Enter bot’s response text...'
+                    password={false}
+                    value={response.value ? response.value : ''}
+                  />
+                </label>
+              ) : (
+                <label htmlFor="">
+                  <InputComponent
+                    onChange={value => data.node.description = value}
+                    placeholder='Enter node description...'
+                    password={false}
+                    value={data.node.description ? data.node.description : ''}
+                  />
+                </label>
+              )}
+            </>
+          )}
+        </div>
         <DialogHeader>
-          <DialogTitle className="flex items-center">
-            <span className="pr-2">{data.type}</span>
-            <Badge variant="secondary">ID: {data.id}</Badge>
-          </DialogTitle>
           <DialogDescription>
-            {data.node?.description}
             <div className="flex pt-3">
               <Variable className="edit-node-modal-variable "></Variable>
               <span className="edit-node-modal-span">
@@ -97,7 +160,6 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
             </div>
           </DialogDescription>
         </DialogHeader>
-
         <div className="edit-node-modal-arrangement">
           <div
             className={classNames(
@@ -114,195 +176,65 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
                     <TableRow className="">
                       <TableHead className="h-7 text-center">PARAM</TableHead>
                       <TableHead className="h-7 p-0 text-center">
-                        VALUE
+                        PRIORITY
                       </TableHead>
-                      <TableHead className="h-7 text-center">SHOW</TableHead>
+                      <TableHead className="h-7 text-center">ACTION</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody className="p-0">
-                    {Object.keys(data.node.template)
-                      .filter(
-                        (t) =>
-                          t.charAt(0) !== "_" &&
-                          data.node.template[t].show &&
-                          (data.node.template[t].type === "str" ||
-                            data.node.template[t].type === "bool" ||
-                            data.node.template[t].type === "float" ||
-                            data.node.template[t].type === "code" ||
-                            data.node.template[t].type === "prompt" ||
-                            data.node.template[t].type === "file" ||
-                            data.node.template[t].type === "int"),
-                      )
-                      .map((n, i) => (
-                        <TableRow key={i} className="h-10">
+                    {conditionsState.map((condition, index) => {
+                      return (
+                        <TableRow key={condition.conditionID} className="h-10">
                           <TableCell className="truncate p-0 text-center text-sm text-foreground sm:px-3">
-                            {data.node.template[n].name
-                              ? data.node.template[n].name
-                              : data.node.template[n].display_name}
-                          </TableCell>
-                          <TableCell className="w-[300px] p-0 text-center text-xs text-foreground ">
-                            {data.node.template[n].type === "str" &&
-                            !data.node.template[n].options ? (
-                              <div className="mx-auto">
-                                {data.node.template[n].list ? (
-                                  <InputListComponent
-                                    editNode={true}
-                                    disabled={false}
-                                    value={
-                                      !data.node.template[n].value ||
-                                      data.node.template[n].value === ""
-                                        ? [""]
-                                        : data.node.template[n].value
-                                    }
-                                    onChange={(t: string[]) => {
-                                      data.node.template[n].value = t;
-                                    }}
-                                  />
-                                ) : data.node.template[n].multiline ? (
-                                  <TextAreaComponent
-                                    disabled={false}
-                                    editNode={true}
-                                    value={data.node.template[n].value ?? ""}
-                                    onChange={(t: string) => {
-                                      data.node.template[n].value = t;
-                                    }}
-                                  />
-                                ) : (
-                                  <InputComponent
-                                    editNode={true}
-                                    disabled={false}
-                                    password={
-                                      data.node.template[n].password ?? false
-                                    }
-                                    value={data.node.template[n].value ?? ""}
-                                    onChange={(t) => {
-                                      data.node.template[n].value = t;
-                                    }}
-                                  />
-                                )}
-                              </div>
-                            ) : data.node.template[n].type === "bool" ? (
-                              <div className="ml-auto">
-                                {" "}
-                                <ToggleShadComponent
-                                  enabled={data.node.template[n].value}
-                                  setEnabled={(e) => {
-                                    data.node.template[n].value = e;
-                                    setEnabled(e);
-                                  }}
-                                  size="small"
-                                  disabled={false}
-                                />
-                              </div>
-                            ) : data.node.template[n].type === "float" ? (
-                              <div className="mx-auto">
-                                <FloatComponent
-                                  disabled={false}
-                                  editNode={true}
-                                  value={data.node.template[n].value ?? ""}
-                                  onChange={(t) => {
-                                    data.node.template[n].value = t;
-                                  }}
-                                />
-                              </div>
-                            ) : data.node.template[n].type === "str" &&
-                              data.node.template[n].options ? (
-                              <div className="mx-auto">
-                                <Dropdown
-                                  numberOfOptions={nodeLength}
-                                  editNode={true}
-                                  options={data.node.template[n].options}
-                                  onSelect={(newValue) =>
-                                    (data.node.template[n].value = newValue)
-                                  }
-                                  value={
-                                    data.node.template[n].value ??
-                                    "Choose an option"
-                                  }
-                                ></Dropdown>
-                              </div>
-                            ) : data.node.template[n].type === "int" ? (
-                              <div className="mx-auto">
-                                <IntComponent
-                                  disabled={false}
-                                  editNode={true}
-                                  value={data.node.template[n].value ?? ""}
-                                  onChange={(t) => {
-                                    data.node.template[n].value = t;
-                                  }}
-                                />
-                              </div>
-                            ) : data.node.template[n].type === "file" ? (
-                              <div className="mx-auto">
-                                <InputFileComponent
-                                  editNode={true}
-                                  disabled={false}
-                                  value={data.node.template[n].value ?? ""}
-                                  onChange={(t: string) => {
-                                    data.node.template[n].value = t;
-                                  }}
-                                  fileTypes={data.node.template[n].fileTypes}
-                                  suffixes={data.node.template[n].suffixes}
-                                  onFileChange={(t: string) => {
-                                    data.node.template[n].content = t;
-                                  }}
-                                ></InputFileComponent>
-                              </div>
-                            ) : data.node.template[n].type === "prompt" ? (
-                              <div className="mx-auto">
-                                <PromptAreaComponent
-                                  editNode={true}
-                                  disabled={false}
-                                  value={data.node.template[n].value ?? ""}
-                                  onChange={(t: string) => {
-                                    data.node.template[n].value = t;
-                                  }}
-                                />
-                              </div>
-                            ) : data.node.template[n].type === "code" ? (
-                              <div className="mx-auto">
-                                <CodeAreaComponent
-                                  disabled={false}
-                                  editNode={true}
-                                  value={data.node.template[n].value ?? ""}
-                                  onChange={(t: string) => {
-                                    data.node.template[n].value = t;
-                                  }}
-                                />
-                              </div>
-                            ) : data.node.template[n].type === "Any" ? (
-                              "-"
-                            ) : (
-                              <div className="hidden"></div>
-                            )}
-                          </TableCell>
-                          <TableCell className="p-0 text-right">
-                            <div className="items-center text-center">
-                              <ToggleShadComponent
-                                enabled={!data.node.template[n].advanced}
-                                setEnabled={(e) =>
-                                  changeAdvanced(data.node.template[n])
-                                }
-                                disabled={false}
-                                size="small"
-                              />
+                            <div className="flex flex-row items-center justify-start">
+                              <DragIcon className="" />
+                              <span className="ml-12">{condition.name}</span>
                             </div>
                           </TableCell>
+                          <TableCell className="w-[300px] p-0 text-center text-xs text-foreground ">
+                            <input
+                              onChange={v => { condition.priority = Number(v.target.value) }}
+                              defaultValue={condition.priority}
+                              type="number"
+                              className="p-1 text-center rounded-lg in-modal-input"
+                            />
+                          </TableCell>
+                          <TableCell className="p-0 text-center" >
+                            <button
+                              className={`${data.node.conditions.length > 0 && 'bg-red-500'} p-1.5 rounded-lg`}
+                              onClick={e => { if (confirm("Вы уверены?")) { data.node.conditions = data.node.conditions.filter((conditionF) => conditionF.conditionID != condition.conditionID); setConditionsState(data.node.conditions.filter((conditionF) => conditionF.conditionID != condition.conditionID)) } }}
+                            >
+                              <DeleteIcon fill={`${data.node.conditions.length > 0 ? 'white' : 'black'}`} />
+                            </button>
+                          </TableCell>
                         </TableRow>
-                      ))}
+                      )
+                    })}
                   </TableBody>
                 </Table>
               </div>
             )}
           </div>
         </div>
-
+        <div className="mb-3">
+          <h5 className="extra-title text-sm mb-2">Preresponse processing</h5>
+          <div className="flex flex-row">
+            {pre_responses?.map((res, idx) => <span key={res.name} className='text-sm bg-neutral-900 text-white px-2 py-1 rounded-md mx-0.5'> <span className="text-neutral-500">{idx}. </span>{res.name}</span>)}
+            <button onClick={e => openPopUp(<EditPreModal data={data} resp={true} />)} className="bg-res-trans-add text-white py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
+          </div>
+        </div>
+        <div className="mb-3">
+          <h5 className="extra-title text-sm mb-2"> Pretransition processing </h5>
+          <div className="flex flex-row">
+            {pre_transitions?.map((res, idx) => <span key={res.name} className='text-sm bg-neutral-900 text-white px-2 py-1 rounded-md mx-0.5'> <span className="text-neutral-500">{idx}. </span>{res.name}</span>)}
+            <button onClick={e => openPopUp(<EditPreModal data={data} resp={false} />)} className="bg-res-trans-add text-white py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
+          </div>
+        </div>
         <DialogFooter>
+          <HelpBtn />
           <Button
             className="mt-3"
-            onClick={() => {
-              setModalOpen(false);
-            }}
+            onClick={handleClick}
             type="submit"
           >
             Save Changes

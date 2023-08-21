@@ -8,6 +8,7 @@ export type FlowType = {
   data: ReactFlowJsonObject;
   description: string;
   style?: FlowStyleType;
+  color? : string
 };
 export type NodeType = {
   id: string;

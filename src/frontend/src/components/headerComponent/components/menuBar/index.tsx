@@ -25,12 +25,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { undoRedoContext } from "../../../../contexts/undoRedoContext";
 import FlowSettingsModal from "../../../../modals/flowSettingsModal";
 import { Button } from "../../../ui/button";
+import { XIcon } from "../../../../icons/XIcon/XIcon";
 
 export const MenuBar = ({ flows, tabId }) => {
-  const { updateFlow, setTabId, addFlow } = useContext(TabsContext);
+  const { updateFlow, setTabId, addFlow, removeFlow } = useContext(TabsContext);
   const { setErrorData } = useContext(alertContext);
   const { openPopUp } = useContext(PopUpContext);
   const { undo, redo } = useContext(undoRedoContext);
+
 
   const navigate = useNavigate();
 
@@ -83,7 +85,7 @@ export const MenuBar = ({ flows, tabId }) => {
               <Settings2 className="header-menu-options " />
               Settings
             </DropdownMenuItem>
-            <DropdownMenuItem
+            {/* <DropdownMenuItem
               onClick={() => {
                 undo();
               }}
@@ -100,6 +102,13 @@ export const MenuBar = ({ flows, tabId }) => {
             >
               <Redo className="header-menu-options " />
               Redo
+            </DropdownMenuItem> */}
+            <DropdownMenuItem
+              onClick={e => { navigate(`/flow/${flows[0].id}`); removeFlow(current_flow.id); }}
+              className={`cursor-pointer `}
+            >
+              <XIcon className="mr-3 ml-0.5" />
+              Delete
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuLabel>Flows</DropdownMenuLabel>

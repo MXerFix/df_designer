@@ -16,6 +16,8 @@ import ReactFlow, {
   Background,
   Controls,
   NodeChange,
+  BaseEdge,
+  EdgeLabelRenderer,
 } from "reactflow";
 import GenericNode from "../../../../CustomNodes/GenericNode";
 import Chat from "../../../../components/chatComponent";
@@ -51,7 +53,7 @@ export default function Page({ flow }: { flow: FlowType }) {
   const { types, reactFlowInstance, setReactFlowInstance, templates } =
     useContext(typesContext);
   const reactFlowWrapper = useRef(null);
-  
+
 
   const { takeSnapshot } = useContext(undoRedoContext);
 
@@ -190,9 +192,17 @@ export default function Page({ flow }: { flow: FlowType }) {
             style: { stroke: "inherit" },
             className:
               params.targetHandle.split("|")[0] === "Text"
-                ? "stroke-foreground "
-                : "stroke-foreground ",
+                ? "stroke-foreground edge-cust"
+                : "stroke-foreground edge-cust",
             animated: params.targetHandle.split("|")[0] === "Text",
+            label: "delete",
+            labelBgBorderRadius: 6,
+            labelBgPadding: [4, 4],
+            labelShowBg: true,
+            labelBgStyle: { fill: "#bbb" },
+            data: {
+              label: "sss"
+            }
           },
           eds,
         ),
@@ -443,8 +453,7 @@ export default function Page({ flow }: { flow: FlowType }) {
                 >
                   <Background className="" />
                   <Controls
-                    className="bg-muted fill-foreground stroke-foreground text-primary
-                   [&>button]:border-b-border hover:[&>button]:bg-border"
+                    className="bg-muted fill-foreground stroke-foreground text-primary [&>button]:border-b-border hover:[&>button]:bg-border"
                   ></Controls>
                 </ReactFlow>
                 <Chat flow={flow} reactFlowInstance={reactFlowInstance} />

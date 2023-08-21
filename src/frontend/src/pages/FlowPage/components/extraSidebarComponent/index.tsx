@@ -1,6 +1,7 @@
 import DisclosureComponent from "../DisclosureComponent";
 import {
   classNames,
+  flow_colors,
   nodeColors,
   nodeIconsLucide,
   nodeNames,
@@ -18,17 +19,34 @@ import { TabsContext } from "../../../../contexts/tabsContext";
 import { alertContext } from "../../../../contexts/alertContext";
 import { Separator } from "../../../../components/ui/separator";
 import { Menu } from "lucide-react";
+import { FlowColorSVG } from "../../../../icons/FlowColorSVG";
+import { CheckSVG } from "../../../../icons/CheckSVG";
+import { Link, useNavigate } from "react-router-dom";
+import { XIcon } from "../../../../icons/XIcon/XIcon";
+import AddFlowModal from "../../../../modals/addFlowModal";
+import FlowSettingsModal from "../../../../modals/flowSettingsModal";
+import { PlusIcon } from "../../../../icons/PlusIcon";
+import { FileUpIcon } from "../../../../icons/FileUpIcon";
+import { FileDownIcon } from "../../../../icons/FileDownIcon";
+import { SaveIcon } from "../../../../icons/SaveIcon";
+import { CodeIcon } from "../../../../icons/CodeIcon";
 
 export default function ExtraSidebar() {
   const { data } = useContext(typesContext);
   const { openPopUp } = useContext(PopUpContext);
-  const { flows, tabId, uploadFlow, tabsState, saveFlow, save, setTabId } =
+  const { flows, tabId, uploadFlow, tabsState, saveFlow, save, setTabId, addFlow, removeFlow } =
     useContext(TabsContext);
+
+  // console.log(flows)
+
   const { setSuccessData, setErrorData } = useContext(alertContext);
   const [dataFilter, setFilterData] = useState(data);
   const [search, setSearch] = useState("");
   const [activeFlow, setActiveFlow] = useState(tabId)
   const isPending = tabsState[tabId]?.isPending;
+
+  const navigate = useNavigate()
+
   function onDragStart(
     event: React.DragEvent<any>,
     data: { type: string; node?: APIClassType }
@@ -60,6 +78,17 @@ export default function ExtraSidebar() {
     });
   }
 
+  function handleAddFlow() {
+    try {
+      addFlow(null, true).then((id) => {
+        navigate("/flow/" + id);
+      });
+      // saveFlowStyleInDataBase();
+    } catch (err) {
+      setErrorData(err);
+    }
+  }
+
   return (
     <div className="side-bar-arrangement">
       <div className="side-bar-buttons-arrangement">
@@ -71,10 +100,7 @@ export default function ExtraSidebar() {
               uploadFlow();
             }}
           >
-            <FileUp
-              strokeWidth={1.5}
-              className="side-bar-button-size "
-            ></FileUp>
+            <FileUpIcon />
           </button>
         </ShadTooltip>
 
@@ -85,10 +111,7 @@ export default function ExtraSidebar() {
               openPopUp(<ExportModal />);
             }}
           >
-            <FileDown
-              strokeWidth={1.5}
-              className="side-bar-button-size"
-            ></FileDown>
+            <FileDownIcon />
           </button>
         </ShadTooltip>
         <ShadTooltip content="Code" side="top">
@@ -98,7 +121,7 @@ export default function ExtraSidebar() {
               openPopUp(<ApiModal flow={flows.find((f) => f.id === tabId)} />);
             }}
           >
-            <Code2 strokeWidth={1.5} className="side-bar-button-size"></Code2>
+            <CodeIcon />
           </button>
         </ShadTooltip>
 
@@ -111,37 +134,61 @@ export default function ExtraSidebar() {
             }}
             disabled={!isPending}
           >
-            <Save
-              strokeWidth={1.5}
-              className={
-                "side-bar-button-size" +
-                (isPending ? " " : " extra-side-bar-save-disable")
-              }
-            ></Save>
+            <SaveIcon
+              stroke={!isPending ? '#777' : '#000'}
+            ></SaveIcon>
           </button>
         </ShadTooltip>
       </div>
       <Separator />
-      <div className="side-bar-search-div-placement">
-        <input
-          type="text"
-          name="search"
-          id="search"
-          placeholder="Search"
-          className="input-search"
-          onChange={(e) => {
-            handleSearchInput(e.target.value);
-            setSearch(e.target.value);
-          }}
-        />
-        <div className="search-icon">
-          {/* ! replace hash color here */}
-          <Search size={20} strokeWidth={1.5} className="text-primary" />
+      <div className="mt-3 mb-8">
+        <div className="mb-2 ml-2 mr-3.5 flex flex-row items-center justify-between">
+          <h5 className="extra-title">Flows</h5>
+          <button
+            onClick={e => openPopUp(<AddFlowModal />)}
+            className={`flex flex-row items-center w-max justify-between text-sm bg-white`}>
+            <PlusIcon />
+            {/* {active && <CheckSVG />} */}
+          </button>
         </div>
+        {flows.map((flow, i) => {
+          const active = (flow.id == tabId)
+          return (
+            <Link
+              to={`/flow/${flow.id}`}
+              key={flow.id}
+              onClick={e => setTabId(flow.id)}
+              className={` ${flow.id == tabId && 'bg-slate-50'} py-1.5 px-3 flex flex-row items-center w-full justify-between text-sm bg-white`}>
+              <div className="flex flex-row">
+                <FlowColorSVG fill={flow.color} />
+                <span className="ml-3"> {flow.name} </span>
+              </div>
+              <div className="flex flex-row gap-2">
+                {active && <CheckSVG />}
+              </div>
+            </Link>
+          )
+        })}
       </div>
-
+      <Separator />
       <div className="side-bar-components-div-arrangement">
-        <h5 className="mb-2 ml-2"> Nodes </h5>
+        <div className="side-bar-search-div-placement">
+          <input
+            type="text"
+            name="search"
+            id="search"
+            placeholder="Search"
+            className="input-search"
+            onChange={(e) => {
+              handleSearchInput(e.target.value);
+              setSearch(e.target.value);
+            }}
+          />
+          <div className="search-icon">
+            {/* ! replace hash color here */}
+            <Search size={20} strokeWidth={1.5} className="text-primary" />
+          </div>
+        </div>
         {Object.keys(dataFilter)
           .sort()
           .map((d: keyof APIObjectType, i) =>
@@ -205,18 +252,7 @@ export default function ExtraSidebar() {
               <div key={i}></div>
             )
           )}
-        <div className="mt-8">
-          <h5 className="mb-2  ml-2"> Active flows </h5>
-          {flows.map((flow) => {
-            return (
-              <button
-                onClick={e => setTabId(flow.id)}
-                className={` ${flow.id == tabId && 'bg-slate-200'} py-2.5 px-3 text-sm bg-node-back components-disclosure-arrangement`}>
-                {flow.name}
-              </button>
-            )
-          })}
-        </div>
+
       </div>
     </div>
   );

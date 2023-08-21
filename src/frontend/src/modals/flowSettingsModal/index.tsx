@@ -29,6 +29,7 @@ export default function FlowSettingsModal() {
   const [description, setDescription] = useState(
     flows.find((f) => f.id === tabId).description,
   );
+  const [color, setColor] = useState(flows.find((f) => f.id === tabId).color ? flows.find((f) => f.id === tabId).color : '')
   function setModalOpen(x: boolean) {
     setOpen(x);
     if (x === false) {
@@ -39,8 +40,13 @@ export default function FlowSettingsModal() {
   }
   function handleClick() {
     let savedFlow = flows.find((f) => f.id === tabId);
+    if (flows.find((f) => (f.name == name && f.id != tabId))) {
+      setErrorData({title: "Flow with same name already exists!"})
+      return -1
+    }
     savedFlow.name = name;
     savedFlow.description = description;
+    savedFlow.color = color
     saveFlow(savedFlow);
     setSuccessData({ title: "Changes saved successfully" });
     closePopUp();
@@ -64,6 +70,7 @@ export default function FlowSettingsModal() {
           tabId={tabId}
           setName={setName}
           setDescription={setDescription}
+          setColor={setColor}
           updateFlow={updateFlow}
         />
 

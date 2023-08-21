@@ -16,6 +16,7 @@ import { Separator } from "../ui/separator";
 import { Bell } from "lucide-react";
 import { ChatIcon } from "../../icons/ChatIcon/ChatIcon";
 import { FlowType } from "../../types/flow";
+import { NewLogo } from "../../icons/NewLogo";
 
 export default function Header() {
   const { flows, addFlow, tabId, setTabId, removeFlow } = useContext(TabsContext);
@@ -65,12 +66,12 @@ export default function Header() {
     <div className="header-arrangement">
       <div className="header-start-display">
         <Link to="/">
-          <span className="ml-4 text-2xl">⛓️</span>
+          <NewLogo />
         </Link>
         {flows.findIndex((f) => tabId === f.id) !== -1 && tabId !== "" && (
           <MenuBar flows={flows} tabId={tabId} />
         )}
-        <div className="flex flex-row items-end justify-end tabs-menu w-max">
+        {/* <div className="flex flex-row items-end justify-end tabs-menu w-max">
           {flows.map((flow) => {
             const active = flow.id == tabId
             return (
@@ -94,7 +95,7 @@ export default function Header() {
           <button onClick={e => handleAddFlow()} className="text-sm py-2 px-3 ml-1 hover:bg-slate-200 rounded-t-md">
             +
           </button>
-        </div>
+        </div> */}
       </div>
       {/* <div className="round-button-div">
         <Link to="/">
