@@ -930,11 +930,13 @@ The cursor: default; property value restores the browser's default cursor style 
 
 .in-modal-input {
   outline: none;
+  background-color: #fff;
   border: 1px solid rgba(39, 39, 39, 0.15);
 }
 
 .in-modal-input:focus {
   border-color: black;
+  background-color: #fff;
 }
 
 .cond-textarea {

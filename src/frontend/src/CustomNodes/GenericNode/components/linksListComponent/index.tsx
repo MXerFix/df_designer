@@ -23,7 +23,7 @@ export const LinksListComponent = ({ links, data }: { links: LinkClassType[], da
   const defaultCondition = conditionLink.to
 
   const flowOptions = flows.map((flow) => flow.name)
-  console.log(defaultFlow)
+
   const defNode = defaultFlow ? flows.filter((flow) => flow.name == defaultFlow)[0].data : null
   const defaultNodeOptions = defaultFlow && defNode ? flows.filter((flow) => flow.name == defaultFlow)[0].data.nodes.filter((node) => node.data.type == 'default_node').map((node) => node.data.id) : []
   const defaultConditionOptions = defNode && defaultFlow && defaultNode && flows.filter((flow) => flow.name == defaultFlow)[0].data.nodes.filter((node) => node.data.id == defaultNode)[0] ? flows.filter((flow) => flow.name == defaultFlow)[0].data.nodes.filter((node) => node.data.id == defaultNode)[0].data.node.conditions.map((condition) => condition.name) : []
@@ -38,7 +38,6 @@ export const LinksListComponent = ({ links, data }: { links: LinkClassType[], da
   const [nodeOptions, setNodeOptions] = useState(defaultNodeOptions)
   const [conditionOptions, setConditionOptions] = useState(defaultConditionOptions)
 
-  console.log(nodeOptions);
 
 
 
@@ -52,11 +51,11 @@ export const LinksListComponent = ({ links, data }: { links: LinkClassType[], da
 
   useEffect(() => {
       setTargetCondition('')
-      console.log(targetFlow, targetNode);
-      console.log(flows.filter((flow) => flow.name == targetFlow)[0])
+      // console.log(targetFlow, targetNode);
+      // console.log(flows.filter((flow) => flow.name == targetFlow)[0])
       const flowData = targetFlow ? flows.filter((flow) => flow.name == targetFlow)[0].data : null
       const nodesData = flowData && targetFlow && targetNode ? flows.filter((flow) => flow.name == targetFlow)[0].data.nodes.filter((node) => node.data.id == targetNode)[0] : null
-      console.log(nodesData);
+      // console.log(nodesData);
       setConditionOptions(nodesData && targetFlow && targetNode ? flows.filter((flow) => flow.name == targetFlow)[0].data.nodes.filter((node) => node.data.id == targetNode)[0].data.node.conditions.map((condition) => condition.name) : [])
   }, [targetNode])
   

@@ -98,7 +98,10 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             transitionType: 'default',
             intent: '',
             action: '',
-            variables: ''
+            variables: '',
+            APIKey: '',
+            llm_model: '',
+            prompt: '',
           },
         ],
         template: {
@@ -132,7 +135,10 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             transitionType: 'default',
             intent: '',
             action: '',
-            variables: ''
+            variables: '',
+            APIKey: '',
+            llm_model: '',
+            prompt: '',
           }
         ],
         template: {
@@ -173,17 +179,46 @@ export function TypesProvider({ children }: { children: ReactNode }) {
         description: "test llm_node",
         display_name: "llm_node",
         documentation: "test field",
+        conditions: [
+          {
+            conditionID: 0,
+            left: false,
+            name: "Exit condition",
+            priority: 1,
+            required: true,
+            type: 'exit_condition',
+            transitionType: 'default',
+            intent: '',
+            action: '',
+            variables: '',
+            APIKey: '',
+            llm_model: '',
+            prompt: '',
+          }
+        ],
         template: {
-          model_name: {
-            placeholder: "Model name",
-            name: "model_name",
+          response: {
+            placeholder: "response",
+            name: "response",
             list: false,
             required: true,
             show: true,
             type: "str",
             multiline: false,
             value: "",
-            display_name: "Model name"
+            display_name: "Some response"
+          },
+          model_name: {
+            placeholder: "Model name",
+            name: "model_name",
+            list: false,
+            required: true,
+            show: true,
+            type: 'str',
+            multiline: false,
+            value: "",
+            display_name: "Model name",
+            options: ['gpt-3', 'gpt-3.5-turbo', 'gpt-4']
           },
           prompt: {
             placeholder: "Prompt",
@@ -196,17 +231,6 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             value: "",
             display_name: "Prompt"
           },
-          exit: {
-            placeholder: "Exit",
-            name: "exit",
-            list: false,
-            required: true,
-            show: true,
-            type: "str",
-            multiline: false,
-            value: "",
-            display_name: "Exit"
-          },
         }
       }
       const default_nodes = {
@@ -215,7 +239,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
         fallback_node: fallback_node,
         llm_node: llm_node,
       }
-      
+
 
       const default_link: APIClassType = {
         display_name: "default_link",

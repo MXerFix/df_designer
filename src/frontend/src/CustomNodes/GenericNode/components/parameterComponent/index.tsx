@@ -35,6 +35,7 @@ import { TransitionComponent } from "./components/transitionComponent";
 import { TransitionList } from "./components/transitionsList";
 import EditConditionModal from "../../../../modals/editConditionModal";
 import useTraceUpdate from "../../../../hooks/useTraceUpdate";
+import EditLLMPromptModal from "../../../../modals/llmPromptEdit";
 
 export default function ParameterComponent({
   left,
@@ -196,6 +197,13 @@ export default function ParameterComponent({
     setNewConditionType()
   }
 
+  const handleInputPlaceholder = (temp_name: string) => {
+    switch(temp_name) {
+      case 'response': return 'Enter bot’s response text...';
+      case 'prompt': return 'Enter some prompt...'
+    }
+  }
+
 
   // const flowsOptions = flows.map((flow) => flow.name)
 
@@ -215,14 +223,14 @@ export default function ParameterComponent({
                 (info !== "" ? " flex items-center" : "")
               }
             >
-              <div className="flex flex-row items-center">
+              <div className={`flex flex-row ${type != 'condition' && ''} items-center`}>
                 {type == `condition` ? <PersonIcon className="mr-2" /> : <></>}
                 {title}
                 {/* <span className="text-destructive">{required ? " *" : ""}</span> */}
               </div>
               <div className="flex flex-row items-center">
                 <span className="text-neutral-400"> {priority} </span>
-                <button onClick={e => openPopUp(<EditConditionModal data={data} conditionID={conditionID} />)}> <ChangeConditionIcon className="ml-8" /> </button>
+                {type == 'condition' && <button onClick={e => openPopUp(<EditConditionModal data={data} conditionID={conditionID} />)}> <ChangeConditionIcon className="ml-8" /> </button>}
                 <div className="">
                   {info !== "" && (
                     <ShadTooltip content={infoHtml.current}>
@@ -301,8 +309,8 @@ export default function ParameterComponent({
                 onChange={handleOnNewValue}
               />
             ) : (
-              <div className="flex flex-row w-full items-center">
-                <BotIcon className="mr-1" />
+              <div className="flex flex-row w-full mt-2 items-center">
+                {name == 'response' && <BotIcon className="mr-1" />}
                 <InputComponent
                   className="w-full"
                   disabled={disabled}
@@ -310,8 +318,9 @@ export default function ParameterComponent({
                   password={data.node.template[name].password ?? false}
                   value={data.node.template[name].value ?? ""}
                   onChange={handleOnNewValue}
-                  placeholder='Enter bot’s response text...'
+                  placeholder={handleInputPlaceholder(name)}
                 />
+                {name == 'prompt' && <button onClick={e => openPopUp(<EditLLMPromptModal data={data} template={data.node.template[name]}  />)}> <ChangeConditionIcon className="ml-8" /> </button>}
               </div>
             )}
           </div>
@@ -339,9 +348,9 @@ export default function ParameterComponent({
         ) : left === true &&
           type === "str" &&
           data.node.template[name].options ? (
-          <div className="mt-2 w-full">
+          <div className="mt-1 w-full">
             <Dropdown
-              options={[]}
+              options={data.node.template[name].options}
               onSelect={handleOnNewValue}
               value={data.node.template[name].value ?? "Choose an option"}
             ></Dropdown>

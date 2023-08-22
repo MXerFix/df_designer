@@ -62,7 +62,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
   const { types } = useContext(typesContext);
   const ref = useRef();
   const [enabled, setEnabled] = useState(null);
-  const [custom, setCustom] = useState(false);
+  const [custom, setCustom] = useState(true);
   const { tabId, flows, saveFlow } = useContext(TabsContext)
 
   if (nodeLength == 0) {
@@ -127,10 +127,10 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
             <Badge variant="secondary" > {data.id} | {condition.name ? condition.name : 'noname'} </Badge>
           </DialogTitle>
           <label className="flex flex-row mr-4" htmlFor="">
-            <span className={`${custom && 'text-neutral-400'}`}>Custom</span>
+            <span className={`${custom && 'text-neutral-400'}`}>Custom (work in progress...)</span>
             <ToggleShadComponent
               enabled={custom}
-              setEnabled={(e) => { setCustom(prev => !prev) }
+              setEnabled={(e) => { setCustom(prev => prev) }
               }
               disabled={false}
               size="small" />
@@ -194,7 +194,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
               </span>
               <label htmlFor="">
                 <span className="text-neutral-400 text-sm"> Prompt </span>
-                <textarea name="prompt" id="condition_prompt" className="w-full rounded-lg mt-1 cond-textarea" rows={10}></textarea>
+                <textarea defaultValue={prompt} onChange={e => setPrompt(e.target.value)} name="prompt" id="condition_prompt" className="w-full rounded-lg mt-1 cond-textarea" rows={10}></textarea>
               </label>
             </>
           )}

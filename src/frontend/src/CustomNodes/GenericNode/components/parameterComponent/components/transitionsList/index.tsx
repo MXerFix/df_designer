@@ -9,7 +9,6 @@ type TransitionListType = {
   forwardsMenu: boolean
 }
 
-console.log('transitions update');
 
 export const TransitionList = ({ id, handleConditionType, forwardsMenu }: TransitionListType) => {
   return (

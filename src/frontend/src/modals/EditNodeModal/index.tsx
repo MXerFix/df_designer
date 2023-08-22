@@ -39,6 +39,8 @@ import { DragIcon } from "../../icons/DragIcon";
 import { TabsContext } from "../../contexts/tabsContext";
 import EditPreModal from "../addeditPreModal";
 import { HelpBtn } from "../../components/ui/helpbtn";
+import { APITemplateType } from "../../types/api";
+import { DropdownMenu } from "../../components/ui/dropdown-menu";
 
 
 export default function EditNodeModal({ data }: { data: NodeDataType }) {
@@ -98,13 +100,13 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
 
 
   const response = data.node.template?.response ? data.node.template?.response : null
-  const conditions = data.node.conditions.length ? data.node.conditions : null
-  const pre_responses = data.node.pre_responses.length ? data.node.pre_responses : null
-  const pre_transitions = data.node.pre_transitions.length ? data.node.pre_transitions : null
+  const conditions = data.node.conditions?.length ? data.node.conditions : null
+  const pre_responses = data.node.pre_responses?.length ? data.node.pre_responses : null
+  const pre_transitions = data.node.pre_transitions?.length ? data.node.pre_transitions : null
 
   // console.log(conditions);
 
-  const [conditionsState, setConditionsState] = useState(conditions)
+  const [conditionsState, setConditionsState] = useState(conditions ? conditions : [])
 
   return (
     <Dialog open={true} onOpenChange={setModalOpen}>
@@ -150,12 +152,98 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
             </>
           )}
         </div>
+        {data.node.base_classes[0] == 'llm_node' && (
+          <>
+            <DialogHeader>
+              <DialogDescription>
+                <div className="flex pt-3">
+                  <Variable className="edit-node-modal-variable "></Variable>
+                  <span className="edit-node-modal-span">
+                    Parameters
+                  </span>
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="edit-node-modal-arrangement">
+              <div
+                className={classNames(
+                  "edit-node-modal-box",
+                  nodeLength > limitScrollFieldsModal
+                    ? "overflow-scroll overflow-x-hidden custom-scroll"
+                    : "overflow-hidden",
+                )}
+              >
+                {nodeLength > 0 && (
+                  <div className="edit-node-modal-table">
+                    <Table className="table-fixed bg-muted outline-1">
+                      <TableHeader className="edit-node-modal-table-header">
+                        <TableRow className="">
+                          <TableHead className="h-7 text-center">PARAM</TableHead>
+                          <TableHead className="h-7 p-0 text-center">
+                            VALUE
+                          </TableHead>
+                          <TableHead className="h-7 text-center">ACTION</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="p-0">
+                        {Object.entries(data.node?.template).map(([key, value]) => {
+                          if (key == 'response') return <></>
+                          return (
+                            <TableRow key={key} className="h-10">
+                              <TableCell className="truncate p-0 text-center text-sm text-foreground sm:px-3">
+                                <div className="flex flex-row items-center justify-start">
+                                  <span className="ml-12">{key}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="w-[300px] p-0 text-center text-xs text-foreground ">
+                                {value.options ? (
+                                  <select
+                                    className="p-1 w-[150px] text-center rounded-lg in-modal-input"
+                                    onChange={e => value.value = e.target.value}
+                                    value={value.value}
+                                  >
+                                    <option value={''}> choose model </option>
+                                    {value.options.map((option) => {
+                                      return (
+                                        <option value={option}>
+                                          {option}
+                                        </option>
+                                      )
+                                    })}
+                                  </select>
+                                ) :
+                                  <input
+                                    onChange={v => { value.value = v.target.value }}
+                                    defaultValue={value.value}
+                                    type="string"
+                                    className="p-1 w-[150px] text-center rounded-lg in-modal-input"
+                                  />}
+                              </TableCell>
+                              <TableCell className="p-0 text-center" >
+                                {/* <button
+                                  className={`${data.node.conditions.length > 0 && 'bg-red-500'} p-1.5 rounded-lg`}
+                                  onClick={e => { if (confirm("Вы уверены?")) { data.node.conditions = data.node.conditions.filter((conditionF) => conditionF.conditionID != condition.conditionID); setConditionsState(data.node.conditions.filter((conditionF) => conditionF.conditionID != condition.conditionID)) } }}
+                                >
+                                  <DeleteIcon fill={`${data.node.conditions.length > 0 ? 'white' : 'black'}`} />
+                                </button> */}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
         <DialogHeader>
           <DialogDescription>
             <div className="flex pt-3">
               <Variable className="edit-node-modal-variable "></Variable>
               <span className="edit-node-modal-span">
-                Parameters
+                Conditions
               </span>
             </div>
           </DialogDescription>
@@ -216,18 +304,23 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
             )}
           </div>
         </div>
-        <div className="mb-3">
-          <h5 className="extra-title text-sm mb-2">Preresponse processing</h5>
-          <div className="flex flex-row">
-            {pre_responses?.map((res, idx) => <span key={res.name} className='text-sm bg-neutral-900 text-white px-2 py-1 rounded-md mx-0.5'> <span className="text-neutral-500">{idx}. </span>{res.name}</span>)}
-            <button onClick={e => openPopUp(<EditPreModal data={data} resp={true} />)} className="bg-res-trans-add text-white py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
+        <h5 className="extra-title text-sm mt-4"> Preprocessing in progress... </h5>
+        <div className="  ">
+          <div className="mb-3 ">
+            {/* <h5 className="extra-title text-sm mb-2 w-max rounded">Preresponse processing</h5> */}
+            <span className="w-[200px] h-[20px] rounded mb-1 bg-neutral-300 block ">  </span>
+            <div className="flex flex-row">
+              {pre_responses?.map((res, idx) => <span key={res.name} className='text-sm bg-neutral-900 text-white px-2 py-1 rounded-md mx-0.5'> <span className="text-neutral-500">{idx}. </span>{res.name}</span>)}
+              <button disabled onClick={e => openPopUp(<EditPreModal data={data} resp={true} />)} className="bg-res-trans-add bg-neutral-300 text-neutral-500 py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
+            </div>
           </div>
-        </div>
-        <div className="mb-3">
-          <h5 className="extra-title text-sm mb-2"> Pretransition processing </h5>
-          <div className="flex flex-row">
-            {pre_transitions?.map((res, idx) => <span key={res.name} className='text-sm bg-neutral-900 text-white px-2 py-1 rounded-md mx-0.5'> <span className="text-neutral-500">{idx}. </span>{res.name}</span>)}
-            <button onClick={e => openPopUp(<EditPreModal data={data} resp={false} />)} className="bg-res-trans-add text-white py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
+          <div className="mb-3">
+            {/* <h5 className="extra-title text-sm mb-2"> Pretransition processing </h5> */}
+            <span className="w-[200px] h-[20px] rounded mb-1 bg-neutral-300 block ">  </span>
+            <div className="flex flex-row">
+              {pre_transitions?.map((res, idx) => <span key={res.name} className='text-sm bg-neutral-900 text-white px-2 py-1 rounded-md mx-0.5'> <span className="text-neutral-500">{idx}. </span>{res.name}</span>)}
+              <button disabled onClick={e => openPopUp(<EditPreModal data={data} resp={false} />)} className="bg-res-trans-add bg-neutral-300 text-neutral-500 py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
+            </div>
           </div>
         </div>
         <DialogFooter>

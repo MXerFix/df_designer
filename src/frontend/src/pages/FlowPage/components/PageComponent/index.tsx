@@ -195,14 +195,6 @@ export default function Page({ flow }: { flow: FlowType }) {
                 ? "stroke-foreground edge-cust"
                 : "stroke-foreground edge-cust",
             animated: params.targetHandle.split("|")[0] === "Text",
-            label: "delete",
-            labelBgBorderRadius: 6,
-            labelBgPadding: [4, 4],
-            labelShowBg: true,
-            labelBgStyle: { fill: "#bbb" },
-            data: {
-              label: "sss"
-            }
           },
           eds,
         ),
