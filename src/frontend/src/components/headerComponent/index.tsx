@@ -152,7 +152,7 @@ export default function Header() {
             <FaDiscord className="side-bar-button-size" />
           </a> */}
 
-          <Separator orientation="vertical" />
+          {/* <Separator orientation="vertical" /> */}
           <button
             className="extra-side-bar-save-disable"
             onClick={() => {
@@ -190,8 +190,8 @@ export default function Header() {
             )}
             <Bell className="side-bar-button-size" aria-hidden="true" />
           </button>
-          <Separator orientation="vertical" />
-          <button className={`chat-btn bg-transparent text-sm flex flex-row py-1 px-3 rounded-md items-center justify-center w-max ${!dark ? 'text-black' : 'text-neutral-50'} hover:bg-blue-700 hover:text-neutral-50 `}>
+          {/* <Separator orientation="vertical" /> */}
+          <button className={`chat-btn bg-transparent text-sm flex flex-row py-1 px-3 rounded-md items-center justify-center w-max ${!dark ? 'text-black' : 'text-neutral-50'} hover:bg-blue-700 hover:text-neutral-50 chat-btn-fix `}>
             Chat with Skill
             <ChatIcon pathClassName={`chat-path`} className={`inline-block ml-2`} fill={dark ? 'white' : 'black'} />
           </button>
