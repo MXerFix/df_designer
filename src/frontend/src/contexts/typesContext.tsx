@@ -91,7 +91,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
           {
             conditionID: 0,
             left: false,
-            name: 'dft_cnd0',
+            name: 'condition0',
             priority: 1,
             required: true,
             type: `condition`,
@@ -244,23 +244,6 @@ export function TypesProvider({ children }: { children: ReactNode }) {
       const default_link: APIClassType = {
         display_name: "default_link",
         base_classes: ["links"],
-        conditions: [
-          {
-            conditionID: 0,
-            left: false,
-            name: 'dft_cnd0',
-            priority: 1,
-            required: true,
-            type: `condition`,
-            transitionType: 'default',
-            intent: '',
-            action: '',
-            variables: '',
-            APIKey: '',
-            llm_model: '',
-            prompt: '',
-          },
-        ],
         template: {},
         links: [
           {
@@ -281,15 +264,15 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             linkType: "node",
             to: ""
           },
-          // {
-          //   name: "To Condition",
-          //   type: "to_condition_link",
-          //   required: true,
-          //   options: [],
-          //   placeholder: "To condition",
-          //   linkType: "condition",
-          //   to: ""
-          // },
+          {
+            name: "To Condition",
+            type: "to_condition_link",
+            required: true,
+            options: [],
+            placeholder: "To condition",
+            linkType: "condition",
+            to: ""
+          },
         ],
         fromFlow: '',
         fromNode: '',

@@ -48,40 +48,29 @@ export default function GenericNode({
   }, [activePreRes, activePreTrans])
 
   const { setErrorData } = useContext(alertContext);
-  const { closePopUp, openPopUp } = useContext(PopUpContext);
   const showError = useRef(true);
   const { types, deleteNode } = useContext(typesContext);
   const { flows, tabId } = useContext(TabsContext)
 
   const [links, setLinks] = useState<any>(data.node.links ? (
-    <div> {data.node.links.map((link) => <span> {link.to} </span>)} </div>
+    <LinksListComponent data={data} links={data.node.links} />
   ) : <></>)
-
-  useEffect(() => {
-    setLinks(<div> {data.node.links?.map((link) =>
-      <div className="px-4 py-2">
-        <span className="bg-[#F5B85A] p-1 rounded"> {link.name}:</span>
-        <span className={` ${link.name != "To Flow" ? 'bg-[#198BF6]' : 'bg-[#8338EC]'} p-1 rounded ml-2 text-white`}> {link.to} </span>
-      </div>
-    )} </div>)
-  }, [flows, closePopUp])
-
   const [conditions, setConditions] = useState<any[]>(data.node.conditions ? data.node.conditions.map((condition, idx) => {
     return <ParameterComponent
       data={data}
       color={
-        nodeColors[types.default_nodes] ??
+        nodeColors[types[data.node.template["response"].type]] ??
         nodeColors.unknown
       }
       title={condition.name}
       info={''}
       name={condition.name}
-      tooltipTitle={data.type}
-      required={true}
-      id={data.id + "|" + `condition${idx}` + "|" + data.id}
+      tooltipTitle={data.node.template["response"].type}
+      required={data.node.template["response"].required}
+      id={data.node.template["response"].type + "|" + `condition${idx}` + "|" + data.id}
       left={condition.left}
       type={`condition`}
-      key={data.id + 'condition' + `${idx}`}
+      key={data.node.template["response"].display_name + `${idx}`}
       priority={condition.priority}
       conditionID={condition.conditionID}
       transitionType={condition.transitionType}
@@ -92,18 +81,18 @@ export default function GenericNode({
       return <ParameterComponent
         data={data}
         color={
-          nodeColors[types.default_nodes] ??
+          nodeColors[types[data.node.template["response"].type]] ??
           nodeColors.unknown
         }
         title={condition.name}
         info={''}
         name={condition.name}
-        tooltipTitle={data.type == 'default_node' || data.type == 'llm_node' ? 'default_node' : data.type == 'default_link' ? 'default_node' : 'default_node'}
-        required={true}
-        id={data.id + "|" + `condition${idx}` + "|" + data.id}
+        tooltipTitle={data.node.template["response"].type}
+        required={data.node.template["response"].required}
+        id={data.node.template["response"].type + "|" + `condition${idx}` + "|" + data.id}
         left={condition.left}
         type={`condition`}
-        key={data.id + 'condition' + `${idx}`}
+        key={data.node.template["response"].display_name + `${idx}`}
         priority={condition.priority}
         conditionID={condition.conditionID}
         transitionType={condition.transitionType}
@@ -111,8 +100,8 @@ export default function GenericNode({
     }) : [])
   }, [flows])
   const [conditionCounter, setConditionCounter] = useState(conditions.length)
-  
 
+  const { closePopUp, openPopUp } = useContext(PopUpContext);
   const [name, setName] = useState('')
   const [nameInput, setNameInput] = useState(false)
   // any to avoid type conflict
@@ -139,54 +128,12 @@ export default function GenericNode({
   }, [])
 
   useEffect(() => {
-    if (data.node.base_classes[0] == 'default_node') {
-      if (data.node.conditions?.filter((condition) => condition.APIKey).length && data.node.conditions?.filter((condition) => condition.llm_model).length && data.node.conditions?.filter((condition) => condition.prompt).length) {
-        setValidationStatus({ valid: true })
-      } else {
-        setValidationStatus(null)
-      }
+    if (data.node.conditions?.filter((condition) => condition.APIKey).length && data.node.conditions?.filter((condition) => condition.llm_model).length && data.node.conditions?.filter((condition) => condition.prompt).length) {
+      setValidationStatus({ valid: true })
+    } else {
+      setValidationStatus(null)
     }
-
-    if (data.node.base_classes[0] == 'links') {
-      if (data.node.conditions?.filter((condition) => condition.APIKey).length && data.node.conditions?.filter((condition) => condition.llm_model).length && data.node.conditions?.filter((condition) => condition.prompt).length && data.node.links?.filter((link) => link.to).length) {
-        setValidationStatus({ valid: true })
-      } else {
-        setValidationStatus(null)
-      }
-    }
-
-    if (data.node.base_classes[0] == 'fallback_node') {
-      if (data.node.template['response']?.value.length) {
-        setValidationStatus({ valid: true })
-      } else {
-        setValidationStatus(null)
-      }
-    }
-
-    if (data.node.base_classes[0] == 'llm_node') {
-      if (Object.values(data.node.template).filter((template) => template.value) && data.node.conditions?.filter((condition) => condition.APIKey).length && data.node.conditions?.filter((condition) => condition.llm_model).length && data.node.conditions?.filter((condition) => condition.prompt).length) {
-        setValidationStatus({ valid: true })
-      } else {
-        setValidationStatus(null)
-      }
-    }
-
-    if (data.node.base_classes[0] == 'fallback_node') {
-      if (data.node.template['response']?.value.length) {
-        setValidationStatus({ valid: true })
-      } else {
-        setValidationStatus(null)
-      }
-    }
-
-    if (data.node.base_classes[0] == 'start_node') {
-      if (data.node.template['response']?.value.length && data.node.conditions?.filter((condition) => condition.APIKey).length && data.node.conditions?.filter((condition) => condition.llm_model).length && data.node.conditions?.filter((condition) => condition.prompt).length) {
-        setValidationStatus({ valid: true })
-      } else {
-        setValidationStatus(null)
-      }
-    }
-  }, [data.node.conditions, closePopUp, data.node.template['response']?.value, data.node.links])
+  }, [data.node.conditions, closePopUp])
 
   // const _data = flows.find((flow) => flow.id == tabId)?.data.nodes?.find((node) => node.id == data.id).data
   // console.log(_data);
@@ -375,27 +322,27 @@ export default function GenericNode({
             <></>
           )}
           {data.node.template[t].name == 'model_name' && (
-            <ParameterComponent
-              data={data}
-              color={
-                nodeColors[types[data.node.template[t].type]] ??
-                nodeColors.unknown
-              }
-              title={
-                data.node.template[t].display_name
-                  ? data.node.template[t].display_name
-                  : data.node.template[t].name
-                    ? toTitleCase(data.node.template[t].name)
-                    : toTitleCase(t)
-              }
-              info={data.node.template[t].info}
-              name={t}
-              tooltipTitle={data.node.template[t].type}
-              required={data.node.template[t].required}
-              id={data.node.template[t].type + "|" + t + "|" + data.id}
-              left={data.node.display_name === "start_node" && data.node.template[t].name !== "response" ? false : true}
-              type={data.node.template[t].type}
-            />
+              <ParameterComponent
+                data={data}
+                color={
+                  nodeColors[types[data.node.template[t].type]] ??
+                  nodeColors.unknown
+                }
+                title={
+                  data.node.template[t].display_name
+                    ? data.node.template[t].display_name
+                    : data.node.template[t].name
+                      ? toTitleCase(data.node.template[t].name)
+                      : toTitleCase(t)
+                }
+                info={data.node.template[t].info}
+                name={t}
+                tooltipTitle={data.node.template[t].type}
+                required={data.node.template[t].required}
+                id={data.node.template[t].type + "|" + t + "|" + data.id}
+                left={data.node.display_name === "start_node" && data.node.template[t].name !== "response" ? false : true}
+                type={data.node.template[t].type}
+              />
           )}
         </div>
       ))))
@@ -426,7 +373,7 @@ export default function GenericNode({
         )}
       >
         <div className="generic-node-div-title relative">
-          {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 ", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
+          <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 ", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />
           <div className="generic-node-title-arrangement">
             {/* <Icon
               strokeWidth={1.5}
@@ -518,8 +465,8 @@ export default function GenericNode({
 
           <>
             {nodeParamsList}
-            {links}
             {conditions}
+            {links}
             <div
               className={classNames(
                 Object.keys(data.node.template).length < 1 ? "hidden" : "",

@@ -57,12 +57,17 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
           data.node.template[t].type === "int"),
     ).length,
   );
-  
+  const [nodeValue, setNodeValue] = useState(null);
   const { closePopUp } = useContext(PopUpContext);
   const { types } = useContext(typesContext);
+  const ref = useRef();
+  const [enabled, setEnabled] = useState(null);
   const [custom, setCustom] = useState(true);
   const { tabId, flows, saveFlow } = useContext(TabsContext)
 
+  if (nodeLength == 0) {
+    closePopUp();
+  }
 
   function setModalOpen(x: boolean) {
     setOpen(x);

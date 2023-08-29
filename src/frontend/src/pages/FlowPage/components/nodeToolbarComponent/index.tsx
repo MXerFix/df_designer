@@ -5,8 +5,6 @@ import { TabsContext } from "../../../../contexts/tabsContext";
 import { useReactFlow } from "reactflow";
 import EditNodeModal from "../../../../modals/EditNodeModal";
 import ShadTooltip from "../../../../components/ShadTooltipComponent";
-import EditLinkModal from "../../../../modals/editLinkModal";
-import { DeleteIcon } from "../../../../icons/DeleteIcon";
 
 const NodeToolbarComponent = (props) => {
   const [nodeLength, setNodeLength] = useState(
@@ -101,14 +99,13 @@ const NodeToolbarComponent = (props) => {
             <button
               className={classNames(
                 "relative -ml-px inline-flex items-center rounded-r-md bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset  ring-ring transition-all duration-500 ease-in-out hover:bg-muted focus:z-10" +
-                  (nodeLength < 0
+                  (nodeLength == 0
                     ? " text-muted-foreground"
                     : " text-foreground")
               )}
               onClick={(event) => {
-                if (nodeLength == 0 && props.data.node.base_classes[0] == 'links') {
+                if (nodeLength == 0) {
                   event.preventDefault();
-                  props.openPopUp(<EditLinkModal data={props.data} />)
                 }
                 event.preventDefault();
                 props.openPopUp(<EditNodeModal data={props.data} />);
