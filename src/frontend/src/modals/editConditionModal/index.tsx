@@ -39,6 +39,8 @@ import { DragIcon } from "../../icons/DragIcon";
 import { EditConditionIcon } from "../../icons/EditConditionIcon";
 import { TabsContext } from "../../contexts/tabsContext";
 import { HelpBtn } from "../../components/ui/helpbtn";
+import { LLM_cnd_icon } from "../../icons/LLMConditionIcon";
+import { Custom_cnd_icon } from "../../icons/CustomConditionIcon";
 
 
 export default function EditConditionModal({ data, conditionID }: { data: NodeDataType, conditionID: number }) {
@@ -57,17 +59,12 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
           data.node.template[t].type === "int"),
     ).length,
   );
-  const [nodeValue, setNodeValue] = useState(null);
+
   const { closePopUp } = useContext(PopUpContext);
   const { types } = useContext(typesContext);
-  const ref = useRef();
-  const [enabled, setEnabled] = useState(null);
   const [custom, setCustom] = useState(true);
   const { tabId, flows, saveFlow } = useContext(TabsContext)
 
-  if (nodeLength == 0) {
-    closePopUp();
-  }
 
   function setModalOpen(x: boolean) {
     setOpen(x);
@@ -118,7 +115,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
     <Dialog open={true} onOpenChange={setModalOpen}>
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className="sm:max-w-[600px] lg:max-w-[700px]">
-        <DialogHeader className="flex flex-row justify-between">
+        <DialogHeader className="flex flex-row justify-between items-start">
           <DialogTitle>
             <span className="flex flex-row items-center mb-2">
               <EditConditionIcon />
@@ -126,15 +123,22 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
             </span>
             <Badge variant="secondary" > {data.id} | {condition.name ? condition.name : 'noname'} </Badge>
           </DialogTitle>
-          <label className="flex flex-row mr-4" htmlFor="">
-            <span className={`${custom && 'text-neutral-400'}`}>Custom (work in progress...)</span>
+          <label className="flex flex-row mr-4 items-center" htmlFor="">
+            <span className={`${custom && 'text-neutral-400'}  flex flex-row items-center`}>
+              <Custom_cnd_icon className="" fill={` ${custom ? '#8D96B5' : 'black'} `} />
+              Custom (work in progress...)
+            </span>
             <ToggleShadComponent
+              className="mt-1"
               enabled={custom}
               setEnabled={(e) => { setCustom(prev => prev) }
               }
               disabled={false}
               size="small" />
-            <span className={`${!custom && 'text-neutral-400'}`}>Using llm</span>
+            <span className={`${!custom && 'text-neutral-400'} flex flex-row items-center`}>
+              <LLM_cnd_icon className="mr-1" fill={` ${!custom ? '#8D96B5' : 'black'} `} />
+              Using llm
+            </span>
           </label>
         </DialogHeader>
         <div>
@@ -200,13 +204,13 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
           )}
         </div>
         <DialogFooter>
-        <HelpBtn />
+          <HelpBtn />
           <Button
             className="mt-3"
             onClick={handleClick}
             type="submit"
           >
-            Save Changes
+            Save Conditions
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -91,7 +91,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
           {
             conditionID: 0,
             left: false,
-            name: 'condition0',
+            name: 'dft_cnd0',
             priority: 1,
             required: true,
             type: `condition`,
@@ -264,15 +264,15 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             linkType: "node",
             to: ""
           },
-          {
-            name: "To Condition",
-            type: "to_condition_link",
-            required: true,
-            options: [],
-            placeholder: "To condition",
-            linkType: "condition",
-            to: ""
-          },
+          // {
+          //   name: "To Condition",
+          //   type: "to_condition_link",
+          //   required: true,
+          //   options: [],
+          //   placeholder: "To condition",
+          //   linkType: "condition",
+          //   to: ""
+          // },
         ],
         fromFlow: '',
         fromNode: '',

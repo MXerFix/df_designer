@@ -7,6 +7,7 @@ export default function ToggleShadComponent({
   setEnabled,
   disabled,
   size,
+  className,
 }: ToggleComponentType) {
   useEffect(() => {
     if (disabled) {
@@ -32,7 +33,7 @@ export default function ToggleShadComponent({
       scaleY = 1;
   }
   return (
-    <div className={disabled ? "pointer-events-none cursor-not-allowed" : ""}>
+    <div className={(disabled ? "pointer-events-none cursor-not-allowed" : "") + ' ' + className}>
       <Switch
         style={{
           transform: `scaleX(${scaleX}) scaleY(${scaleY})`,

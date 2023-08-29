@@ -54,38 +54,39 @@ export const MenuBar = ({ flows, tabId }) => {
         <ChevronLeft className="w-4" />
       </Link>
       <div className="header-menu-bar">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              className="header-menu-bar-display"
-              variant="primary"
-              size="sm"
-            >
-              <div className="header-menu-flow-name">{current_flow.name}</div>
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-44">
-            <DropdownMenuLabel>Options</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => {
-                handleAddFlow();
-              }}
-              className="cursor-pointer"
-            >
-              <Plus className="header-menu-options" />
-              New
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                openPopUp(<FlowSettingsModal />);
-              }}
-              className="cursor-pointer"
-            >
-              <Settings2 className="header-menu-options " />
-              Settings
-            </DropdownMenuItem>
-            {/* <DropdownMenuItem
+        <span className="w-max header-menu-bar-fix">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                className="header-menu-bar-display border-0"
+                variant="primary"
+                size="sm"
+              >
+                <div className="header-menu-flow-name">{current_flow.name}</div>
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-44">
+              <DropdownMenuLabel>Options</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => {
+                  handleAddFlow();
+                }}
+                className="cursor-pointer"
+              >
+                <Plus className="header-menu-options" />
+                New
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  openPopUp(<FlowSettingsModal />);
+                }}
+                className="cursor-pointer"
+              >
+                <Settings2 className="header-menu-options " />
+                Settings
+              </DropdownMenuItem>
+              {/* <DropdownMenuItem
               onClick={() => {
                 undo();
               }}
@@ -103,40 +104,41 @@ export const MenuBar = ({ flows, tabId }) => {
               <Redo className="header-menu-options " />
               Redo
             </DropdownMenuItem> */}
-            <DropdownMenuItem
-              onClick={e => { navigate(`/flow/${flows[0].id}`); removeFlow(current_flow.id); }}
-              className={`cursor-pointer `}
-            >
-              <XIcon className="mr-3 ml-0.5" />
-              Delete
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel>Flows</DropdownMenuLabel>
-            <DropdownMenuRadioGroup className="max-h-full overflow-scroll"
-              value={tabId}
-              onValueChange={(value) => {
-                setTabId(value);
-              }}
-            >
-              {flows.map((flow, idx) => {
-                return (
-                  <Link
-                    key={flow.id}
-                    to={"/flow/" + flow.id}
-                    className="flex w-full items-center"
-                  >
-                    <DropdownMenuRadioItem
-                      value={flow.id}
-                      className="flex-1 w-full inline-block truncate break-words mr-2"
+              <DropdownMenuItem
+                onClick={e => { navigate(`/flow/${flows[0].id}`); removeFlow(current_flow.id); }}
+                className={`cursor-pointer `}
+              >
+                <XIcon className="mr-3 ml-0.5" />
+                Delete
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Flows</DropdownMenuLabel>
+              <DropdownMenuRadioGroup className="max-h-full overflow-scroll"
+                value={tabId}
+                onValueChange={(value) => {
+                  setTabId(value);
+                }}
+              >
+                {flows.map((flow, idx) => {
+                  return (
+                    <Link
+                      key={flow.id}
+                      to={"/flow/" + flow.id}
+                      className="flex w-full items-center"
                     >
-                      {flow.name}
-                    </DropdownMenuRadioItem>
-                  </Link>
-                );
-              })}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                      <DropdownMenuRadioItem
+                        value={flow.id}
+                        className="flex-1 w-full inline-block truncate break-words mr-2"
+                      >
+                        {flow.name}
+                      </DropdownMenuRadioItem>
+                    </Link>
+                  );
+                })}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </span>
       </div>
     </div>
   );

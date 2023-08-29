@@ -159,7 +159,7 @@ export default function ExtraSidebar() {
               key={flow.id}
               onClick={e => setTabId(flow.id)}
               className={` ${flow.id == tabId && 'bg-slate-50'} py-1.5 px-3 flex flex-row items-center w-full justify-between text-sm bg-white`}>
-              <div className="flex flex-row">
+              <div className="flex flex-row items-center">
                 <FlowColorSVG fill={flow.color} />
                 <span className="ml-3"> {flow.name} </span>
               </div>
@@ -173,21 +173,21 @@ export default function ExtraSidebar() {
       <Separator />
       <div className="side-bar-components-div-arrangement">
         <div className="side-bar-search-div-placement">
+          <div className="search-icon ml-1 left-0">
+            {/* ! replace hash color here */}
+            <Search size={20} strokeWidth={1} className="text-primary" />
+          </div>
           <input
             type="text"
             name="search"
             id="search"
             placeholder="Search"
-            className="input-search"
+            className="input-search rounded-xl"
             onChange={(e) => {
               handleSearchInput(e.target.value);
               setSearch(e.target.value);
             }}
           />
-          <div className="search-icon">
-            {/* ! replace hash color here */}
-            <Search size={20} strokeWidth={1.5} className="text-primary" />
-          </div>
         </div>
         {Object.keys(dataFilter)
           .sort()

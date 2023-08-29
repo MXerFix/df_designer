@@ -41,6 +41,7 @@ import EditPreModal from "../addeditPreModal";
 import { HelpBtn } from "../../components/ui/helpbtn";
 import { APITemplateType } from "../../types/api";
 import { DropdownMenu } from "../../components/ui/dropdown-menu";
+import { EditConditionIcon } from "../../icons/EditConditionIcon";
 
 
 export default function EditNodeModal({ data }: { data: NodeDataType }) {
@@ -113,7 +114,8 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className="sm:max-w-[600px] lg:max-w-[700px]">
         <DialogTitle className="flex items-center">
-          <span className="pr-2">{data.type}</span>
+          <EditConditionIcon />
+          <span className="pr-2">Edit node </span>
           <Badge variant="secondary">ID: {data.id}</Badge>
         </DialogTitle>
         <div>

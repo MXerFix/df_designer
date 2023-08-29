@@ -24,6 +24,7 @@ export type InputComponentType = {
   placeholder?: string;
 };
 export type ToggleComponentType = {
+  className?: string
   enabled: boolean;
   setEnabled: (state: boolean) => void;
   disabled: boolean;
