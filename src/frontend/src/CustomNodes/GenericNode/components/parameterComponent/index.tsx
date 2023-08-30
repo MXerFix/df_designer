@@ -211,7 +211,7 @@ export default function ParameterComponent({
   return (
     <div
       ref={ref}
-      className={"my-1 flex w-full flex-wrap items-center justify-between bg-node-back px-5" + ' ' + (name == 'response' ? "mb-2" : 'mb-1') + ' ' + (type == 'condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
+      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "mb-1 w-full" : 'mb-1 bg-node-back new-templates') + ' ' + (type == 'condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
     >
       <>
         {
@@ -310,7 +310,7 @@ export default function ParameterComponent({
               />
             ) : (
               <div className="flex flex-row w-full mt-2 items-center">
-                {name == 'response' && <BotIcon className="mr-1" />}
+                {name == 'response' && <BotIcon className="mr-2" />}
                 <InputComponent
                   className="w-full"
                   disabled={disabled}

@@ -32,6 +32,7 @@ import { LinksListComponent } from "./components/linksListComponent";
 import EditConditionModal from "../../modals/editConditionModal";
 import { Badge, BadgeProps } from "../../components/ui/badge";
 import { Link, useNavigate } from "react-router-dom";
+import { ConditionPlusIcon } from "../../icons/ConditionPlus";
 
 export default function GenericNode({
   data,
@@ -56,25 +57,29 @@ export default function GenericNode({
   const showError = useRef(true);
   const { types, deleteNode } = useContext(typesContext);
   const { flows, tabId } = useContext(TabsContext)
-  const { setViewport } = useReactFlow();
+  const { setViewport, getEdges, setEdges, setNodes } = useReactFlow();
   const navigate = useNavigate()
+  const edges = getEdges()
+  // console.log(edges)
 
   const goToNodeHandler = (currFlow: FlowType, nodeID: string) => {
-    const currNode: NodeType = currFlow.data.nodes.find((node) => node.data.id == nodeID)
-    console.log(currFlow.data.viewport, currNode.position);
     navigate(`/flow/${flows.find((flow) => currFlow.name == flow.name).id}`)
+    // const width = window.innerWidth
+    // const height = window.innerHeight
+    const currNode: NodeType = currFlow.data.nodes.find((node) => node.data.id == nodeID)
     setTimeout(() => {
-      setViewport({ x: currNode.position.x - window.innerWidth*0.5, y: currNode.position.y + window.innerHeight*0.5, zoom: 0.9 });
-    }, 100);
+      const nodes = reactFlowInstance.getNodes()
+      let node = nodes.find((node) => node.id == currNode.id)
+      reactFlowInstance.fitBounds({x: currNode.position.x, y: currNode.position.y, width: node.width, height: node.height})
+      node.selected = true
+    }, 50);
   }
 
-  const [links, setLinks] = useState<any>(data.node.links ? (
-    <div> {data.node.links.map((link) => <span> {link.to} </span>)} </div>
-  ) : <></>)
+  const [links, setLinks] = useState<any>()
 
   useEffect(() => {
     setLinks(<div> {data.node.links?.map((link, idx, arr) =>
-      <div className="px-4 py-2">
+      <div key={link.to} className="px-4 py-2">
         <span className="bg-[#F5B85A] p-1 rounded"> {link.name}:</span>
         <span className={` ${link.name != "To Flow" ? 'bg-[#198BF6]' : 'bg-[#8338EC]'} p-1 rounded ml-2 text-white`}> {link.to} </span>
         {link.name == 'To Flow' && <Link to={`/flow/${flows.find(({ name }) => name == link.to)?.id}`}> to flow </Link>}
@@ -84,6 +89,19 @@ export default function GenericNode({
       </div>
     )} </div>)
   }, [flows, closePopUp])
+
+  useEffect(() => {
+    if (data.node.base_classes[0] == 'links') {
+      data.node.from_links = edges.filter((edge) => edge.target == data.id).map((edge) => {
+        return {
+          node: edge.source,
+          condition: flows.find((flow) => flow.data.nodes.find((node: NodeType) => node.data.id == edge.source)).data.nodes.find((node: NodeType) => node.data.id == edge.source).data.node.conditions.find((cnd) => `condition${cnd.conditionID}` == edge.sourceHandle.split('|')[1]).name
+        }
+      })
+      // console.log(data.node.from_links)
+    }
+  }, [setEdges, setNodes, edges.length])
+
 
   const [conditions, setConditions] = useState<any[]>(data.node.conditions ? data.node.conditions.map((condition, idx) => {
     return <ParameterComponent
@@ -97,7 +115,7 @@ export default function GenericNode({
       name={condition.name}
       tooltipTitle={data.type}
       required={true}
-      id={data.id + "|" + `condition${idx}` + "|" + data.id}
+      id={data.id + "|" + `condition${condition.conditionID}` + '|' + data.id}
       left={condition.left}
       type={`condition`}
       key={data.id + 'condition' + `${idx}`}
@@ -119,7 +137,7 @@ export default function GenericNode({
         name={condition.name}
         tooltipTitle={data.type == 'default_node' || data.type == 'llm_node' ? 'default_node' : data.type == 'default_link' ? 'default_node' : 'default_node'}
         required={true}
-        id={data.id + "|" + `condition${idx}` + "|" + data.id}
+        id={data.id + "|" + `condition${condition.conditionID}` + '|' + data.id}
         left={condition.left}
         type={`condition`}
         key={data.id + 'condition' + `${idx}`}
@@ -141,6 +159,14 @@ export default function GenericNode({
   // State for outline color
   const { sseData, isBuilding } = useSSE();
   const refHtml = useRef(null);
+  const [inputLinks, setInputLinks] = useState(flows.filter((flow) => flow.data?.nodes?.find((node: NodeType) => node?.data?.node?.links?.find((link) => link.to == data.id))).map((flow) => {
+    const sourceLinks = flow.data.nodes.filter((node: NodeType) => node.data.node.links?.find((link) => link.to == data.id))
+    const p = sourceLinks.map((sourceLink) => flow.data.nodes.filter((node: NodeType) => node.id == edges.find((edge) => edge.target == sourceLink.id)?.source))
+    const sourceNodes = sourceLinks.map((sourceLink: NodeType) => sourceLink.data.node.from_links)
+    return { flow: flow.name, sourceLinks, sourceNodes }
+  }))
+
+  // console.log(inputLinks);
   const [pre_responses, setPre_responses] = useState(data.node?.pre_responses?.length ? data.node.pre_responses : [])
   const [pre_transitions, setPre_transitions] = useState(data.node?.pre_transitions?.length ? data.node.pre_transitions : [])
 
@@ -148,6 +174,7 @@ export default function GenericNode({
     setPre_responses(data.node?.pre_responses?.length ? data.node.pre_responses : [])
     setPre_transitions(data.node?.pre_transitions?.length ? data.node.pre_transitions : [])
   }, [data.node?.pre_responses?.length, data.node?.pre_transitions?.length])
+
 
   useOnClickOutside(refHtml, () => {
     setNameInput(false)
@@ -325,7 +352,7 @@ export default function GenericNode({
     setNodeParamsList((Object.keys(data.node.template)
       .filter((t) => t.charAt(0) !== "_")
       .map((t: string, idx) => (
-        <div key={idx}>
+        <div className="w-full flex flex-col items-center" key={idx}>
           {data.node.template[t].show &&
             !data.node.template[t].advanced && data.node.template[t].name == 'response' || data.node.template[t].name == 'prompt' ? (
             <>
@@ -441,10 +468,30 @@ export default function GenericNode({
       <div
         className={classNames(
           selected ? "border border-ring" : "border",
-          "generic-node-div"
+          "generic-node-div new-node-style"
         )}
       >
-        <div className="generic-node-div-title relative">
+        <div>
+          {inputLinks.map((inputLink) => (
+            <div>
+              <h5 className="font-bold"> {inputLink.flow} </h5>
+              {inputLink.sourceLinks.map((sourceLink: NodeType, idx) => (
+                <div>
+                  <h6 className="font-semibold"> {sourceLink.id} </h6>
+                  <div>
+                    {inputLink.sourceNodes[idx].map((sourceNode) => (
+                      <div>
+                        <p> {sourceNode.node} | {sourceNode.condition} </p>
+                        <button className="py-0.5 px-1 bg-[#3300FF] text-white" onClick={e => goToNodeHandler(flows.find((flow) => flow.name == inputLink.flow), sourceNode.node)}> go to node {sourceNode.node} </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div className="generic-node-div-title relative rounded-[15px]">
           {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 ", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
           <div className="generic-node-title-arrangement">
             {/* <Icon
@@ -530,15 +577,17 @@ export default function GenericNode({
             </div>
           </div>
         </div>
-        <div className="generic-node-desc m-0 pt-2">
+        <div className="generic-node-desc m-0 py-2 pt-0">
           {/* <div className="generic-node-desc-text">
             {data.node.description}
           </div> */}
 
           <>
-            {nodeParamsList}
-            {links}
-            {conditions}
+            <div className="flex flex-col items-center w-full">
+              {nodeParamsList}
+              {links}
+              {conditions}
+            </div>
             <div
               className={classNames(
                 Object.keys(data.node.template).length < 1 ? "hidden" : "",
@@ -567,8 +616,8 @@ export default function GenericNode({
               // )
             })}
             {(data.node.display_name === "default_node" || data.node.display_name === "llm_node") && (
-              <div className="flex w-full items-center justify-center mt-5">
-                <button className=" text-center bg-slate-100 py-1 px-6 hover:bg-slate-300 transition-all rounded-xl " onClick={(e) => {
+              <div className="flex w-full items-center justify-center mt-1">
+                <button className=" text-center flex flex-col justify-center items-center text-xl bg-white py-1 px-6 hover:bg-node-back text-[#3300FF] transition-all rounded-lg new-cnd-btn " onClick={(e) => {
                   // console.log(conditionCounter)
                   const newCondition: ConditionClassType = {
                     conditionID: conditionCounter,
@@ -591,7 +640,7 @@ export default function GenericNode({
                       name={newCondition.name}
                       tooltipTitle={data.node.template["response"].type}
                       required={data.node.template["response"].required}
-                      id={data.node.template["response"].type + "|" + `condition${conditionCounter}` + "|" + data.id}
+                      id={data.id + "|" + `condition${newCondition.conditionID}` + '|' + data.id}
                       left={false}
                       type={`condition`}
                       key={data.node.template["response"].display_name + `${conditionCounter}`}
@@ -643,7 +692,9 @@ export default function GenericNode({
                   //   key={data.node.template["response"].display_name + `${nodeParamsList.length}`}
                   //   priority={1}
                   // />])
-                }} ><strong> + Conditions </strong></button>
+                }} >
+                  <ConditionPlusIcon fill="#3300FF" />
+                </button>
               </div>
             )}
           </>

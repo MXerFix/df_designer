@@ -958,3 +958,19 @@ The cursor: default; property value restores the browser's default cursor style 
   background: var(--unnamed, #fff);
   box-shadow: 0px 8px 15px 0px rgba(14, 1, 66, 0.08);
 }
+
+.new-templates {
+  border: 1px solid #f0f0f3;
+}
+
+.new-node-style {
+  border-radius: 16px;
+  border: 1px solid var(--10, #f0f0f3);
+  background: #fff;
+  box-shadow: 0px 8px 15px 0px rgba(14, 1, 66, 0.08);
+}
+
+.new-cnd-btn {
+  width: 95%;
+  border: 1px solid var(--10, #f0f0f3);
+}

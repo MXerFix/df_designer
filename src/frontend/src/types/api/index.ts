@@ -17,9 +17,15 @@ export type APIClassType = {
   pre_transitions?: any[]
   conditions?: ConditionClassType[]
   links?: LinkClassType[]
+  from_links?: FromLinkType[]
   name?: string
-  [key: string]: Array<string> | string | APITemplateType | ConditionClassType[] | LinkClassType[];
+  [key: string]: Array<string> | string | APITemplateType | ConditionClassType[] | LinkClassType[] | FromLinkType[];
 };
+
+export type FromLinkType = {
+  node: string
+  condition: string
+}
 
 export type LinkClassType = {
   name: string,
