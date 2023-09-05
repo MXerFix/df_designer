@@ -215,7 +215,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
   }
 
   function updateDisplay_name(node: NodeType, template: APIClassType) {
-    node.data.node.display_name = template["display_name"] || node.data.type;
+    // node.data.node.display_name = template["display_name"] || node.data.type;
   }
 
   function updateNodeDocumentation(node: NodeType, template: APIClassType) {
@@ -273,8 +273,17 @@ export function TabsProvider({ children }: { children: ReactNode }) {
     );
   }
 
-  function updateStateWithDbData(tabsData) {
-    setFlows(tabsData);
+  function updateStateWithDbData(tabsData: FlowType[] | any) {
+    // console.log(tabsData);
+    // TODO: DELETE IT WHEN FLOW COLOR WILL ADDED IN DATABASE
+    const newTabsData = tabsData.map((flow, idx) => {
+      return {
+        ...flow,
+        color: findUnPickedColor(flows)[idx]
+      }
+    })
+    // console.log(newTabsData)
+    setFlows(newTabsData);
   }
 
   function hardReset() {
@@ -330,7 +339,8 @@ export function TabsProvider({ children }: { children: ReactNode }) {
   }
 
   function getNodeId(nodeType: string) {
-    return nodeType + "-" + incrementNodeId();
+    // WAS: nodeType + "-" + incrementNodeId()
+    return incrementNodeId();
   }
 
   /**
@@ -607,7 +617,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
         newFlows[index].description = newFlow.description ?? "";
         newFlows[index].data = newFlow.data;
         newFlows[index].name = newFlow.name;
-        newFlows[index].color = newFlow.color ?? "";
+        newFlows[index].color = newFlow.color ? newFlow.color : findUnPickedColor(flows)[0] ;
       }
       return newFlows;
     });
@@ -626,7 +636,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
             newFlows[index].description = newFlow.description ?? "";
             newFlows[index].data = newFlow.data;
             newFlows[index].name = newFlow.name;
-            newFlows[index].color = newFlow.color ?? ""
+            newFlows[index].color = newFlow.color ?? findUnPickedColor(flows)[0];
           }
           return newFlows;
         });

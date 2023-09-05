@@ -31,6 +31,8 @@ import { isValidConnection } from "../../../../utils";
 import ConnectionLineComponent from "../ConnectionLineComponent";
 import ExtraSidebar from "../extraSidebarComponent";
 import { undoRedoContext } from "../../../../contexts/undoRedoContext";
+import { PopUpContext } from "../../../../contexts/popUpContext";
+import EditLinkModal from "../../../../modals/editLinkModal";
 
 const nodeTypes = {
   genericNode: GenericNode,
@@ -53,6 +55,7 @@ export default function Page({ flow }: { flow: FlowType }) {
   const { types, reactFlowInstance, setReactFlowInstance, templates } =
     useContext(typesContext);
   const reactFlowWrapper = useRef(null);
+  const { openPopUp } = useContext(PopUpContext)
 
 
   const { takeSnapshot } = useContext(undoRedoContext);
@@ -192,8 +195,8 @@ export default function Page({ flow }: { flow: FlowType }) {
             style: { stroke: "inherit" },
             className:
               params.targetHandle.split("|")[0] === "Text"
-                ? "stroke-foreground edge-cust"
-                : "stroke-foreground edge-cust",
+                ? "stroke-foreground edge-cust mt-2"
+                : "stroke-foreground edge-cust mt-2",
             animated: params.targetHandle.split("|")[0] === "Text",
           },
           eds,
@@ -261,14 +264,14 @@ export default function Page({ flow }: { flow: FlowType }) {
           // console.log(element)
           let newNode: NodeType;
           newNode = {
-            id: getNodeId(element.display_name),
+            id: getNodeId(element.base_classes[0]),
             type: "genericNode",
             position: { x: position.x + 400 * item, y: position.y },
             data: {
               node: element,
-              id: getNodeId(element.display_name),
+              id: getNodeId(element.base_classes[0]),
               value: null,
-              type: element.display_name
+              type: element.base_classes[0]
             }
           }
           // setNodes((nds) => nds.concat(newNode))
@@ -313,6 +316,11 @@ export default function Page({ flow }: { flow: FlowType }) {
         setNodes((nds) => nds.concat(newNode));
         // Add the new node to the list of nodes in state
       }
+
+      if (data.node.base_classes[0] == 'links') {
+        openPopUp(<EditLinkModal data={newNode.data} />)
+      }
+
     },
     // Specify dependencies for useCallback
     [getNodeId, reactFlowInstance, setErrorData, setNodes, takeSnapshot],

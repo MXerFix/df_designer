@@ -1,8 +1,8 @@
 import { Node, Edge, Viewport } from "reactflow";
 //kind and class are just representative names to represent the actual structure of the object received by the API
 
-export type APIObjectType = { kind: APIKindType; [key: string]: APIKindType };
-export type APIKindType = { class: APIClassType; [key: string]: APIClassType };
+export type APIObjectType = { kind: APIKindType;[key: string]: APIKindType };
+export type APIKindType = { class: APIClassType;[key: string]: APIClassType };
 export type APITemplateType = {
   variable: TemplateVariableType;
   [key: string]: TemplateVariableType;
@@ -72,6 +72,10 @@ export type TemplateVariableType = {
   show: boolean;
   multiline?: boolean;
   value?: any;
+  api_key?: string
+  model_name?: string
+  prompt?: string
+  quote?: string | string[]
   [key: string]: any;
 };
 export type sendAllProps = {

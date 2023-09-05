@@ -79,9 +79,9 @@ const NodeToolbarComponent = (props) => {
             <a
               className={classNames(
                 "relative -ml-px inline-flex items-center bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset ring-ring  transition-all duration-500 ease-in-out hover:bg-muted focus:z-10" +
-                  (props.data.node.documentation === ""
-                    ? " text-muted-foreground"
-                    : " text-foreground")
+                (props.data.node.documentation === ""
+                  ? " text-muted-foreground"
+                  : " text-foreground")
               )}
               target="_blank"
               rel="noopener noreferrer"
@@ -101,17 +101,18 @@ const NodeToolbarComponent = (props) => {
             <button
               className={classNames(
                 "relative -ml-px inline-flex items-center rounded-r-md bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset  ring-ring transition-all duration-500 ease-in-out hover:bg-muted focus:z-10" +
-                  (nodeLength < 0
-                    ? " text-muted-foreground"
-                    : " text-foreground")
+                (nodeLength < 0
+                  ? " text-muted-foreground"
+                  : " text-foreground")
               )}
               onClick={(event) => {
                 if (nodeLength == 0 && props.data.node.base_classes[0] == 'links') {
                   event.preventDefault();
                   props.openPopUp(<EditLinkModal data={props.data} />)
+                } else {
+                  event.preventDefault();
+                  props.openPopUp(<EditNodeModal data={props.data} />);
                 }
-                event.preventDefault();
-                props.openPopUp(<EditNodeModal data={props.data} />);
               }}
             >
               <Settings2 className="h-4 w-4 "></Settings2>

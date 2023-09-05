@@ -114,7 +114,11 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             type: "str",
             multiline: false,
             value: "",
-            display_name: "Some response"
+            display_name: "Some response",
+            APIKey: '',
+            llm_model: '',
+            prompt: '',
+            quote: '',
           },
 
         }
@@ -151,7 +155,11 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             type: "str",
             multiline: false,
             value: "",
-            display_name: "Some response"
+            display_name: "Some response",
+            APIKey: '',
+            llm_model: '',
+            prompt: '',
+            quote: '',
           },
         }
       }
@@ -170,7 +178,11 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             type: "str",
             multiline: false,
             value: "",
-            display_name: "Some response"
+            display_name: "Some response",
+            APIKey: '',
+            llm_model: '',
+            prompt: '',
+            quote: '',
           },
         }
       }
@@ -206,7 +218,11 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             type: "str",
             multiline: false,
             value: "",
-            display_name: "Some response"
+            display_name: "Some response",
+            APIKey: '',
+            llm_model: '',
+            prompt: '',
+            quote: '',
           },
           model_name: {
             placeholder: "Model name",

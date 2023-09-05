@@ -112,7 +112,7 @@ export default function ParameterComponent({
     e.preventDefault()
     setForwardsMenu(true)
   };
-  
+
 
   const HandleTypeIcon = (transitionType: string) => {
     switch (transitionType) {
@@ -198,7 +198,7 @@ export default function ParameterComponent({
   }
 
   const handleInputPlaceholder = (temp_name: string) => {
-    switch(temp_name) {
+    switch (temp_name) {
       case 'response': return 'Enter bot’s response text...';
       case 'prompt': return 'Enter some prompt...'
     }
@@ -311,16 +311,24 @@ export default function ParameterComponent({
             ) : (
               <div className="flex flex-row w-full mt-2 items-center">
                 {name == 'response' && <BotIcon className="mr-2" />}
-                <InputComponent
-                  className="w-full"
-                  disabled={disabled}
-                  disableCopyPaste={true}
-                  password={data.node.template[name].password ?? false}
-                  value={data.node.template[name].value ?? ""}
-                  onChange={handleOnNewValue}
-                  placeholder={handleInputPlaceholder(name)}
-                />
-                {name == 'prompt' && <button onClick={e => openPopUp(<EditLLMPromptModal data={data} template={data.node.template[name]}  />)}> <ChangeConditionIcon className="ml-8" /> </button>}
+                {name == 'response' ?
+                  <>
+                    {data.node.template[name].value ? data.node.template[name].value : "‘I am a bot and here is my quote’"}
+                  </>
+                  :
+                  <>
+                    <InputComponent
+                      className="w-full"
+                      disabled={disabled}
+                      disableCopyPaste={true}
+                      password={data.node.template[name].password ?? false}
+                      value={data.node.template[name].value ?? ""}
+                      onChange={handleOnNewValue}
+                      placeholder={handleInputPlaceholder(name)}
+                    />
+                  </>
+                }
+                {name == 'prompt' && <button onClick={e => openPopUp(<EditLLMPromptModal data={data} template={data.node.template[name]} />)}> <ChangeConditionIcon className="ml-8" /> </button>}
               </div>
             )}
           </div>
@@ -398,6 +406,6 @@ export default function ParameterComponent({
           <></>
         )}
       </>
-    </div>
+    </div >
   );
 }

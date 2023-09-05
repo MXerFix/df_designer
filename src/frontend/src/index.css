@@ -974,3 +974,7 @@ The cursor: default; property value restores the browser's default cursor style 
   width: 95%;
   border: 1px solid var(--10, #f0f0f3);
 }
+
+.curr-shadow {
+  box-shadow: 0px 8px 15px 0px rgba(14, 1, 66, 0.08);
+}

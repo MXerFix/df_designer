@@ -39,9 +39,11 @@ import { DragIcon } from "../../icons/DragIcon";
 import { TabsContext } from "../../contexts/tabsContext";
 import EditPreModal from "../addeditPreModal";
 import { HelpBtn } from "../../components/ui/helpbtn";
-import { APITemplateType } from "../../types/api";
+import { APITemplateType, ConditionClassType } from "../../types/api";
 import { DropdownMenu } from "../../components/ui/dropdown-menu";
 import { EditConditionIcon } from "../../icons/EditConditionIcon";
+import { EditResponseIcon } from "../../icons/EditResponseIcon";
+import EditResponseModal from "../EditResponseModal";
 
 
 export default function EditNodeModal({ data }: { data: NodeDataType }) {
@@ -68,9 +70,69 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
   const ref = useRef();
   const [enabled, setEnabled] = useState(null);
   const [quote, setQuote] = useState(false);
-  if (nodeLength == 0) {
-    closePopUp();
+  const [dragCnd, setDragCnd] = useState<ConditionClassType>()
+  const [dropCnd, setDropCnd] = useState<any>()
+  const [name, setName] = useState(data.node?.display_name ? data.node.display_name : '')
+
+  const response = data.node.template?.response ? data.node.template?.response : null
+  let conditions = data.node.conditions?.length ? data.node.conditions : null
+  const pre_responses = data.node.pre_responses?.length ? data.node.pre_responses : null
+  const pre_transitions = data.node.pre_transitions?.length ? data.node.pre_transitions : null
+
+  // console.log(conditions);
+
+  const [responseValue, setResponseValue] = useState(response.value)
+  const [conditionsState, setConditionsState] = useState(conditions ? conditions : [])
+
+  const onDragStartHandler = (e: DragEvent, cond: ConditionClassType) => {
+    // e.preventDefault()
+    console.log(cond)
+    setDragCnd(cond)
+    console.log(conditions);
   }
+
+  const onDragOverHandler = (e: DragEvent) => {
+    e.preventDefault()
+    // console.log(e)
+    // e.target.style.background = 'black'
+  }
+
+  const onDragLeaveHandler = (e: DragEvent) => {
+    e.preventDefault()
+    // console.log(e)
+    // e.target.style.background = '#F9FAFC'
+  }
+
+  const onDragEndHandler = (e: DragEvent) => {
+    // console.log(e)
+  }
+
+  const onDropHandler = (e: any, cond: ConditionClassType) => {
+    e.preventDefault()
+    console.log(cond)
+    setConditionsState(conditions.map((condition, idx) => {
+      if (condition.conditionID == cond.conditionID) {
+        console.log(dragCnd)
+        return dragCnd
+      }
+      if (condition.conditionID == dragCnd.conditionID) {
+        return cond
+      }
+      return condition
+    }))
+    data.node.conditions = conditionsState
+  }
+
+  // const sortConditions = (a: ConditionClassType, b: ConditionClassType) => {
+  //   if (a.conditionID > b.conditionID) {
+  //     return 1
+  //   } else return -1
+  // }
+
+  useEffect(() => {
+    setConditionsState(conditions ? conditions : [])
+    console.log('changed');
+  }, [conditions])
 
   function setModalOpen(x: boolean) {
     setOpen(x);
@@ -83,6 +145,8 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
     let savedFlow = flows.find((f) => f.id === tabId);
     data.node.pre_responses = data.node.pre_responses
     data.node.pre_transitions = data.node.pre_transitions
+    data.node.conditions = conditionsState
+    data.node.display_name = name
     saveFlow(savedFlow);
     closePopUp();
   }
@@ -100,15 +164,6 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
   }
 
 
-  const response = data.node.template?.response ? data.node.template?.response : null
-  const conditions = data.node.conditions?.length ? data.node.conditions : null
-  const pre_responses = data.node.pre_responses?.length ? data.node.pre_responses : null
-  const pre_transitions = data.node.pre_transitions?.length ? data.node.pre_transitions : null
-
-  // console.log(conditions);
-
-  const [conditionsState, setConditionsState] = useState(conditions ? conditions : [])
-
   return (
     <Dialog open={true} onOpenChange={setModalOpen}>
       <DialogTrigger asChild></DialogTrigger>
@@ -116,12 +171,28 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
         <DialogTitle className="flex items-center">
           <EditConditionIcon />
           <span className="pr-2">Edit node </span>
-          <Badge variant="secondary">ID: {data.id}</Badge>
+          <Badge variant="secondary">Name: {data.node.display_name}</Badge>
+          <Badge className="ml-2" variant="secondary">ID: {data.id}</Badge>
         </DialogTitle>
+        <div>
+          <label htmlFor="">
+            <span className={`text-sm mb-2 block font-semibold`}>Name</span>
+            <InputComponent onChange={e => setName(e)} password={false} value={name} />
+          </label>
+        </div>
         <div>
           {response && (
             <>
-              <label className="flex flex-row" htmlFor="">
+              <label htmlFor="">
+                <span className={`text-sm mb-2 block font-semibold`}>Response</span>
+                <span className="bg-[#F9FAFC] text-[#8D96B5] flex flex-row items-center justify-between p-3 h-[38px] w-full rounded-md text-sm border-[1px] border-[#8D96B5]">
+                  {responseValue ? responseValue : 'Edit response to show it here...'}
+                  <button onClick={e => openPopUp(<EditResponseModal data={data}/> )}>
+                    <EditResponseIcon />
+                  </button>
+                </span>
+              </label>
+              {/* <label className="flex flex-row" htmlFor="">
                 <span className={`${quote && 'text-neutral-400'}`}>Quote</span>
                 <ToggleShadComponent
                   enabled={quote}
@@ -130,8 +201,8 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
                   disabled={false}
                   size="small" />
                 <span className={`${!quote && 'text-neutral-400'}`}>Description</span>
-              </label>
-              {!quote ? (
+              </label> */}
+              {/* {!quote ? (
                 <label htmlFor="">
                   <span></span>
                   <InputComponent
@@ -150,7 +221,7 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
                     value={data.node.description ? data.node.description : ''}
                   />
                 </label>
-              )}
+              )} */}
             </>
           )}
         </div>
@@ -274,10 +345,18 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
                   <TableBody className="p-0">
                     {conditionsState.map((condition, index) => {
                       return (
-                        <TableRow key={condition.conditionID} className="h-10">
+                        <TableRow
+                          draggable
+                          onDragStart={e => onDragStartHandler(e, condition)}
+                          onDragLeave={e => onDragLeaveHandler(e)}
+                          onDragOver={e => onDragOverHandler(e)}
+                          onDragEnd={e => onDragEndHandler(e)}
+                          onDrop={e => onDropHandler(e, condition)}
+                          key={condition.conditionID}
+                          className="h-10">
                           <TableCell className="truncate p-0 text-center text-sm text-foreground sm:px-3">
                             <div className="flex flex-row items-center justify-start">
-                              <DragIcon className="" />
+                              <DragIcon className="cursor-grabbing" />
                               <span className="ml-12">{condition.name}</span>
                             </div>
                           </TableCell>

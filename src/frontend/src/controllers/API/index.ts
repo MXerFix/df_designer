@@ -148,6 +148,7 @@ export async function updateFlowInDatabase(
 export async function readFlowsFromDatabase() {
   try {
     const response = await axios.get("/api/v1/flows/");
+    // console.log(response.data);
     if (response.status !== 200) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
