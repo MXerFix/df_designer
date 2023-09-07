@@ -35,6 +35,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ConditionPlusIcon } from "../../icons/ConditionPlus";
 import InputConditionsModal from "../../modals/inputConditionsModal";
 import { EditLinkIcon } from "../../icons/EditLinkIcon";
+import { Links_ } from "../../icons/Links";
+import { darkContext } from "../../contexts/darkContext";
 
 export default function GenericNode({
   data,
@@ -80,15 +82,15 @@ export default function GenericNode({
   const [links, setLinks] = useState<any>()
 
   useEffect(() => {
-    setLinks(<div> {data.node.links?.map((link, idx, arr) =>
-      <div key={link.to} className="px-4 py-2">
-        <span className="bg-[#F5B85A] p-1 rounded"> {link.name}:</span>
-        <span className={` ${link.name != "To Flow" ? 'bg-[#198BF6]' : 'bg-[#8338EC]'} p-1 rounded ml-2 text-white`}> {link.to} </span>
-        {link.name == 'To Node' && <button onClick={e => {
-          goToNodeHandler(flows.find((flow) => flow.name == arr[idx - 1].to), link.to)
-        }} > clg flow </button>}
-      </div>
-    )} </div>)
+    // setLinks(<div> {data.node.links?.map((link, idx, arr) =>
+    //   <div key={link.to} className="px-4 py-2">
+    //     <span className="bg-[#F5B85A] p-1 rounded"> {link.name}:</span>
+    //     <span className={` ${link.name != "To Flow" ? 'bg-[#198BF6]' : 'bg-[#8338EC]'} p-1 rounded ml-2 text-white`}> {link.to} </span>
+    //     {link.name == 'To Node' && <button onClick={e => {
+    //       goToNodeHandler(flows.find((flow) => flow.name == arr[idx - 1].to), link.to)
+    //     }} > clg flow </button>}
+    //   </div>
+    // )} </div>)
   }, [flows, closePopUp])
 
   useEffect(() => {
@@ -152,6 +154,7 @@ export default function GenericNode({
 
 
   const [name, setName] = useState('')
+  const { dark } = useContext(darkContext)
   const [nameInput, setNameInput] = useState(false)
   // any to avoid type conflict
   const Icon: any =
@@ -234,6 +237,23 @@ export default function GenericNode({
       }
     }
   }, [data.node.conditions, closePopUp, data.node.template['response']?.value, data.node.links])
+
+  //  default_node: "bg-[#198BF6] text-white border-transparent ",
+  // links: " bg-[#F5B85A] border-transparent  ",
+  // fallback_node: " bg-[#FF3434] text-[white] border-transparent  ",
+  // start_node: " bg-[#00CC99] text-[white] border-transparent  ",
+  // llm_node: "bg-[#7000FF] text-[white] border-transparent",
+
+  const handleClassNameForNodeName = () => {
+    switch (data.node.base_classes[0]) {
+      case "default_node": return "bg-[#198BF6] text-white border-transparent"
+      case "links": return "bg-[#F5B85A] border-transparent"
+      case "fallback_node": return "bg-[#FF3434] text-[white] border-transparent"
+      case "start_node": return "bg-[#00CC99] text-[white] border-transparent"
+      case "llm_node": return "bg-[#7000FF] text-[white] border-transparent"
+    }
+    return ""
+  }
 
   // const _data = flows.find((flow) => flow.id == tabId)?.data.nodes?.find((node) => node.id == data.id).data
   // console.log(_data);
@@ -453,9 +473,10 @@ export default function GenericNode({
   //   console.log(data.node.display_name)
   // }, [name])
 
-  
 
 
+
+  const [idBadge, setIdBadge] = useState(false)
 
 
   return (
@@ -513,8 +534,10 @@ export default function GenericNode({
         ) : (
           <>
             <div className="generic-node-div-title relative rounded-t-[15px]">
-              {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 mt-2", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
-              {data.node.base_classes[0] == 'default_node' && <button className="absolute -left-8 top-2.5 px-1 text-[10px] border-blue-condition border-[2px] font-semibold rounded-s-lg rounded-e bg-white" onClick={e => openPopUp(<InputConditionsModal goToHandler={goToNodeHandler} data={data} />)}> Links </button>}
+              {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames(`-ml-0.5 ${inputLinks.length != 0 && "mt-2"}`, "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
+              {data.node.base_classes[0] == 'default_node' && inputLinks.length != 0 && <button className={`absolute -left-8 top-2.5 px-1 text-[10px] border-blue-condition border-[2px] font-semibold rounded-s-lg rounded-e ${!dark ? "bg-white" : "bg-muted"}`} onClick={e => openPopUp(<InputConditionsModal goToHandler={goToNodeHandler} data={data} />)}>
+                Links
+              </button>}
               <div className="generic-node-title-arrangement">
                 {/* <Icon
               strokeWidth={1.5}
@@ -538,9 +561,22 @@ export default function GenericNode({
                     : <></>}
                 </div>
               </ShadTooltip> */}
-                  <ShadTooltip delayDuration={100} content={data.node.display_name}>
+                  {/* <ShadTooltip delayDuration={100} side="top" content={`ID: ${data.id}`}>
                     <Badge variant={data.node.base_classes[0]}> {data.node.display_name} </Badge>
-                  </ShadTooltip>
+                  </ShadTooltip> */}
+                  <div className="flex flex-row items-center">
+                    <div
+                      onMouseLeave={e => setIdBadge(false)}
+                      onMouseDownCapture={e => setIdBadge(true)}
+                      className={handleClassNameForNodeName() + ' w-full h-full px-2 py-0.5 rounded-xl font-medium id-node-name '}>
+                      <span>
+                        {data.node.display_name}
+                      </span>
+                    </div>
+                    <Badge variant="default" className={` ${idBadge ? "id-after-node-name" : "id-after-node-name-reverse"} ml-3`}>
+                      ID: {data.id}
+                    </Badge>
+                  </div>
                 </div>
               </div>
               <div className="round-button-div">
@@ -639,7 +675,7 @@ export default function GenericNode({
                 })}
                 {(data.node.base_classes[0] === "default_node" || data.node.base_classes[0] === "llm_node") && (
                   <div className="flex w-full items-center justify-center mt-1">
-                    <button className=" text-center flex flex-col justify-center items-center text-xl bg-white py-1 px-6 hover:bg-node-back text-[#3300FF] transition-all rounded-lg new-cnd-btn " onClick={(e) => {
+                    <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back" : "bg-muted hover:bg-slate-700"} py-1 px-6  text-[#3300FF] transition-all rounded-lg new-cnd-btn `} onClick={(e) => {
                       // console.log(conditionCounter)
                       const newCondition: ConditionClassType = {
                         conditionID: conditionCounter,

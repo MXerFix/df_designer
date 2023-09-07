@@ -121,7 +121,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
   return (
     <Dialog open={true} onOpenChange={setModalOpen}>
       <DialogTrigger asChild></DialogTrigger>
-      <DialogContent className={`sm:max-w-[600px] ${promptTestWindow ? "lg:max-w-[940px]" : "lg:max-w-[700px]"} flex flex-row transition-all`}>
+      <DialogContent className={`sm:max-w-[600px] ${promptTestWindow ? "lg:max-w-[940px]" : "lg:max-w-[700px]"} flex flex-row transition-all duration-500 `}>
         <div className="w-full flex flex-col justify-between">
           <DialogHeader className="flex flex-row justify-between items-start">
             <DialogTitle>
@@ -134,7 +134,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
             <label className="flex flex-row mr-4 items-center" htmlFor="">
               <span className={`${custom && 'text-neutral-400'}  flex flex-row items-center`}>
                 <Custom_cnd_icon className="" fill={` ${custom ? '#8D96B5' : 'black'} `} />
-                Custom (work in progress...)
+                Custom
               </span>
               <ToggleShadComponent
                 className="mt-1"
@@ -239,7 +239,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
         {promptTestWindow && custom && (
           <>
             <span className="min-h-[572px] max-h-full ml-2.5 w-[1px] bg-neutral-300 rounded-lg block"></span>
-            <div className=" flex flex-col justify-between text-lg font-semibold min-w-[220px] ml-[12px] ">
+            <div className={` flex flex-col justify-between text-lg font-semibold min-w-[0px] max-w-[220px] test-anim-for-modal ml-3 `}>
               <div className="w-full flex flex-col justify-between h-full">
                 <div>
                   <Title className="flex flex-row items-center gap-2 mb-3">

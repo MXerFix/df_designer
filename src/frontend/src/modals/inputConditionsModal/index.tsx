@@ -145,31 +145,31 @@ export default function InputConditionsModal({ data, goToHandler }: { data: Node
         </label>
         <div className="max-h-[640px] overflow-y-scroll">
           {inputLinks.map((inputLink) => (
-            <div className="mb-4">
+            <div key={inputLink.flow} className="mb-4">
               <h5 className="font-bold mb-2 flex flex-row items-center gap-2">
                 <FlowColorSVG fill={flows.find((flow) => flow.name == inputLink.flow).color} />
                 {inputLink.flow}
               </h5>
               {inputLink.sourceLinks.map((sourceLink: NodeType, idx) => (
-                <div className="bg-node-back border-[1px] border-[#D8DBE5] rounded-xl">
+                <div key={sourceLink.id} className="bg-node-back border-[1px] border-[#D8DBE5] rounded-xl">
                   <Table className="w-full">
                     <TableHeader className="w-full">
                       <TableRow className="">
-                        <TableCell className="py-3"></TableCell>
-                        <TableCell className="py-3"> Link ID </TableCell>
-                        <TableCell className="py-3"> Node </TableCell>
-                        <TableCell className="py-3"> Condition </TableCell>
-                        <TableCell className="py-3"> Actions </TableCell>
+                        <TableCell className="px-3 py-3"></TableCell>
+                        <TableCell className="px-3 py-3 w-20"> Link ID </TableCell>
+                        <TableCell className="px-3 py-3 w-52"> Node </TableCell>
+                        <TableCell className="px-3 py-3 w-48"> Condition </TableCell>
+                        <TableCell className="px-3 py-3"> Actions </TableCell>
                       </TableRow>
                     </TableHeader>
                     <TableBody className="w-full">
-                      {inputLink.sourceNodes[idx].map((sourceNode) => (
-                        <TableRow>
-                          <TableCell className="py-3"> <Checkbox /> </TableCell>
-                          <TableCell className="font-semibold py-3"> {sourceLink.id} </TableCell>
-                          <TableCell className="py-3"> {sourceNode.node} </TableCell>
-                          <TableCell className="w-max py-3"> {sourceNode.condition}</TableCell>
-                          <TableCell> <button className="py-0.5 px-1 bg-[#55a5ff] rounded-lg text-white" onClick={e => { closePopUp(); goToHandler(flows.find((flow) => flow.name == inputLink.flow), sourceNode.node) }}> go to source </button> </TableCell>
+                      {inputLink.sourceNodes[idx].map((sourceNode, idx) => (
+                        <TableRow key={`${sourceNode.condition}${idx}`}>
+                          <TableCell className="px-3 py-3"> <Checkbox /> </TableCell>
+                          <TableCell className="px-3 font-semibold py-3 w-20"> {sourceLink.id} </TableCell>
+                          <TableCell className="px-3 py-3 w-52"> {flows.find((flow) => flow.name == inputLink.flow).data.nodes.find((node: NodeType) => node.data.id == sourceNode.node).data.node.display_name} </TableCell>
+                          <TableCell className="px-3 py-3 w-48"> {sourceNode.condition}</TableCell>
+                          <TableCell className="px-3"> <button className="py-0.5 px-1 bg-[#55a5ff] rounded-lg text-white" onClick={e => { closePopUp(); goToHandler(flows.find((flow) => flow.name == inputLink.flow), sourceNode.node) }}> go to source </button> </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

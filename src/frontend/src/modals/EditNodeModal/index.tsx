@@ -84,26 +84,26 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
   const [responseValue, setResponseValue] = useState(response.value)
   const [conditionsState, setConditionsState] = useState(conditions ? conditions : [])
 
-  const onDragStartHandler = (e: DragEvent, cond: ConditionClassType) => {
+  const onDragStartHandler = (e: DragEvent | any, cond: ConditionClassType) => {
     // e.preventDefault()
     console.log(cond)
     setDragCnd(cond)
     console.log(conditions);
   }
 
-  const onDragOverHandler = (e: DragEvent) => {
+  const onDragOverHandler = (e: DragEvent | any) => {
     e.preventDefault()
     // console.log(e)
     // e.target.style.background = 'black'
   }
 
-  const onDragLeaveHandler = (e: DragEvent) => {
+  const onDragLeaveHandler = (e: DragEvent | any) => {
     e.preventDefault()
     // console.log(e)
     // e.target.style.background = '#F9FAFC'
   }
 
-  const onDragEndHandler = (e: DragEvent) => {
+  const onDragEndHandler = (e: DragEvent | any) => {
     // console.log(e)
   }
 
@@ -131,7 +131,6 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
 
   useEffect(() => {
     setConditionsState(conditions ? conditions : [])
-    console.log('changed');
   }, [conditions])
 
   function setModalOpen(x: boolean) {
@@ -392,7 +391,7 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
             <span className="w-[200px] h-[20px] rounded mb-1 bg-neutral-300 block ">  </span>
             <div className="flex flex-row">
               {pre_responses?.map((res, idx) => <span key={res.name} className='text-sm bg-neutral-900 text-white px-2 py-1 rounded-md mx-0.5'> <span className="text-neutral-500">{idx}. </span>{res.name}</span>)}
-              <button disabled onClick={e => openPopUp(<EditPreModal data={data} resp={true} />)} className="bg-res-trans-add bg-neutral-300 text-neutral-500 py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
+              <button disabled onClick={e => openPopUp(<EditPreModal data={data} resp={true} />)} className=" bg-neutral-300 text-neutral-500 py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
             </div>
           </div>
           <div className="mb-3">
@@ -400,7 +399,7 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
             <span className="w-[200px] h-[20px] rounded mb-1 bg-neutral-300 block ">  </span>
             <div className="flex flex-row">
               {pre_transitions?.map((res, idx) => <span key={res.name} className='text-sm bg-neutral-900 text-white px-2 py-1 rounded-md mx-0.5'> <span className="text-neutral-500">{idx}. </span>{res.name}</span>)}
-              <button disabled onClick={e => openPopUp(<EditPreModal data={data} resp={false} />)} className="bg-res-trans-add bg-neutral-300 text-neutral-500 py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
+              <button disabled onClick={e => openPopUp(<EditPreModal data={data} resp={false} />)} className=" bg-neutral-300 text-neutral-500 py-1 px-2 text-sm rounded-md font-medium">+ Add</button>
             </div>
           </div>
         </div>

@@ -156,7 +156,7 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply w-full truncate pr-1 text-xs text-foreground;
   }
   .side-bar-components-div-form {
-    @apply flex w-full items-center justify-between rounded-md rounded-l-none border border-l-0 border-dashed border-ring  bg-white px-3 py-1 text-sm;
+    @apply flex w-full items-center justify-between rounded-md rounded-l-none border border-l-0 border-dashed border-ring bg-muted px-3 py-1 text-sm;
   }
   .side-bar-components-border {
     @apply cursor-grab rounded-l-md border-l-8;
@@ -349,7 +349,7 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply hover:text-accent-foreground hover:transition-all;
   }
   .generic-node-desc {
-    @apply h-full w-full py-5 text-foreground;
+    @apply h-full w-full py-5 text-foreground bg-card rounded-b-2xl;
   }
   .generic-node-desc-text {
     @apply w-full px-5 pb-3 text-sm text-muted-foreground;
@@ -977,4 +977,70 @@ The cursor: default; property value restores the browser's default cursor style 
 
 .curr-shadow {
   box-shadow: 0px 8px 15px 0px rgba(14, 1, 66, 0.08);
+}
+
+.test-anim-for-modal {
+  transform-origin: right center;
+  animation-name: test_anim;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-duration: 500ms;
+}
+
+@keyframes test_anim {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.id-node-name {
+  z-index: 2;
+}
+
+.id-after-node-name {
+  /* opacity: 1;
+  transform: translateX(0px); */
+  animation-name: badge_anim;
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  z-index: 1;
+  /* transition: all 300ms; */
+}
+
+.id-after-node-name-reverse {
+  /* opacity: 1;
+  transform: translateX(-100px);
+  transition: all 300ms; */
+  opacity: 0;
+  transform: translateX(-100px);
+  animation-name: badge_anim_rev;
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.165, 0.84, 0.44, 1);
+  z-index: 1;
+}
+
+@keyframes badge_anim {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0px);
+  }
+}
+
+@keyframes badge_anim_rev {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
 }

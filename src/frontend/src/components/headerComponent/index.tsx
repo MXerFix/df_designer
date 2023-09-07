@@ -1,4 +1,4 @@
-import { Home, MoonIcon, SunIcon, Users2, XIcon } from "lucide-react";
+import { Home, MoonIcon, SettingsIcon, SunIcon, Users2, XIcon } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 import { FaDiscord, FaGithub, FaTwitter } from "react-icons/fa";
 import { Button } from "../ui/button";
@@ -17,6 +17,8 @@ import { Bell } from "lucide-react";
 import { ChatIcon } from "../../icons/ChatIcon/ChatIcon";
 import { FlowType } from "../../types/flow";
 import { NewLogo } from "../../icons/NewLogo";
+import AddFlowModal from "../../modals/addFlowModal";
+import SettingsModal from "../../modals/SettingsModal";
 
 export default function Header() {
   const { flows, addFlow, tabId, setTabId, removeFlow } = useContext(TabsContext);
@@ -153,6 +155,9 @@ export default function Header() {
           </a> */}
 
           {/* <Separator orientation="vertical" /> */}
+          <button onClick={e => openPopUp(<SettingsModal  />)} className="extra-side-bar-save-disable">
+            <SettingsIcon width={20} height={20} />
+          </button>
           <button
             className="extra-side-bar-save-disable"
             onClick={() => {

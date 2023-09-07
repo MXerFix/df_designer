@@ -18,7 +18,7 @@ const badgeVariants = cva(
         links: " bg-[#F5B85A] border-transparent  ",
         fallback_node: " bg-[#FF3434] text-[white] border-transparent  ",
         start_node: " bg-[#00CC99] text-[white] border-transparent  ",
-        llm_node: "bg-[#7000FF] text-[white] border-transparent"
+        llm_node: "bg-[#7000FF] text-[white] border-transparent",
       },
     },
     defaultVariants: {

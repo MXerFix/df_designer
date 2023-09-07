@@ -283,7 +283,71 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       }
     })
     // console.log(newTabsData)
-    setFlows(newTabsData);
+    setFlows([{
+      name: "GLOBAL",
+      id: "GLOBAL",
+      description: "Global flow",
+      color: "red",
+      data: {
+        nodes: [
+          {
+            dragging: false,
+            width: 384,
+            height: 229,
+            id: "GLOBAL_NODE",
+            position: { x: 0, y: 0 },
+            type: "genericNode",
+            data: {
+              id:"GLOBAL_NODE",
+              type: "default_node",
+              value: null,
+              node: {
+                base_classes: ["default_node"],
+                description: "GLOBAL_NODE",
+                display_name: "GLOBAL_NODE",
+                documentation: "GLOBAL_NODE",
+                pre_responses: [],
+                pre_transitions: [],
+                conditions: [
+                  {
+                    conditionID: 0,
+                    left: false,
+                    name: 'dft_cnd0',
+                    priority: 1,
+                    required: true,
+                    type: `condition`,
+                    transitionType: 'default',
+                    intent: '',
+                    action: '',
+                    variables: '',
+                    APIKey: '',
+                    llm_model: '',
+                    prompt: '',
+                  },
+                ],
+                template: {
+                  response: {
+                    placeholder: "response",
+                    name: "response",
+                    list: false,
+                    required: true,
+                    show: true,
+                    type: "str",
+                    multiline: false,
+                    value: "",
+                    display_name: "Some response",
+                    APIKey: '',
+                    llm_model: '',
+                    prompt: '',
+                    quote: '',
+                  },
+                }
+              }
+            },
+          }
+        ]
+      }
+    }, ...newTabsData]);
   }
 
   function hardReset() {
@@ -589,7 +653,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       }
     });
   };
-  
+
 
   const createNewFlow = (flowData, flow, newFlow) => ({
     description: newFlow?.description ? newFlow.description : flowData.description,
@@ -617,7 +681,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
         newFlows[index].description = newFlow.description ?? "";
         newFlows[index].data = newFlow.data;
         newFlows[index].name = newFlow.name;
-        newFlows[index].color = newFlow.color ? newFlow.color : findUnPickedColor(flows)[0] ;
+        newFlows[index].color = newFlow.color ? newFlow.color : findUnPickedColor(flows)[0];
       }
       return newFlows;
     });

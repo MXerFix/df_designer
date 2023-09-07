@@ -211,7 +211,7 @@ export default function ParameterComponent({
   return (
     <div
       ref={ref}
-      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "mb-1 w-full" : 'mb-1 bg-node-back new-templates') + ' ' + (type == 'condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
+      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full" : 'mb-1 bg-muted new-templates') + ' ' + (type == 'condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
     >
       <>
         {
@@ -277,7 +277,7 @@ export default function ParameterComponent({
               ></Handle>
             </ShadTooltip>
             <div className="relative">
-              <div onContextMenu={(e) => handleClick(e)} style={{ borderColor: '#FF9500' }} className={classNames(forwardsItem != 'default' ? '' : 'hidden', 'absolute flex flex-row items-center justify-center w-max left-80 ml-8 bg-node-back px-2 text-xs font-semibold rounded -top-5 border-2')}>
+              <div onContextMenu={(e) => handleClick(e)} style={{ borderColor: '#FF9500' }} className={classNames(forwardsItem != 'default' ? '' : 'hidden', 'absolute flex flex-row items-center justify-center w-max left-[305px] ml-8 bg-node-back px-2 text-xs font-semibold rounded rounded-e-lg -top-[22px] border-2')}>
                 {forwardsItem}
                 <span className="ml-1">{iconType}</span>
               </div>

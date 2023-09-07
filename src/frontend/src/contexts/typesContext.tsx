@@ -82,7 +82,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
       const default_node: APIClassType = {
         base_classes: ["default_node"],
         description: "test default node",
-        display_name: "default_node",
+        display_name: "Default Node",
         documentation: "test field",
         pre_responses: [],
         pre_transitions: [],
@@ -126,7 +126,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
       const start_node: APIClassType = {
         base_classes: ["start_node"],
         description: "test start node",
-        display_name: "start_node",
+        display_name: "Start Node",
         documentation: "test field",
         conditions: [
           {
@@ -166,7 +166,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
       const fallback_node: APIClassType = {
         base_classes: ["fallback_node"],
         description: "test fallback_node",
-        display_name: "fallback_node",
+        display_name: "Fallback Node",
         documentation: "test field",
         template: {
           response: {
@@ -189,7 +189,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
       const llm_node: APIClassType = {
         base_classes: ["llm_node"],
         description: "test llm_node",
-        display_name: "llm_node",
+        display_name: "LLM Base Node",
         documentation: "test field",
         conditions: [
           {
@@ -258,7 +258,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
 
 
       const default_link: APIClassType = {
-        display_name: "default_link",
+        display_name: "Link",
         base_classes: ["links"],
         template: {},
         links: [

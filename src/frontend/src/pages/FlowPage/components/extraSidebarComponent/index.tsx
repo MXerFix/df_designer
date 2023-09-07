@@ -37,6 +37,8 @@ export default function ExtraSidebar() {
   const { flows, tabId, uploadFlow, tabsState, saveFlow, save, setTabId, addFlow, removeFlow } =
     useContext(TabsContext);
 
+  const { reactFlowInstance } = useContext(typesContext)
+
   // console.log(flows)
 
   const { setSuccessData, setErrorData } = useContext(alertContext);
@@ -157,8 +159,13 @@ export default function ExtraSidebar() {
             <Link
               to={`/flow/${flow.id}`}
               key={flow.id}
-              onClick={e => setTabId(flow.id)}
-              className={` ${flow.id == tabId && 'bg-slate-50'} py-1.5 px-3 flex flex-row items-center w-full justify-between text-sm bg-white`}>
+              onClick={e => {
+                setTabId(flow.id);
+                setTimeout(() => {
+                  reactFlowInstance.fitView()
+                }, 25);
+              }}
+              className={` ${flow.id == tabId && 'bg-muted'} py-1.5 px-3 flex flex-row items-center w-full justify-between text-sm bg-card`}>
               <div className="flex flex-row items-center">
                 <FlowColorSVG fill={flow.color} />
                 <span className="ml-3"> {flow.name} </span>
