@@ -30,6 +30,8 @@ import { FileUpIcon } from "../../../../icons/FileUpIcon";
 import { FileDownIcon } from "../../../../icons/FileDownIcon";
 import { SaveIcon } from "../../../../icons/SaveIcon";
 import { CodeIcon } from "../../../../icons/CodeIcon";
+import { ManageIcon } from "../../../../icons/ManageIcon";
+import EditFlowSettings from "../../../../components/EditFlowSettingsComponent";
 
 export default function ExtraSidebar() {
   const { data } = useContext(typesContext);
@@ -146,12 +148,20 @@ export default function ExtraSidebar() {
       <div className="mt-3 mb-8">
         <div className="mb-2 ml-2 mr-3.5 flex flex-row items-center justify-between">
           <h5 className="extra-title">Flows</h5>
-          <button
-            onClick={e => openPopUp(<AddFlowModal />)}
-            className={`flex flex-row items-center w-max justify-between text-sm bg-white`}>
-            <PlusIcon />
-            {/* {active && <CheckSVG />} */}
-          </button>
+          <div className="flex flex-row items-center gap-2">
+            <button
+              onClick={e => openPopUp(<FlowSettingsModal />)}
+              disabled={tabId == 'GLOBAL'}
+              className={`flex flex-row items-center w-max justify-between text-sm bg-white`}>
+              <ManageIcon fill={tabId == 'GLOBAL' ? '#ddd' : 'black'} />
+            </button>
+            <button
+              onClick={e => openPopUp(<AddFlowModal />)}
+              className={`flex flex-row items-center w-max justify-between text-sm bg-white`}>
+              <PlusIcon />
+              {/* {active && <CheckSVG />} */}
+            </button>
+          </div>
         </div>
         {flows.map((flow, i) => {
           const active = (flow.id == tabId)
@@ -162,8 +172,8 @@ export default function ExtraSidebar() {
               onClick={e => {
                 setTabId(flow.id);
                 setTimeout(() => {
-                  reactFlowInstance.fitView()
-                }, 25);
+                  reactFlowInstance.fitView({ maxZoom: 1 })
+                }, 75);
               }}
               className={` ${flow.id == tabId && 'bg-muted'} py-1.5 px-3 flex flex-row items-center w-full justify-between text-sm bg-card`}>
               <div className="flex flex-row items-center">

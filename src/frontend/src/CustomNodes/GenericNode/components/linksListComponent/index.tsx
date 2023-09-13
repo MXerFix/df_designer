@@ -32,10 +32,10 @@ export const LinksListComponent = ({ links, data, className }: { links: LinkClas
     // setDefaultCondition(conditionLink.to)
   }, [flows, closePopUp])
 
-  const flowOptions = flows.map((flow) => flow.name)
+  const flowOptions = flows.filter(({name}) => name != 'GLOBAL').map((flow) => {return {name: flow.name, id: flow.name}})
 
   const defNode = defaultFlow ? flows.filter((flow) => flow.name == defaultFlow)[0].data : null
-  const defaultNodeOptions = defaultFlow && defNode ? flows.filter((flow) => flow.name == defaultFlow)[0].data.nodes.filter((node) => node.data.type == 'default_node').map((node) => node.data.id) : []
+  const defaultNodeOptions = defaultFlow && defNode ? flows.filter((flow) => flow.name == defaultFlow)[0].data.nodes.filter((node) => node.data.type == 'default_node').map((node) => {return {id: node.data.id, name: node.data.node.display_name}}) : []
   const defaultConditionOptions = defNode && defaultFlow && defaultNode && flows.filter((flow) => flow.name == defaultFlow)[0].data.nodes.filter((node) => node.data.id == defaultNode)[0] ? flows.filter((flow) => flow.name == defaultFlow)[0].data.nodes.filter((node) => node.data.id == defaultNode)[0].data.node.conditions.map((condition) => condition.name) : []
   // console.log(defaultConditionOptions);
 
@@ -62,7 +62,7 @@ export const LinksListComponent = ({ links, data, className }: { links: LinkClas
     setConditionOptions([])
     setTargetNode('')
     const flowData = targetFlow ? flows.filter((flow) => flow.name == targetFlow)[0].data : null
-    setNodeOptions(flowData && targetFlow ? flows.filter((flow) => flow.name == targetFlow)[0].data.nodes.filter((node) => node.data.type == 'default_node').map((node) => node.data.id) : [])
+    setNodeOptions(flowData && targetFlow ? flows.filter((flow) => flow.name == targetFlow)[0].data.nodes.filter((node) => node.data.type == 'default_node').map((node) => {{return {id: node.data.id, name: node.data.node.display_name}}}) : [])
   }, [targetFlow])
 
   useEffect(() => {

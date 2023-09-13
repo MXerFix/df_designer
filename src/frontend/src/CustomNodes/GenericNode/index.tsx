@@ -245,13 +245,13 @@ export default function GenericNode({
   // llm_node: "bg-[#7000FF] text-[white] border-transparent",
 
   const handleClassNameForNodeName = () => {
-    switch (data.node.base_classes[0]) {
-      case "default_node": return "bg-[#198BF6] text-white border-transparent"
-      case "links": return "bg-[#F5B85A] border-transparent"
-      case "fallback_node": return "bg-[#FF3434] text-[white] border-transparent"
-      case "start_node": return "bg-[#00CC99] text-[white] border-transparent"
-      case "llm_node": return "bg-[#7000FF] text-[white] border-transparent"
-    }
+    // switch (data.node.base_classes[0]) {
+    //   case "default_node": return "bg-[#198BF6] text-white border-transparent"
+    //   case "links": return "bg-[#F5B85A] border-transparent"
+    //   case "fallback_node": return "bg-[#FF3434] text-[white] border-transparent"
+    //   case "start_node": return "bg-[#00CC99] text-[white] border-transparent"
+    //   case "llm_node": return "bg-[#7000FF] text-[white] border-transparent"
+    // }
     return ""
   }
 
@@ -524,7 +524,7 @@ export default function GenericNode({
             <div className="flex flex-row items-center justify-between w-full gap-3 mb-4 ml-3">
               <div className="flex flex-row items-center">
                 <EditLinkIcon />
-                <h5 className="ml-1"> {data.node.links[1].to} </h5>
+                <h5 className="ml-1"> {flows.find((flow) => flow.name == data.node.links[0].to)?.data?.nodes?.find((node: NodeType) => node.id == data.node.links[1].to)?.data?.node?.display_name ?? ''} </h5>
               </div>
               <button onClick={e => {
                 goToNodeHandler(flows.find((flow) => flow.name == data.node.links[0].to), data.node.links[1].to)
@@ -568,7 +568,7 @@ export default function GenericNode({
                     <div
                       onMouseLeave={e => setIdBadge(false)}
                       onMouseDownCapture={e => setIdBadge(true)}
-                      className={handleClassNameForNodeName() + ' w-full h-full px-2 py-0.5 rounded-xl font-medium id-node-name '}>
+                      className={handleClassNameForNodeName() + ' w-full h-full px-2 py-0.5 rounded-xl font-medium id-node-name bg-muted '}>
                       <span>
                         {data.node.display_name}
                       </span>

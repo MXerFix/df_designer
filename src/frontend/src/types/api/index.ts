@@ -35,6 +35,7 @@ export type LinkClassType = {
   placeholder: string,
   linkType: string
   to: string
+  toName: string
 }
 
 export type ConditionClassType = {

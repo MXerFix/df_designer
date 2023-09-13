@@ -269,7 +269,8 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             options: [],
             placeholder: "To flow",
             linkType: "flow",
-            to: ""
+            to: "",
+            toName: '',
           },
           {
             name: "To Node",
@@ -278,7 +279,8 @@ export function TypesProvider({ children }: { children: ReactNode }) {
             options: [],
             placeholder: "To node",
             linkType: "node",
-            to: ""
+            to: "",
+            toName: '',
           },
           // {
           //   name: "To Condition",

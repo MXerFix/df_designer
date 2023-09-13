@@ -55,6 +55,10 @@ export default function AddFlowModal() {
   }
 
   function handleAddFlow() {
+    if (flows.find((f) => (f.name == name && f.id != tabId))) {
+      setErrorData({ title: "Flow with same name already exists!" })
+      return -1
+    }
     const flow = {
       name: name,
       description: description,

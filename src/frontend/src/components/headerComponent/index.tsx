@@ -57,13 +57,6 @@ export default function Header() {
     removeFlow(flow.id)
   }
 
-  useEffect(() => {
-    async function fetchStars() {
-      const starsCount = await getRepoStars("logspace-ai", "langflow");
-      setStars(starsCount);
-    }
-    fetchStars();
-  }, []);
   return (
     <div className="header-arrangement">
       <div className="header-start-display">
@@ -73,88 +66,10 @@ export default function Header() {
         {flows.findIndex((f) => tabId === f.id) !== -1 && tabId !== "" && (
           <MenuBar flows={flows} tabId={tabId} />
         )}
-        {/* <div className="flex flex-row items-end justify-end tabs-menu w-max">
-          {flows.map((flow) => {
-            const active = flow.id == tabId
-            return (
-              <>
-                <Link
-                  key={flow.id}
-                  to={"/flow/" + flow.id}
-                  onClick={e => setTabId(flow.id)}
-                  className={` flex flex-row items-center whitespace-nowrap text-sm border-tab ml-1 border-slate-300 ${!active ? "bg-node-back" : " bg-white border-b-white"} py-2 px-4 pr-2 `}>
-                  {flow.name}
-                  <Link
-                    to={active && currRefToDelete}
-                    onClick={e => { deleteFlowOnTabHandler(flow) }}
-                    className="ml-2 text-sm hover:bg-slate-200 rounded-full p-1">
-                    <XIcon className="w-3 h-3" />
-                  </Link>
-                </Link>
-              </>
-            )
-          })}
-          <button onClick={e => handleAddFlow()} className="text-sm py-2 px-3 ml-1 hover:bg-slate-200 rounded-t-md">
-            +
-          </button>
-        </div> */}
       </div>
-      {/* <div className="round-button-div">
-        <Link to="/">
-          <Button
-            className="gap-2"
-            variant={location.pathname === "/" ? "primary" : "secondary"}
-            size="sm"
-          >
-            <Home className="h-4 w-4" />
-            <div className="flex-1">{USER_PROJECTS_HEADER}</div>
-          </Button>
-        </Link>
-        <Link to="/community">
-          <Button
-            className="gap-2"
-            variant={
-              location.pathname === "/community" ? "primary" : "secondary"
-            }
-            size="sm"
-          >
-            <Users2 className="h-4 w-4" />
-            <div className="flex-1">Community Examples</div>
-          </Button>
-        </Link>
-      </div> */}
+      
       <div className="header-end-division">
         <div className="header-end-display">
-          {/* <a
-            href="https://github.com/logspace-ai/langflow"
-            target="_blank"
-            rel="noreferrer"
-            className="header-github-link"
-          >
-            <FaGithub className="mr-2 h-5 w-5" />
-            Star
-            <div className="header-github-display">
-              {stars}
-            </div>
-          </a>
-          <a
-            href="https://twitter.com/logspace_ai"
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted-foreground"
-          >
-            <FaTwitter className="side-bar-button-size" />
-          </a>
-          <a
-            href="https://discord.gg/EqksyE2EX9"
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted-foreground"
-          >
-            <FaDiscord className="side-bar-button-size" />
-          </a> */}
-
-          {/* <Separator orientation="vertical" /> */}
           <button onClick={e => openPopUp(<SettingsModal  />)} className="extra-side-bar-save-disable">
             <SettingsIcon width={20} height={20} />
           </button>
@@ -195,7 +110,6 @@ export default function Header() {
             )}
             <Bell className="side-bar-button-size" aria-hidden="true" />
           </button>
-          {/* <Separator orientation="vertical" /> */}
           <button className={`chat-btn bg-transparent text-sm flex flex-row py-1 px-3 rounded-md items-center justify-center w-max ${!dark ? 'text-black' : 'text-neutral-50'} hover:bg-blue-700 hover:text-neutral-50 chat-btn-fix `}>
             Chat with Skill
             <ChatIcon pathClassName={`chat-path`} className={`inline-block ml-2`} fill={dark ? 'white' : 'black'} />

@@ -942,7 +942,7 @@ The cursor: default; property value restores the browser's default cursor style 
 
 .edge-cust text {
   font-weight: 400 !important;
-  stroke-width: 0;
+  strokeWidth: 0;
 }
 
 .header-menu-bar-fix {
