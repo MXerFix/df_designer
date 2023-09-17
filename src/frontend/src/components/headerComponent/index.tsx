@@ -47,10 +47,7 @@ export default function Header() {
 
 
   const indexOfCurrFlow = flows.indexOf(flows.find(({ id }) => id == tabId))
-  // console.log(indexOfCurrFlow);
   const currRefToDelete = (indexOfCurrFlow >= 0) ? (indexOfCurrFlow == 0 ? (flows.length > 1 ? `/flow/${flows[1].id}` : `/`) : `/flow/${flows[indexOfCurrFlow - 1].id}`) : `/`
-  // console.log(currRefToDelete)
-  // const currRefToDelete = indexOfPrevFlow == 0 ? '/flow/' : `/flow/${flows[indexOfPrevFlow].id}`
 
 
   function deleteFlowOnTabHandler(flow: FlowType) {

@@ -68,15 +68,6 @@ export const MenuBar = ({ flows, tabId }) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-44">
               <DropdownMenuLabel>Options</DropdownMenuLabel>
-              {/* <DropdownMenuItem
-                onClick={() => {
-                  handleAddFlow();
-                }}
-                className="cursor-pointer"
-              >
-                <Plus className="header-menu-options" />
-                New
-              </DropdownMenuItem> */}
               <DropdownMenuItem
               onClick={() => {
                 undo();
@@ -104,38 +95,6 @@ export const MenuBar = ({ flows, tabId }) => {
                 <Settings2 className="header-menu-options " />
                 Settings
               </DropdownMenuItem>
-              {/* <DropdownMenuItem
-                onClick={e => { navigate(`/flow/${flows[0].id}`); removeFlow(current_flow.id); }}
-                className={`cursor-pointer `}
-              >
-                <XIcon className="mr-3 ml-0.5" />
-                Delete
-              </DropdownMenuItem> */}
-              {/* <DropdownMenuSeparator /> */}
-              {/* <DropdownMenuLabel>Flows</DropdownMenuLabel>
-              <DropdownMenuRadioGroup className="max-h-full overflow-scroll"
-                value={tabId}
-                onValueChange={(value) => {
-                  setTabId(value);
-                }}
-              >
-                {flows.map((flow, idx) => {
-                  return (
-                    <Link
-                      key={flow.id}
-                      to={"/flow/" + flow.id}
-                      className="flex w-full items-center"
-                    >
-                      <DropdownMenuRadioItem
-                        value={flow.id}
-                        className="flex-1 w-full inline-block truncate break-words mr-2"
-                      >
-                        {flow.name}
-                      </DropdownMenuRadioItem>
-                    </Link>
-                  );
-                })}
-              </DropdownMenuRadioGroup> */}
             </DropdownMenuContent>
           </DropdownMenu>
         </span>

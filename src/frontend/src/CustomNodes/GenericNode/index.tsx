@@ -50,7 +50,6 @@ export default function GenericNode({
   const [activePreTrans, setActivePreTrans] = useState<string[]>([])
 
   useEffect(() => {
-    // console.log(activePreRes, activePreTrans)
   }, [activePreRes, activePreTrans])
 
 
@@ -64,12 +63,9 @@ export default function GenericNode({
   const { setViewport, getEdges, setEdges, setNodes } = useReactFlow();
   const navigate = useNavigate()
   const edges = getEdges()
-  // console.log(edges)
 
   const goToNodeHandler = (currFlow: FlowType, nodeID: string) => {
     navigate(`/flow/${flows.find((flow) => currFlow.name == flow.name).id}`)
-    // const width = window.innerWidth
-    // const height = window.innerHeight
     const currNode: NodeType = currFlow.data.nodes.find((node) => node.data.id == nodeID)
     setTimeout(() => {
       const nodes = reactFlowInstance.getNodes()
@@ -80,18 +76,6 @@ export default function GenericNode({
   }
 
   const [links, setLinks] = useState<any>()
-
-  useEffect(() => {
-    // setLinks(<div> {data.node.links?.map((link, idx, arr) =>
-    //   <div key={link.to} className="px-4 py-2">
-    //     <span className="bg-[#F5B85A] p-1 rounded"> {link.name}:</span>
-    //     <span className={` ${link.name != "To Flow" ? 'bg-[#198BF6]' : 'bg-[#8338EC]'} p-1 rounded ml-2 text-white`}> {link.to} </span>
-    //     {link.name == 'To Node' && <button onClick={e => {
-    //       goToNodeHandler(flows.find((flow) => flow.name == arr[idx - 1].to), link.to)
-    //     }} > clg flow </button>}
-    //   </div>
-    // )} </div>)
-  }, [flows, closePopUp])
 
   useEffect(() => {
     if (data.node.base_classes[0] == 'links') {
@@ -238,12 +222,6 @@ export default function GenericNode({
     }
   }, [data.node.conditions, closePopUp, data.node.template['response']?.value, data.node.links])
 
-  //  default_node: "bg-[#198BF6] text-white border-transparent ",
-  // links: " bg-[#F5B85A] border-transparent  ",
-  // fallback_node: " bg-[#FF3434] text-[white] border-transparent  ",
-  // start_node: " bg-[#00CC99] text-[white] border-transparent  ",
-  // llm_node: "bg-[#7000FF] text-[white] border-transparent",
-
   const handleClassNameForNodeName = () => {
     // switch (data.node.base_classes[0]) {
     //   case "default_node": return "bg-[#198BF6] text-white border-transparent"
@@ -254,28 +232,6 @@ export default function GenericNode({
     // }
     return ""
   }
-
-  // const _data = flows.find((flow) => flow.id == tabId)?.data.nodes?.find((node) => node.id == data.id).data
-  // console.log(_data);
-
-
-
-  // useEffect(() => {
-  //   if (reactFlowInstance) {
-  //     setParams(Object.values(reactFlowInstance.toObject()));
-  //   }
-  // }, [save]);
-
-  // New useEffect to watch for changes in sseData and update validation status
-  // useEffect(() => {
-  //   const relevantData = sseData[data.id];
-  //   if (relevantData) {
-  //     // Extract validation information from relevantData and update the validationStatus state
-  //     setValidationStatus(relevantData);
-  //   } else {
-  //     setValidationStatus(null);
-  //   }
-  // }, [sseData, data.id]);
 
   if (!Icon) {
     if (showError.current) {
@@ -468,14 +424,6 @@ export default function GenericNode({
       ))))
   }, [pre_responses, pre_transitions, closePopUp])
 
-
-  // useEffect(() => {
-  //   console.log(data.node.display_name)
-  // }, [name])
-
-
-
-
   const [idBadge, setIdBadge] = useState(false)
 
 
@@ -495,26 +443,6 @@ export default function GenericNode({
           "generic-node-div new-node-style"
         )}
       >
-        {/* <div>
-          {inputLinks.map((inputLink) => (
-            <div>
-              <h5 className="font-bold"> {inputLink.flow} </h5>
-              {inputLink.sourceLinks.map((sourceLink: NodeType, idx) => (
-                <div>
-                  <h6 className="font-semibold"> {sourceLink.id} </h6>
-                  <div>
-                    {inputLink.sourceNodes[idx].map((sourceNode) => (
-                      <div>
-                        <p> {sourceNode.node} | {sourceNode.condition} </p>
-                        <button className="py-0.5 px-1 bg-[#3300FF] text-white" onClick={e => goToNodeHandler(flows.find((flow) => flow.name == inputLink.flow), sourceNode.node)}> go to node {sourceNode.node} </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div> */}
         {data.node.base_classes[0] == 'links' ? (
           <div className="generic-node-div-title gap-0 relative rounded-[15px] flex flex-col justify-center items-start">
             {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 mt-2", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
@@ -539,31 +467,7 @@ export default function GenericNode({
                 Links
               </button>}
               <div className="generic-node-title-arrangement">
-                {/* <Icon
-              strokeWidth={1.5}
-              className="generic-node-icon"
-              style={{
-                color: nodeColors[types[data.type]] ?? nodeColors.unknown,
-              }}
-            /> */}
                 <div className="generic-node-tooltip-div">
-                  {/* <ShadTooltip
-                delayDuration={1500}
-                content={data.node.display_name}
-              >
-                <div ref={refHtml} onClick={(e) => { setNameInput(true); e.stopPropagation() }} className="generic-node-tooltip-div text-primary">
-                  {!nameInput && (<span style={{ backgroundColor: titleNodeColors[data.node.base_classes[0]], borderRadius: "6px", padding: "2px 4px", color: titleTextNodeColors[data.node.base_classes[0]] }}>{nameInput ? '' : (name == '' ? data.node.display_name : name)}</span>)}
-                  {nameInput ?
-                    <div className="relative">
-                      <InputComponent placeholder="Enter new node name" value="" password={false} onChange={(e) => { setName(e) }} />
-                      <button className="absolute top-1 right-1 p-1 hover:bg-slate-200 rounded-md " onClick={(e) => { setNameInput(false); e.stopPropagation(); e.preventDefault(); data.node.display_name = name }} > OK </button>
-                    </div>
-                    : <></>}
-                </div>
-              </ShadTooltip> */}
-                  {/* <ShadTooltip delayDuration={100} side="top" content={`ID: ${data.id}`}>
-                    <Badge variant={data.node.base_classes[0]}> {data.node.display_name} </Badge>
-                  </ShadTooltip> */}
                   <div className="flex flex-row items-center">
                     <div
                       onMouseLeave={e => setIdBadge(false)}
@@ -596,10 +500,6 @@ export default function GenericNode({
                         "Validating..."
                       ) : (
                         <div className="generic-node-validation-div">
-                          {/* {validationStatus.params ||
-                        ""
-                          .split("\n")
-                          .map((line, index) => <div key={index}>{line}</div>)} */}
                           <span> Ready for connection </span>
                         </div>
                       )
@@ -636,10 +536,6 @@ export default function GenericNode({
               </div>
             </div>
             <div className="generic-node-desc m-0 py-2 pt-0">
-              {/* <div className="generic-node-desc-text">
-            {data.node.description}
-          </div> */}
-
               <>
                 <div className="flex flex-col items-center w-full">
                   {nodeParamsList}
@@ -654,25 +550,9 @@ export default function GenericNode({
                 >
                   {" "}
                 </div>
-                {/* <div className="px-5 py-2 mt-2 text-center">
-                  Output
-              </div> */}
-                {data.node.base_classes.map((base_class, idx) => {
+                {/* {data.node.base_classes.map((base_class, idx) => {
 
-
-                  // return (
-                  //   <ParameterComponent
-                  //     key={idx + [data.type, data.id, ...data.node.base_classes].join("|")}
-                  //     data={data}
-                  //     color={nodeColors[types[data.type]] ?? nodeColors.unknown}
-                  //     title={data.type}
-                  //     tooltipTitle={`${data.node.base_classes.join("\n")}`}
-                  //     id={[data.type, data.id, ...data.node.base_classes].join("|")}
-                  //     type={data.node.base_classes.join("|")}
-                  //     left={false}
-                  //   />
-                  // )
-                })}
+                })} */}
                 {(data.node.base_classes[0] === "default_node" || data.node.base_classes[0] === "llm_node") && (
                   <div className="flex w-full items-center justify-center mt-1">
                     <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back" : "bg-muted hover:bg-slate-700"} py-1 px-6  text-[#3300FF] transition-all rounded-lg new-cnd-btn `} onClick={(e) => {
@@ -710,46 +590,6 @@ export default function GenericNode({
                       data.node.conditions.push(newCondition)
                       setConditions(prev => [...prev, newConditionJSX])
                       setConditionCounter(prev => prev + 1)
-                      // console.log(data.node.conditions)
-                      // console.log(conditions);
-
-                      // console.log(nodeParamsList.length)
-                      // data.node.template[`condition${nodeParamsList.length}`] = {
-                      //   name: `condition`,
-                      //   id: data.node.template["response"].type + "|" + `condition${nodeParamsList.length}` + "|" + data.id,
-                      //   list: data.node.template["response"].list,
-                      //   required: data.node.template["response"].required,
-                      //   show: data.node.template["response"].show,
-                      //   type: `condition`,
-                      //   placeholder: data.node.template["response"].placeholder,
-                      //   multiline: data.node.template["response"].multiline,
-                      //   priority: 1,
-                      //   value: "",
-                      // }
-                      // console.log(data.node.template);
-                      // setNodeParamsList(prev => [...prev, <ParameterComponent
-                      //   data={data}
-                      //   color={
-                      //     nodeColors[types[data.node.template["response"].type]] ??
-                      //     nodeColors.unknown
-                      //   }
-                      //   title={
-                      //     `Condition ${nodeParamsList.length}`
-                      //     // ? data.node.template["condition"].display_name + `${nodeParamsList.length}`
-                      //     // : data.node.template["condition"].name + `${nodeParamsList.length}`
-                      //     //   ? toTitleCase(data.node.template["condition"].name) + `${nodeParamsList.length}`
-                      //     //   : toTitleCase("condition") + `${nodeParamsList.length}`
-                      //   }
-                      //   info={''}
-                      //   name={`condition`}
-                      //   tooltipTitle={data.node.template["response"].type}
-                      //   required={data.node.template["response"].required}
-                      //   id={data.node.template["response"].type + "|" + `condition${nodeParamsList.length}` + "|" + data.id}
-                      //   left={false}
-                      //   type={`condition`}
-                      //   key={data.node.template["response"].display_name + `${nodeParamsList.length}`}
-                      //   priority={1}
-                      // />])
                     }} >
                       <ConditionPlusIcon fill="#3300FF" />
                     </button>

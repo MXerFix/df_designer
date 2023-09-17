@@ -28,24 +28,11 @@ export const LinkComponent = ({ options, type, linkType, setTarget, defaultValue
       : ''
 
       console.log(options)
-  
-
-  // useEffect(() => {
-  //   console.log(option);
-  // }, [option])
-
-  // if (disabled) {
-  //   return (
-  //     <select onChange={(e) => setOption(e.target.value)} name="" id="">
-  //       <option disabled value="">Choose previous option</option>
-  //     </select>
-  //   )
-  // }
 
 
   return (
     <div className='mb-3'>
-      <select className='bg-node-back rounded-xl px-4 py-1' value={option} onChange={(e) => { console.log(e.target.value) ;setOption(e.target.value); setTarget(e.target.value); link.to = e.target.value;}}>
+      <select className='bg-background border-[1px] border-foreground w-full h-10 rounded-lg px-4 py-1' value={option} onChange={(e) => { console.log(e.target.value) ;setOption(e.target.value); setTarget(e.target.value); link.to = e.target.value;}}>
         <option value="">Choose option...</option>
         {options.map((option) => {
           return (
@@ -53,7 +40,6 @@ export const LinkComponent = ({ options, type, linkType, setTarget, defaultValue
           )
         })}
       </select>
-      {/* <Dropdown options={['Choose an option', ...options]} value={option} onSelect={e => {setOption(e === 'Choose an option' ? '' : e); setTarget(e === 'Choose an option' ? '' : e); link.to = e === 'Choose an option' ? '' : e}} /> */}
     </div>
   )
 }

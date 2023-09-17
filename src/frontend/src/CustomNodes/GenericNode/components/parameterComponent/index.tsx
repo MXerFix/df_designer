@@ -205,9 +205,6 @@ export default function ParameterComponent({
   }
 
 
-  // const flowsOptions = flows.map((flow) => flow.name)
-
-
   return (
     <div
       ref={ref}
@@ -226,7 +223,6 @@ export default function ParameterComponent({
               <div className={`flex flex-row ${type != 'condition' && ''} items-center`}>
                 {type == `condition` ? <PersonIcon className="mr-2" /> : <></>}
                 {title}
-                {/* <span className="text-destructive">{required ? " *" : ""}</span> */}
               </div>
               <div className="flex flex-row items-center">
                 <span className="text-neutral-400"> {priority} </span>
@@ -261,9 +257,6 @@ export default function ParameterComponent({
                 type={left ? "target" : "source"}
                 position={left ? Position.Left : Position.Right}
                 id={id}
-                // isValidConnection={(connection) =>
-                //   isValidConnection(connection, reactFlowInstance)
-                // }
                 isConnectable={true}
                 className={classNames(
                   left ? "-ml-0.5 " : "-mr-0.5 ",
@@ -277,11 +270,17 @@ export default function ParameterComponent({
               ></Handle>
             </ShadTooltip>
             <div className="relative">
-              <div onContextMenu={(e) => handleClick(e)} style={{ borderColor: '#FF9500' }} className={classNames(forwardsItem != 'default' ? '' : 'hidden', 'absolute flex flex-row items-center justify-center w-max left-[305px] ml-8 bg-node-back px-2 text-xs font-semibold rounded rounded-e-lg -top-[22px] border-2')}>
+              <div
+                onContextMenu={(e) => handleClick(e)}
+                style={{ borderColor: '#FF9500' }}
+                className={classNames(forwardsItem != 'default' ? '' : 'hidden', 'absolute flex flex-row items-center justify-center w-max left-[305px] ml-8 bg-node-back px-2 text-xs font-semibold rounded rounded-e-lg -top-[22px] border-2')}>
                 {forwardsItem}
                 <span className="ml-1">{iconType}</span>
               </div>
-              <TransitionList forwardsMenu={forwardsMenu} handleConditionType={handleConditionType} id={id} />
+              <TransitionList
+                forwardsMenu={forwardsMenu}
+                handleConditionType={handleConditionType}
+                id={id} />
             </div>
           </div>
 
