@@ -77,7 +77,7 @@ export default function ExtraSidebar() {
     setTimeout(() => {
       const nodes = reactFlowInstance.getNodes()
       let node = nodes.find((node) => node.id == currNode.id)
-      reactFlowInstance.fitBounds({ x: currNode.position.x - node.width/2, y: currNode.position.y - node.height/2, width: node.width *2, height: node.height *2 })
+      reactFlowInstance.fitBounds({ x: currNode.position.x - node.width / 2, y: currNode.position.y - node.height / 2, width: node.width * 2, height: node.height * 2 })
       node.selected = true
     }, 50);
   }
@@ -234,7 +234,7 @@ export default function ExtraSidebar() {
             }}
           />
         </div>
-        <h5 className="mb-2 mt-4"> Available components: </h5>
+        <h5 className="mb-2 mt-4 ml-2"> Available components: </h5>
         {Object.keys(dataFilter)
           .sort()
           .map((d: keyof APIObjectType, i) =>
@@ -298,40 +298,42 @@ export default function ExtraSidebar() {
               <div key={i}></div>
             )
           )}
-        <div className="side-bar-components-gap pb-10">
-          <h5 className=" mt-4"> Results: </h5>
-          <div>
-            {nodesFilter?.map((nf: FilterNodesType) => {
-              if (nf.filteredNodes?.length) {
-                return (
-                  <div className="mt-2">
-                    <div className="flex flex-row items-center justify-start gap-1.5">
-                      <span className={` w-4 h-4 block rounded-full `} style={{ backgroundColor: nf.flow.color ?? "grey", opacity: 0.7 }} >  </span>
-                      <p className="font-semibold"> {nf.flow.name ?? ''} </p>
-                    </div>
-                    <div className="mt-1">
-                      {nf.filteredNodes?.map((node) => {
-                        return (
-                          <div
-                            className={"side-bar-components-border mb-1 "}
-                            style={{
-                              borderLeftColor:
-                                titleNodeColors[node.data.node.base_classes[0]] ?? nodeColors.unknown,
-                            }}
-                          >
-                            <div onClick={e => goToNodeHandler(nf.flow, node.id)} className="flex flex-row items-center justify-between side-bar-components-div-form px-3 py-1.5 cursor-pointer border-solid ">
-                              <p> {node.data.node.display_name ?? ''} </p>
+        {search ? (
+          <div className="side-bar-components-gap pb-10">
+            <h5 className=" mt-4"> Results: </h5>
+            <div>
+              {nodesFilter?.map((nf: FilterNodesType) => {
+                if (nf.filteredNodes?.length) {
+                  return (
+                    <div className="mt-2">
+                      <div className="flex flex-row items-center justify-start gap-1.5">
+                        <span className={` w-4 h-4 block rounded-full `} style={{ backgroundColor: nf.flow.color ?? "grey", opacity: 0.7 }} >  </span>
+                        <p className="font-semibold"> {nf.flow.name ?? ''} </p>
+                      </div>
+                      <div className="mt-1">
+                        {nf.filteredNodes?.map((node) => {
+                          return (
+                            <div
+                              className={"side-bar-components-border mb-1 "}
+                              style={{
+                                borderLeftColor:
+                                  titleNodeColors[node.data.node.base_classes[0]] ?? nodeColors.unknown,
+                              }}
+                            >
+                              <div onClick={e => goToNodeHandler(nf.flow, node.id)} className="flex flex-row items-center justify-between side-bar-components-div-form px-3 py-1.5 cursor-pointer border-solid ">
+                                <p> {node.data.node.display_name ?? ''} </p>
+                              </div>
                             </div>
-                          </div>
-                        )
-                      })}
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )
-              }
-            })}
+                  )
+                }
+              })}
+            </div>
           </div>
-        </div>
+        ) : <></>}
       </div>
     </div>
   );
