@@ -86,6 +86,11 @@ module.exports = {
         "success-foreground": "var(--success-foreground)",
         "res-trans-add": "#8D96B5",
 
+        double: {
+          active: "var(--double-active)",
+          inactive: 'var(--double-inactive)',
+        },
+        
         white: "#FFFFFF",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

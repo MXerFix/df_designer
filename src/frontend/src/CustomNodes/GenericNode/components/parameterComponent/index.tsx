@@ -36,6 +36,7 @@ import { TransitionList } from "./components/transitionsList";
 import EditConditionModal from "../../../../modals/editConditionModal";
 import useTraceUpdate from "../../../../hooks/useTraceUpdate";
 import EditLLMPromptModal from "../../../../modals/llmPromptEdit";
+import { darkContext } from "../../../../contexts/darkContext";
 
 export default function ParameterComponent({
   left,
@@ -59,6 +60,7 @@ export default function ParameterComponent({
   const [position, setPosition] = useState(0);
   const { closePopUp, openPopUp } = useContext(PopUpContext);
   const { setTabsState, tabId, save, saveFlow, updateFlow } = useContext(TabsContext);
+  const { dark } = useContext(darkContext)
   let { flows } = useContext(TabsContext)
   const { setEdges } = useReactFlow()
   const [forwardsMenu, setForwardsMenu] = useState(false)
@@ -208,7 +210,7 @@ export default function ParameterComponent({
   return (
     <div
       ref={ref}
-      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full" : 'mb-1 bg-muted new-templates') + ' ' + (type == 'condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
+      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full rounded-none" : 'mb-1 bg-secondary new-templates border-[1px] border-border') + ' ' + (type == 'condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
     >
       <>
         {
@@ -221,12 +223,12 @@ export default function ParameterComponent({
               }
             >
               <div className={`flex flex-row ${type != 'condition' && ''} items-center`}>
-                {type == `condition` ? <PersonIcon className="mr-2" /> : <></>}
+                {type == `condition` ? <PersonIcon fill='var(--condition-default)' className="mr-2" /> : <></>}
                 {title}
               </div>
               <div className="flex flex-row items-center">
                 <span className="text-neutral-400"> {priority} </span>
-                {type == 'condition' && <button onClick={e => openPopUp(<EditConditionModal data={data} conditionID={conditionID} />)}> <ChangeConditionIcon className="ml-8" /> </button>}
+                {type == 'condition' && <button onClick={e => openPopUp(<EditConditionModal data={data} conditionID={conditionID} />)}> <ChangeConditionIcon fill={dark ? "white" : "black"} className="ml-8" /> </button>}
                 <div className="">
                   {info !== "" && (
                     <ShadTooltip content={infoHtml.current}>
@@ -308,8 +310,8 @@ export default function ParameterComponent({
                 onChange={handleOnNewValue}
               />
             ) : (
-              <div className="flex flex-row w-full mt-2 items-center">
-                {name == 'response' && <BotIcon className="mr-2" />}
+              <div className="flex flex-row w-full mt-0 items-center">
+                {name == 'response' && <BotIcon fill={dark ? "white" : "black"} className="mr-2" />}
                 {name == 'response' ?
                   <>
                     {data.node.template[name].value ? data.node.template[name].value : "‘I am a bot and here is my quote’"}

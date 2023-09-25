@@ -27,6 +27,9 @@
     --radius: 0.5rem;
     --ring: 215 20.2% 65.1%; /* hsl(215 20% 65%) */
 
+    --double-active: #fff;
+    --double-inactive: hsl(210 40% 98%);
+
     --round-btn-shadow: #00000063;
 
     --error-background: #fef2f2;
@@ -41,6 +44,9 @@
     --high-indigo: #4338ca;
     --medium-indigo: #6366f1;
 
+    --condition-default: #3300FF;
+    --condition-custom: #C6C;
+
     /* Colors that are shared in dark and light mode */
     --blur-shared: #151923de;
     --build-trigger: #dc735b;
@@ -52,38 +58,41 @@
   }
 
   .dark {
-    --background: 224 35% 7.5%; /* hsl(224 40% 10%) */
-    --foreground: 213 31% 85%; /* hsl(213 31% 91%) */
+    --background: 240 1% 13%; /* hsl(240 1% 13%) */
+    --foreground: 0 0% 100%; /* hsl(0 0% 100%) */
 
-    --muted: 223 27% 11%; /* hsl(223 27% 11%) */
-    --muted-foreground: 215.4 16.3% 56.9%; /* hsl(215 16% 56%) */
+    --muted: 0 0% 7%; /* hsla(0, 0%, 7%, 1) */
+    --muted-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
 
     --popover: 224 71% 4%; /* hsl(224 71% 4%) */
-    --popover-foreground: 215 20.2% 65.1%; /* hsl(215 20% 65%) */
+    --popover-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
 
-    --card: 224 25% 15.5%; /* hsl(224 71% 4%) */
-    --card-foreground: 213 31% 80%; /* hsl(213 31% 91%) */
+    --card: 0 1% 21%; /* hsl(0 1% 21%) */
+    --card-foreground: 0 0% 100%; /* hsl(0 0% 100%)  */
 
-    --border: 216 24% 17%; /* hsl(216 34% 17%) */
-    --input: 216 24% 17%; /* hsl(216 34% 17%) */
+    --border: 0 1% 21%; /* hsl(0 1% 21%) */
+    --input: 0 1% 21%; /* hsla(0, 0%, 7%, 1)*/
 
-    --primary: 210 20% 80%; /* hsl(210 40% 98%) */
-    --primary-foreground: 222.2 27.4% 1.2%; /* hsl(222 47% 1%) */
+    --primary: 0 1% 21%; /* hsla(0, 1%, 21%, 1)  */
+    --primary-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
 
-    --secondary: 222.2 47.4% 11.2%; /* hsl(222 47% 11%) */
-    --secondary-foreground: 210 40% 98%; /* hsl(210 40% 98%) */
+    --secondary: 240 1% 13%; /* hsl(240 1% 13%) */
+    --secondary-foreground: 0 0% 100%; /* hsl(0 0% 100%)  */
 
-    --accent: 216 24% 17%; /* hsl(216 34% 17%) */
-    --accent-foreground: 210 30% 98%; /* hsl(210 40% 98%) */
+    --accent: 0 1% 21%; /* hsl(0 1% 21%) */
+    --accent-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
 
     --destructive: 0 63% 31%; /* hsl(0 63% 31%) */
-    --destructive-foreground: 210 40% 98%; /* hsl(210 40% 98%) */
+    --destructive-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
 
-    --ring: 216 24% 30%; /* hsl(216 24% 30%) */
+    --ring: 0 1% 21%; /* hsl(0 1% 30%) */
 
     --radius: 0.5rem;
 
     --round-btn-shadow: #00000063;
+
+    --double-active: #353434;
+    --double-inactive: #212121;
 
     --success-background: #022c22;
     --success-foreground: #ecfdf5;
@@ -97,8 +106,11 @@
     --high-indigo: #4338ca;
     --medium-indigo: #6366f1;
 
+    --condition-default: rgba(51, 153, 204, 1);
+    --condition-custom: #C6C;
+
     /* Colors that are shared in dark and light mode */
-    --blur-shared: #151923d2;
+    --blur-shared: #1f2021d2;
     --build-trigger: #dc735b;
     --chat-trigger: #5c8be1;
     --status-red: #ef4444;
@@ -234,7 +246,7 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply -mt-px flex w-full select-none items-center justify-between border-y border-y-input bg-muted px-3 py-2;
   }
   .components-disclosure-title {
-    @apply flex items-center text-sm text-primary;
+    @apply flex items-center text-sm text-foreground;
   }
   .components-disclosure-div {
     @apply flex gap-2;
@@ -896,6 +908,19 @@ The cursor: default; property value restores the browser's default cursor style 
   .api-modal-table-arrangement {
     @apply flex h-fit flex-col gap-5;
   }
+
+  .header-double-button {
+    @apply bg-double-inactive flex flex-row items-center justify-center rounded-lg curr-shadow overflow-hidden
+  }
+
+  .double-button-button {
+    @apply h-9 w-10 first:border-r-[1px] border-border flex flex-col items-center justify-center
+  }
+
+  .double-button-button-active {
+    @apply bg-double-active
+  }
+
 }
 
 .border-tab {
@@ -947,32 +972,31 @@ The cursor: default; property value restores the browser's default cursor style 
 
 .header-menu-bar-fix {
   box-shadow: 0px 8px 15px 0px rgba(14, 1, 66, 0.08);
-  border-radius: 6px;
-  border: 0px solid var(--c, #f0f0f3);
+  border-radius: 7px;
+  border: 0px solid var(--border);
   background: var(--unnamed, #fff);
 }
 
 .chat-btn-fix {
   border-radius: 6px;
-  border: 0px solid var(--c, #f0f0f3);
+  border: 0px solid var(--border);
   background: var(--unnamed, #fff);
   box-shadow: 0px 8px 15px 0px rgba(14, 1, 66, 0.08);
 }
 
 .new-templates {
-  border: 1px solid #f0f0f3;
+  /* border: 1px solid (var(--border)); */
 }
 
 .new-node-style {
   border-radius: 16px;
-  border: 1px solid var(--10, #f0f0f3);
-  background: #fff;
+  /* border: 1px solid var(--border); */
   box-shadow: 0px 8px 15px 0px rgba(14, 1, 66, 0.08);
 }
 
 .new-cnd-btn {
   width: 95%;
-  border: 1px solid var(--10, #f0f0f3);
+  /* border: 1px solid var(--border); */
 }
 
 .curr-shadow {

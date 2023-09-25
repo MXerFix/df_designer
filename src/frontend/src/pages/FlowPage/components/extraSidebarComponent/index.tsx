@@ -7,7 +7,7 @@ import {
   nodeNames,
   titleNodeColors,
 } from "../../../../utils";
-import { useContext, useState } from "react";
+import { ChangeEvent, useContext, useState } from "react";
 import { typesContext } from "../../../../contexts/typesContext";
 import { APIClassType, APIObjectType } from "../../../../types/api";
 import ShadTooltip from "../../../../components/ShadTooltipComponent";
@@ -32,10 +32,14 @@ import { SaveIcon } from "../../../../icons/SaveIcon";
 import { CodeIcon } from "../../../../icons/CodeIcon";
 import { ManageIcon } from "../../../../icons/ManageIcon";
 import EditFlowSettings from "../../../../components/EditFlowSettingsComponent";
+import { darkContext } from "../../../../contexts/darkContext";
+import { FlowType, NodeType } from "../../../../types/flow";
+import { FilterNodesType } from "../../../../types/components";
 
 export default function ExtraSidebar() {
   const { data } = useContext(typesContext);
   const { openPopUp } = useContext(PopUpContext);
+  const { dark } = useContext(darkContext)
   const { flows, tabId, uploadFlow, tabsState, saveFlow, save, setTabId, addFlow, removeFlow } =
     useContext(TabsContext);
 
@@ -45,6 +49,7 @@ export default function ExtraSidebar() {
 
   const { setSuccessData, setErrorData } = useContext(alertContext);
   const [dataFilter, setFilterData] = useState(data);
+  const [nodesFilter, setNodesFilter] = useState<FilterNodesType[]>()
   const [search, setSearch] = useState("");
   const [activeFlow, setActiveFlow] = useState(tabId)
   const isPending = tabsState[tabId]?.isPending;
@@ -66,6 +71,17 @@ export default function ExtraSidebar() {
     event.dataTransfer.setData("json", JSON.stringify(data));
   }
 
+  const goToNodeHandler = (currFlow: FlowType, nodeID: string) => {
+    navigate(`/flow/${flows.find((flow) => currFlow.name == flow.name).id}`)
+    const currNode: NodeType = currFlow.data.nodes.find((node) => node.data.id == nodeID)
+    setTimeout(() => {
+      const nodes = reactFlowInstance.getNodes()
+      let node = nodes.find((node) => node.id == currNode.id)
+      reactFlowInstance.fitBounds({ x: currNode.position.x - node.width/2, y: currNode.position.y - node.height/2, width: node.width *2, height: node.height *2 })
+      node.selected = true
+    }, 50);
+  }
+
   function handleSearchInput(e: string) {
     setFilterData((_) => {
       let ret = {};
@@ -80,6 +96,17 @@ export default function ExtraSidebar() {
       });
       return ret;
     });
+  }
+
+  const handleSearchInputActiveNodes = (e: string) => {
+    // console.log(nodesFilter)
+    const currFlows = flows.filter((flow) => flow.data.nodes.filter((node: NodeType) => node.data.node.display_name.toLowerCase().includes(e.toLowerCase())))
+    const currNodes = currFlows.map((flow) => {
+      const nodes = flow.data.nodes.filter((node: NodeType) => node.data.node.display_name.toLowerCase().includes(e.toLowerCase()))
+      return { flow: flow, filteredNodes: nodes }
+    })
+    setNodesFilter(prev => currNodes)
+    return currNodes
   }
 
   function handleAddFlow() {
@@ -104,7 +131,7 @@ export default function ExtraSidebar() {
               uploadFlow();
             }}
           >
-            <FileUpIcon />
+            <FileUpIcon fill={dark ? "white" : "black"} />
           </button>
         </ShadTooltip>
 
@@ -115,7 +142,7 @@ export default function ExtraSidebar() {
               openPopUp(<ExportModal />);
             }}
           >
-            <FileDownIcon />
+            <FileDownIcon fill={dark ? "white" : "black"} />
           </button>
         </ShadTooltip>
         <ShadTooltip content="Code" side="top">
@@ -125,7 +152,7 @@ export default function ExtraSidebar() {
               openPopUp(<ApiModal flow={flows.find((f) => f.id === tabId)} />);
             }}
           >
-            <CodeIcon />
+            <CodeIcon fill={dark ? "white" : "black"} />
           </button>
         </ShadTooltip>
 
@@ -139,7 +166,7 @@ export default function ExtraSidebar() {
             disabled={!isPending}
           >
             <SaveIcon
-              stroke={!isPending ? '#777' : '#000'}
+              stroke={dark ? (!isPending ? '#777' : '#fff') : (!isPending ? '#777' : '#000')}
             ></SaveIcon>
           </button>
         </ShadTooltip>
@@ -152,13 +179,13 @@ export default function ExtraSidebar() {
             <button
               onClick={e => openPopUp(<FlowSettingsModal />)}
               disabled={tabId == 'GLOBAL'}
-              className={`flex flex-row items-center w-max justify-between text-sm bg-white`}>
-              <ManageIcon fill={tabId == 'GLOBAL' ? '#ddd' : 'black'} />
+              className={`flex flex-row items-center w-max justify-between text-sm bg-transparent`}>
+              <ManageIcon fill={dark ? (tabId == 'GLOBAL' ? '#ddd' : 'white') : (tabId == 'GLOBAL' ? '#ddd' : 'black')} />
             </button>
             <button
               onClick={e => openPopUp(<AddFlowModal />)}
-              className={`flex flex-row items-center w-max justify-between text-sm bg-white`}>
-              <PlusIcon />
+              className={`flex flex-row items-center w-max justify-between text-sm bg-transparent`}>
+              <PlusIcon fill={dark ? "white" : "black"} />
               {/* {active && <CheckSVG />} */}
             </button>
           </div>
@@ -203,9 +230,11 @@ export default function ExtraSidebar() {
             onChange={(e) => {
               handleSearchInput(e.target.value);
               setSearch(e.target.value);
+              handleSearchInputActiveNodes(e.target.value);
             }}
           />
         </div>
+        <h5 className="mb-2 mt-4"> Available components: </h5>
         {Object.keys(dataFilter)
           .sort()
           .map((d: keyof APIObjectType, i) =>
@@ -269,7 +298,40 @@ export default function ExtraSidebar() {
               <div key={i}></div>
             )
           )}
-
+        <div className="side-bar-components-gap pb-10">
+          <h5 className=" mt-4"> Results: </h5>
+          <div>
+            {nodesFilter?.map((nf: FilterNodesType) => {
+              if (nf.filteredNodes?.length) {
+                return (
+                  <div className="mt-2">
+                    <div className="flex flex-row items-center justify-start gap-1.5">
+                      <span className={` w-4 h-4 block rounded-full `} style={{ backgroundColor: nf.flow.color ?? "grey", opacity: 0.7 }} >  </span>
+                      <p className="font-semibold"> {nf.flow.name ?? ''} </p>
+                    </div>
+                    <div className="mt-1">
+                      {nf.filteredNodes?.map((node) => {
+                        return (
+                          <div
+                            className={"side-bar-components-border mb-1 "}
+                            style={{
+                              borderLeftColor:
+                                titleNodeColors[node.data.node.base_classes[0]] ?? nodeColors.unknown,
+                            }}
+                          >
+                            <div onClick={e => goToNodeHandler(nf.flow, node.id)} className="flex flex-row items-center justify-between side-bar-components-div-form px-3 py-1.5 cursor-pointer border-solid ">
+                              <p> {node.data.node.display_name ?? ''} </p>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )
+              }
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

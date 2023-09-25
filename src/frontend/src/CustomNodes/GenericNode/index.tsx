@@ -439,29 +439,30 @@ export default function GenericNode({
 
       <div
         className={classNames(
+          "generic-node-div new-node-style",
           selected ? "border border-ring" : "border",
-          "generic-node-div new-node-style"
+
         )}
       >
         {data.node.base_classes[0] == 'links' ? (
-          <div className="generic-node-div-title gap-0 relative rounded-[15px] flex flex-col justify-center items-start">
+          <div className={`generic-node-div-title bg-accent ${dark ? "border-0" : ''} gap-0 relative rounded-[15px] flex flex-col justify-center items-start`}>
             {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 mt-2", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
-            <span className="text-[#8D96B5] font-semibold mb-2">
+            <span className="text-foreground font-semibold mb-2">
               {data.node.links[0].to}
             </span>
             <div className="flex flex-row items-center justify-between w-full gap-3 mb-4 ml-3">
               <div className="flex flex-row items-center">
-                <EditLinkIcon />
+                <EditLinkIcon fill={dark ? "white" : "black"} />
                 <h5 className="ml-1"> {flows.find((flow) => flow.name == data.node.links[0].to)?.data?.nodes?.find((node: NodeType) => node.id == data.node.links[1].to)?.data?.node?.display_name ?? ''} </h5>
               </div>
               <button onClick={e => {
                 goToNodeHandler(flows.find((flow) => flow.name == data.node.links[0].to), data.node.links[1].to)
-              }} className="bg-white px-2 rounded-lg curr-shadow border-[1px] mr-3 font-semibold"> go to node -&gt; </button>
+              }} className="bg-background px-2 rounded-lg curr-shadow border-[1px] mr-3 font-semibold"> go to node -&gt; </button>
             </div>
           </div>
         ) : (
           <>
-            <div className="generic-node-div-title relative rounded-t-[15px]">
+            <div className={`generic-node-div-title ${dark && 'bg-background'} relative rounded-t-[15px]`}>
               {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames(`-ml-0.5 ${inputLinks.length != 0 && "mt-2"}`, "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
               {data.node.base_classes[0] == 'default_node' && inputLinks.length != 0 && <button className={`absolute -left-8 top-2.5 px-1 text-[10px] border-blue-condition border-[2px] font-semibold rounded-s-lg rounded-e ${!dark ? "bg-white" : "bg-muted"}`} onClick={e => openPopUp(<InputConditionsModal goToHandler={goToNodeHandler} data={data} />)}>
                 Links
@@ -472,7 +473,7 @@ export default function GenericNode({
                     <div
                       onMouseLeave={e => setIdBadge(false)}
                       onMouseDownCapture={e => setIdBadge(true)}
-                      className={handleClassNameForNodeName() + ' w-full h-full px-2 py-0.5 rounded-xl font-medium id-node-name bg-muted '}>
+                      className={handleClassNameForNodeName() + ` w-full h-full px-2 py-0.5 rounded-xl font-medium id-node-name ${dark ? `bg-background` : "bg-muted"} `}>
                       <span>
                         {data.node.display_name}
                       </span>
@@ -535,7 +536,7 @@ export default function GenericNode({
                 </div>
               </div>
             </div>
-            <div className="generic-node-desc m-0 py-2 pt-0">
+            <div className="generic-node-desc bg-card m-0 py-2 pt-0 rounded-b-[15px]">
               <>
                 <div className="flex flex-col items-center w-full">
                   {nodeParamsList}
@@ -555,7 +556,7 @@ export default function GenericNode({
                 })} */}
                 {(data.node.base_classes[0] === "default_node" || data.node.base_classes[0] === "llm_node") && (
                   <div className="flex w-full items-center justify-center mt-1">
-                    <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back" : "bg-muted hover:bg-slate-700"} py-1 px-6  text-[#3300FF] transition-all rounded-lg new-cnd-btn `} onClick={(e) => {
+                    <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back border-[1px] border-border " : "bg-card hover:bg-muted border-[1px] border-muted"} py-1 px-6 transition-all rounded-lg new-cnd-btn  `} onClick={(e) => {
                       // console.log(conditionCounter)
                       const newCondition: ConditionClassType = {
                         conditionID: conditionCounter,
@@ -591,7 +592,7 @@ export default function GenericNode({
                       setConditions(prev => [...prev, newConditionJSX])
                       setConditionCounter(prev => prev + 1)
                     }} >
-                      <ConditionPlusIcon fill="#3300FF" />
+                      <ConditionPlusIcon fill="var(--condition-default)" />
                     </button>
                   </div>
                 )}

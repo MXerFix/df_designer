@@ -1,5 +1,5 @@
 import { ReactElement, ReactNode } from "react";
-import { NodeDataType } from "../flow/index";
+import { FlowType, NodeDataType, NodeType } from "../flow/index";
 import { typesContextType } from "../typesContext";
 
 export type SVGElementInterface = {
@@ -142,3 +142,8 @@ export type ShadTooltipProps = {
   content: ReactNode;
   children: ReactNode;
 };
+
+export type FilterNodesType = {
+  flow: FlowType
+  filteredNodes: NodeType[]
+}

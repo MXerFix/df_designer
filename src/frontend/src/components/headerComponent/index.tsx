@@ -19,6 +19,11 @@ import { FlowType } from "../../types/flow";
 import { NewLogo } from "../../icons/NewLogo";
 import AddFlowModal from "../../modals/addFlowModal";
 import SettingsModal from "../../modals/SettingsModal";
+import { CursorIcon } from "../../icons/CursorIcon";
+import { GrabberIcon } from "../../icons/GrabberIcon";
+import { DoubleButton } from "../ui/double-button";
+import { WorkSpaceModeIcon } from "../../icons/CanvaModeIcon";
+import { NodesPlacementIcon } from "../../icons/NodesPlacementIcon";
 
 export default function Header() {
   const { flows, addFlow, tabId, setTabId, removeFlow } = useContext(TabsContext);
@@ -32,6 +37,8 @@ export default function Header() {
   const location = useLocation();
 
   const [stars, setStars] = useState(null);
+  const [workSpaceMode, setWorkSpaceMode] = useState(false)
+  const [nodesPlacement, setNodesPlacement] = useState(false)
   const navigate = useNavigate()
 
   function handleAddFlow() {
@@ -63,11 +70,20 @@ export default function Header() {
         {flows.findIndex((f) => tabId === f.id) !== -1 && tabId !== "" && (
           <MenuBar flows={flows} tabId={tabId} />
         )}
+        {tabId !== '' && (
+          <>
+            <DoubleButton setFunction={setWorkSpaceMode} isActive={workSpaceMode} First={CursorIcon} Second={GrabberIcon} />
+            <DoubleButton setFunction={setNodesPlacement} isActive={nodesPlacement} First={WorkSpaceModeIcon} Second={NodesPlacementIcon} />
+          </>
+        )}
+        <div>
+
+        </div>
       </div>
-      
+
       <div className="header-end-division">
         <div className="header-end-display">
-          <button onClick={e => openPopUp(<SettingsModal  />)} className="extra-side-bar-save-disable">
+          <button onClick={e => openPopUp(<SettingsModal />)} className="extra-side-bar-save-disable">
             <SettingsIcon width={20} height={20} />
           </button>
           <button
