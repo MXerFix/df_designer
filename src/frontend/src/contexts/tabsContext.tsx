@@ -287,7 +287,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       name: "GLOBAL",
       id: "GLOBAL",
       description: "Global flow",
-      color: "red",
+      color: "#8338EC",
       data: {
         nodes: [
           {

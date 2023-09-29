@@ -69,26 +69,30 @@ export const MenuBar = ({ flows, tabId }) => {
             <DropdownMenuContent className="w-44">
               <DropdownMenuLabel>Options</DropdownMenuLabel>
               <DropdownMenuItem
-              onClick={() => {
-                undo();
-              }}
-              className="cursor-pointer"
-            >
-              <Undo className="header-menu-options " />
-              Undo
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                redo();
-              }}
-              className="cursor-pointer"
-            >
-              <Redo className="header-menu-options " />
-              Redo
-            </DropdownMenuItem>
-            <DropdownMenuItem
                 onClick={() => {
-                  openPopUp(<FlowSettingsModal />);
+                  undo();
+                }}
+                className="cursor-pointer"
+              >
+                <Undo className="header-menu-options " />
+                Undo
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  redo();
+                }}
+                className="cursor-pointer"
+              >
+                <Redo className="header-menu-options " />
+                Redo
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  if (tabId !== "GLOBAL") {
+                    openPopUp(<FlowSettingsModal />);
+                  } else {
+                    setErrorData({title: "Oops!", list: ["You can't change GLOBAL flow settings!"]})
+                  }
                 }}
                 className="cursor-pointer"
               >

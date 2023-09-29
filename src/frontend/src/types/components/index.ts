@@ -31,9 +31,9 @@ export type ToggleComponentType = {
   size: "small" | "medium" | "large";
 };
 export type DropDownComponentType = {
-  value: string;
-  options: string[];
-  onSelect: (value: string) => void;
+  value: string | ReactNode;
+  options: string[] | ReactNode[];
+  onSelect: (value: string | ReactNode | any) => void;
   editNode?: boolean;
   apiModal?: boolean;
   numberOfOptions?: number;

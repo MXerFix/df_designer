@@ -171,7 +171,28 @@ export default function ExtraSidebar() {
           </button>
         </ShadTooltip>
       </div>
+
+      <div className="side-bar-search-div-placement">
+        <div className="search-icon ml-1 left-0">
+          {/* ! replace hash color here */}
+          <Search size={20} strokeWidth={1} className="text-primary" />
+        </div>
+        <input
+          type="text"
+          name="search"
+          id="search"
+          placeholder="Search"
+          className="input-search rounded-xl"
+          onChange={(e) => {
+            handleSearchInput(e.target.value);
+            setSearch(e.target.value);
+            handleSearchInputActiveNodes(e.target.value);
+          }}
+        />
+      </div>
+
       <Separator />
+
       <div className="mt-3 mb-8">
         <div className="mb-2 ml-2 mr-3.5 flex flex-row items-center justify-between">
           <h5 className="extra-title">Flows</h5>
@@ -190,51 +211,37 @@ export default function ExtraSidebar() {
             </button>
           </div>
         </div>
-        {flows.map((flow, i) => {
-          const active = (flow.id == tabId)
-          return (
-            <Link
-              to={`/flow/${flow.id}`}
-              key={flow.id}
-              onClick={e => {
-                setTabId(flow.id);
-                setTimeout(() => {
-                  reactFlowInstance.fitView({ maxZoom: 1 })
-                }, 75);
-              }}
-              className={` ${flow.id == tabId && 'bg-muted'} py-1.5 px-3 flex flex-row items-center w-full justify-between text-sm bg-card`}>
-              <div className="flex flex-row items-center">
-                <FlowColorSVG fill={flow.color} />
-                <span className="ml-3"> {flow.name} </span>
-              </div>
-              <div className="flex flex-row gap-2">
-                {active && <CheckSVG />}
-              </div>
-            </Link>
-          )
-        })}
+        <div className="px-2">
+          {flows.map((flow, i) => {
+            const active = (flow.id == tabId)
+            return (
+              <span className=" block">
+                <Link
+                  to={`/flow/${flow.id}`}
+                  key={flow.id}
+                  onClick={e => {
+                    setTabId(flow.id);
+                    setTimeout(() => {
+                      reactFlowInstance.fitView({ maxZoom: 1 })
+                    }, 75);
+                  }}
+                  className={` w-full ${flow.id == tabId && 'bg-muted'} ${flow.id != 'GLOBAL' ? 'pl-4' : 'pl-1'} py-1.5 px-3 flex flex-row items-center justify-between text-sm bg-background rounded-lg `}>
+                  <div className={`flex flex-row items-center `}>
+                    <FlowColorSVG fill={flow.color} />
+                    <span className="ml-3"> {flow.name} </span>
+                  </div>
+                  <div className="flex flex-row gap-2">
+                    {active && <CheckSVG fill={dark ? "white" : "black"} />}
+                  </div>
+                </Link>
+              </span>
+            )
+          })}
+        </div>
       </div>
       <Separator />
       <div className="side-bar-components-div-arrangement">
-        <div className="side-bar-search-div-placement">
-          <div className="search-icon ml-1 left-0">
-            {/* ! replace hash color here */}
-            <Search size={20} strokeWidth={1} className="text-primary" />
-          </div>
-          <input
-            type="text"
-            name="search"
-            id="search"
-            placeholder="Search"
-            className="input-search rounded-xl"
-            onChange={(e) => {
-              handleSearchInput(e.target.value);
-              setSearch(e.target.value);
-              handleSearchInputActiveNodes(e.target.value);
-            }}
-          />
-        </div>
-        <h5 className="mb-2 mt-4 ml-2"> Available components: </h5>
+        <h5 className="mb-2 mt-4 ml-2 extra-title"> Available components </h5>
         {Object.keys(dataFilter)
           .sort()
           .map((d: keyof APIObjectType, i) =>
@@ -300,14 +307,15 @@ export default function ExtraSidebar() {
           )}
         {search ? (
           <div className="side-bar-components-gap pb-10">
-            <h5 className=" mt-4"> Results: </h5>
+            <h5 className=" mt-4 extra-title extra-title"> Results </h5>
             <div>
               {nodesFilter?.map((nf: FilterNodesType) => {
                 if (nf.filteredNodes?.length) {
                   return (
                     <div className="mt-2">
                       <div className="flex flex-row items-center justify-start gap-1.5">
-                        <span className={` w-4 h-4 block rounded-full `} style={{ backgroundColor: nf.flow.color ?? "grey", opacity: 0.7 }} >  </span>
+                        {/* <span className={` w-4 h-4 block rounded-full `} style={{ backgroundColor: nf.flow.color ?? "grey", opacity: 0.7 }} >  </span> */}
+                        <FlowColorSVG fill={nf.flow.color} />
                         <p className="font-semibold"> {nf.flow.name ?? ''} </p>
                       </div>
                       <div className="mt-1">

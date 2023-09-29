@@ -243,7 +243,7 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply w-6 fill-chat-trigger stroke-chat-trigger stroke-1;
   }
   .components-disclosure-arrangement {
-    @apply -mt-px flex w-full select-none items-center justify-between border-y border-y-input bg-muted px-3 py-2;
+    @apply mt-1 flex w-[96%] h-10 rounded-lg mx-auto select-none items-center justify-between border border-input bg-muted px-3 py-2;
   }
   .components-disclosure-title {
     @apply flex items-center text-sm text-foreground;
@@ -494,10 +494,10 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply input-edit-node relative pr-8;
   }
   .dropdown-component-false-outline {
-    @apply input-primary py-2 pl-3 pr-10 text-left;
+    @apply input-primary bg-muted py-2 pl-3 pr-10 text-left;
   }
   .dropdown-component-display {
-    @apply block w-full truncate bg-background;
+    @apply block w-full truncate bg-muted;
   }
   .dropdown-component-arrow {
     @apply pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2;
@@ -506,7 +506,7 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply extra-side-bar-save-disable h-5 w-5;
   }
   .dropdown-component-options {
-    @apply z-10 mt-1 max-h-60 overflow-auto rounded-md bg-background py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
+    @apply z-10 mt-1 max-h-60 overflow-auto rounded-md bg-muted py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm;
   }
   .dropdown-component-true-options {
     @apply dropdown-component-options w-[215px];
@@ -919,6 +919,38 @@ The cursor: default; property value restores the browser's default cursor style 
 
   .double-button-button-active {
     @apply bg-double-active
+  }
+
+  .settings-object {
+    @apply ml-8 mb-6
+  }
+
+  .settings-block-head {
+    @apply mb-6
+  }
+
+  .settings-block {
+    @apply mt-2
+  }
+
+  .settings-block:first-child {
+    @apply mt-1
+  }
+
+  .settings-title {
+    @apply text-base
+  }
+
+  .settings-object {
+    @apply max-w-[88%]
+  }
+
+  .settings-object-title {
+    @apply text-sm
+  }
+
+  .settings-object-description {
+    @apply text-sm text-neutral-500 mb-3 block
   }
 
 }

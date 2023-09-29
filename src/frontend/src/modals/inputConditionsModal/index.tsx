@@ -43,11 +43,16 @@ import { APITemplateType } from "../../types/api";
 import { useNavigate } from "react-router-dom";
 import { Checkbox } from "../../components/ui/checkbox";
 import { FlowColorSVG } from "../../icons/FlowColorSVG";
+import { GoToTargetIcon } from "../../icons/GoToTargetIcon";
+import { darkContext } from "../../contexts/darkContext";
+import { Link } from "../../icons/FormatTextIcons/Link";
+import { EditLinkIcon } from "../../icons/EditLinkIcon";
 
 
 export default function InputConditionsModal({ data, goToHandler }: { data: NodeDataType, goToHandler: Function }) {
   const { openPopUp } = useContext(PopUpContext)
   const [open, setOpen] = useState(true);
+  const { dark } = useContext(darkContext)
   const { reactFlowInstance, setReactFlowInstance } =
     useContext(typesContext);
   const [nodeLength, setNodeLength] = useState(
@@ -137,11 +142,11 @@ export default function InputConditionsModal({ data, goToHandler }: { data: Node
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className="sm:max-w-[600px] lg:max-w-[700px]">
         <DialogTitle className="flex items-center">
-          <span className="pr-2">{data.type}</span>
+          <span className="pr-2 flex flex-row items-center justify-center gap-2"> <EditLinkIcon fill={dark ? "white" : "black"} /> Links </span>
           <Badge variant="secondary">ID: {data.id}</Badge>
         </DialogTitle>
         <label htmlFor="">
-          <span className="text-neutral-400 text-sm"> Input conditions </span>
+          <span className="text-neutral-400 text-sm"> Connected to <span className="text-condition-default"> {data.node.display_name} </span> </span>
         </label>
         <div className="max-h-[640px] overflow-y-scroll">
           {inputLinks.map((inputLink) => (
@@ -151,7 +156,7 @@ export default function InputConditionsModal({ data, goToHandler }: { data: Node
                 {inputLink.flow}
               </h5>
               {inputLink.sourceLinks.map((sourceLink: NodeType, idx) => (
-                <div key={sourceLink.id} className="bg-node-back border-[1px] border-[#D8DBE5] rounded-xl">
+                <div key={sourceLink.id} className="bg-muted border-[1px] border-border rounded-xl">
                   <Table className="w-full">
                     <TableHeader className="w-full">
                       <TableRow className="">
@@ -169,7 +174,7 @@ export default function InputConditionsModal({ data, goToHandler }: { data: Node
                           <TableCell className="px-3 font-semibold py-3 w-20"> {sourceLink.id} </TableCell>
                           <TableCell className="px-3 py-3 w-52"> {flows.find((flow) => flow.name == inputLink.flow).data.nodes.find((node: NodeType) => node.data.id == sourceNode.node).data.node.display_name} </TableCell>
                           <TableCell className="px-3 py-3 w-48"> {sourceNode.condition}</TableCell>
-                          <TableCell className="px-3"> <button className="py-0.5 px-1 bg-[#55a5ff] rounded-lg text-white" onClick={e => { closePopUp(); goToHandler(flows.find((flow) => flow.name == inputLink.flow), sourceNode.node) }}> go to source </button> </TableCell>
+                          <TableCell className="px-3"> <button className="w-max flex flex-row items-center justify-center" onClick={e => { closePopUp(); goToHandler(flows.find((flow) => flow.name == inputLink.flow), sourceNode.node) }}> <GoToTargetIcon fill={dark ? 'white' : "black"} /> </button> </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
