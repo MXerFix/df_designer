@@ -25,8 +25,11 @@ const NodeToolbarComponent = (props) => {
     ).length
   );
 
-  const { setLastCopiedSelection, paste } = useContext(TabsContext);
+  const { setLastCopiedSelection, paste, disableCopyPaste } = useContext(TabsContext);
   const reactFlowInstance = useReactFlow();
+
+  if (disableCopyPaste) return <></>
+
   return (
     <>
       <div className="w-26 h-10">

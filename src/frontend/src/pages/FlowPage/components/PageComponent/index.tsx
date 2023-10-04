@@ -33,6 +33,7 @@ import ExtraSidebar from "../extraSidebarComponent";
 import { undoRedoContext } from "../../../../contexts/undoRedoContext";
 import { PopUpContext } from "../../../../contexts/popUpContext";
 import EditLinkModal from "../../../../modals/editLinkModal";
+import ErrorAlert from "../../../../alerts/error";
 
 const nodeTypes = {
   genericNode: GenericNode,
@@ -58,7 +59,7 @@ export default function Page({ flow }: { flow: FlowType }) {
   const { openPopUp } = useContext(PopUpContext)
 
 
-  const { takeSnapshot } = useContext(undoRedoContext);
+  const { takeSnapshot, undo } = useContext(undoRedoContext);
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [lastSelection, setLastSelection] =
@@ -120,6 +121,7 @@ export default function Page({ flow }: { flow: FlowType }) {
   const [selectionMenuVisible, setSelectionMenuVisible] = useState(false);
 
   const { setExtraComponent, setExtraNavigation } = useContext(locationContext);
+  const { getIntersectingNodes } = useReactFlow();
   const { setErrorData } = useContext(alertContext);
   const [nodes, setNodes, onNodesChange] = useNodesState(
     flow.data?.nodes ?? [],
@@ -210,11 +212,20 @@ export default function Page({ flow }: { flow: FlowType }) {
     [setEdges, setNodes, takeSnapshot],
   );
 
-  const onNodeDragStart: NodeDragHandler = useCallback((event: React.DragEvent) => {
+  // const nodeInitialPosition = useRef<any>()
+
+  const onNodeDragStart: NodeDragHandler = useCallback((event: React.DragEvent, node: NodeType) => {
     // 👇 make dragging a node undoable
     takeSnapshot();
     // 👉 you can place your event handlers here
   }, [takeSnapshot]);
+
+  const onNodeDragStop = useCallback((event: React.DragEvent, node: NodeType) => {
+    if (getIntersectingNodes(node).length) {
+      undo() // undo if nodes intersect
+      setErrorData({ title: "Nodes can't intersect!" })
+    }
+  }, [takeSnapshot])
 
   const onSelectionDragStart: SelectionDragHandler = useCallback(() => {
     // 👇 make dragging a selection undoable
@@ -256,6 +267,11 @@ export default function Page({ flow }: { flow: FlowType }) {
       let { type } = data;
       let newId = getNodeId(type);
       let newNode: NodeType;
+
+      if (tabId === "GLOBAL") {
+        setErrorData({title: "You can't add new nodes on GLOBAL flow!"})
+        return
+      }
 
       if (data.node.nodes !== undefined) {
         const resultNodes = []
@@ -415,25 +431,26 @@ export default function Page({ flow }: { flow: FlowType }) {
                   }}
                   edges={edges}
                   onPaneClick={() => {
-                    setDisableCopyPaste(false);
+                    // setDisableCopyPaste(false); FIXME: was active
                   }}
                   onPaneMouseLeave={() => {
-                    setDisableCopyPaste(true);
+                    // setDisableCopyPaste(true); FIXME: was active
                   }}
                   onPaneMouseEnter={() => {
-                    setDisableCopyPaste(false);
+                    // setDisableCopyPaste(false); FIXME: was active
                   }}
                   onNodesChange={onNodesChangeMod}
                   onEdgesChange={onEdgesChangeMod}
-                  onConnect={onConnect}
+                  onConnect={disableCopyPaste ? () => { } : onConnect}
                   disableKeyboardA11y={true}
                   onLoad={setReactFlowInstance}
                   onInit={setReactFlowInstance}
                   nodeTypes={nodeTypes}
-                  onEdgeUpdate={onEdgeUpdate}
-                  onEdgeUpdateStart={onEdgeUpdateStart}
+                  onEdgeUpdate={disableCopyPaste ? () => { } : onEdgeUpdate}
+                  onEdgeUpdateStart={disableCopyPaste ? () => { } : onEdgeUpdateStart}
                   onEdgeUpdateEnd={onEdgeUpdateEnd}
                   onNodeDragStart={onNodeDragStart}
+                  onNodeDragStop={onNodeDragStop}
                   onSelectionDragStart={onSelectionDragStart}
                   onSelectionEnd={onSelectionEnd}
                   onSelectionStart={onSelectionStart}
@@ -444,7 +461,7 @@ export default function Page({ flow }: { flow: FlowType }) {
                   onNodesDelete={onDelete}
                   onSelectionChange={onSelectionChange}
                   nodesDraggable={!disableCopyPaste}
-                  panOnDrag={!disableCopyPaste}
+                  panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
                   zoomOnDoubleClick={!disableCopyPaste}
                   selectNodesOnDrag={false}
                   className="theme-attribution"

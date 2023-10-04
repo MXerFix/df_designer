@@ -25,7 +25,7 @@ import { nodeColors } from "../../../../utils";
 import ShadTooltip from "../../../../components/ShadTooltipComponent";
 import { PopUpContext } from "../../../../contexts/popUpContext";
 import ToggleShadComponent from "../../../../components/toggleShadComponent";
-import { Info } from "lucide-react";
+import { Globe2, Info } from "lucide-react";
 import { BotIcon } from "../../../../icons/BotIcon";
 import { PersonIcon } from "../../../../icons/PersonIcon";
 import { ChangeConditionIcon } from "../../../../icons/ChangeConditionIcon";
@@ -37,6 +37,7 @@ import EditConditionModal from "../../../../modals/editConditionModal";
 import useTraceUpdate from "../../../../hooks/useTraceUpdate";
 import EditLLMPromptModal from "../../../../modals/llmPromptEdit";
 import { darkContext } from "../../../../contexts/darkContext";
+import { Globe2Icon } from "lucide-react";
 
 export default function ParameterComponent({
   left,
@@ -210,7 +211,7 @@ export default function ParameterComponent({
   return (
     <div
       ref={ref}
-      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full rounded-none" : 'mb-1 bg-secondary new-templates border-[1px] border-border') + ' ' + (type == 'condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
+      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full rounded-none" : 'mb-1 bg-secondary new-templates border-[1px] border-border') + ' ' + (type == 'condition' || type == 'global_condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
     >
       <>
         {
@@ -222,8 +223,9 @@ export default function ParameterComponent({
                 (info !== "" ? " flex items-center" : "")
               }
             >
-              <div className={`flex flex-row ${type != 'condition' && ''} items-center`}>
+              <div className={`flex flex-row ${type == 'global_condition' && 'text-neutral-500'} items-center`}>
                 {type == `condition` ? <PersonIcon fill='var(--condition-default)' className="mr-2" /> : <></>}
+                { type == 'global_condition' ? <Globe2Icon className="mr-2" strokeWidth={1.5} stroke="var(--medium-indigo)" /> : <></> }
                 {title}
               </div>
               <div className="flex flex-row items-center">

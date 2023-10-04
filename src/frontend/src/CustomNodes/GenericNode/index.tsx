@@ -59,7 +59,7 @@ export default function GenericNode({
   const { closePopUp, openPopUp } = useContext(PopUpContext);
   const showError = useRef(true);
   const { types, deleteNode } = useContext(typesContext);
-  const { flows, tabId } = useContext(TabsContext)
+  const { flows, tabId, disableCopyPaste } = useContext(TabsContext)
   const { setViewport, getEdges, setEdges, setNodes } = useReactFlow();
   const navigate = useNavigate()
   const edges = getEdges()
@@ -89,28 +89,61 @@ export default function GenericNode({
     }
   }, [setEdges, setNodes, edges.length])
 
+  const [globalConditions, setGlobalConditions] = useState<any>(
+    data.id !== 'GLOBAL_NODE' && data.node.base_classes[0] == 'default_node' && (
+      flows.find(({ id }) => id == 'GLOBAL').data?.nodes?.find((node: NodeType) => node.id == "GLOBAL_NODE")?.data?.node?.conditions?.map((condition: ConditionClassType, idx: number) => {
+        const global_data = flows.find(({ id }) => id == 'GLOBAL').data.nodes.find((node: NodeType) => node.id == "GLOBAL_NODE").data
+        return (
+          <ParameterComponent
+            data={global_data}
+            color={
+              nodeColors[types.default_nodes] ??
+              nodeColors.unknown
+            }
+            title={`GLOBAL_${condition.name}`}
+            info={''}
+            name={`${condition.name}`}
+            tooltipTitle={global_data.type}
+            required={true}
+            id={global_data.id + "|" + `condition${condition.conditionID}` + '|' + global_data.id}
+            left={condition.left}
+            type={`global_condition`}
+            key={global_data.id + 'condition' + `${idx}`}
+            priority={condition.priority}
+            conditionID={condition.conditionID}
+            transitionType={condition.transitionType}
+          />
+        )
+      })
+    )
+  )
 
-  const [conditions, setConditions] = useState<any[]>(data.node.conditions ? data.node.conditions.map((condition, idx) => {
-    return <ParameterComponent
-      data={data}
-      color={
-        nodeColors[types.default_nodes] ??
-        nodeColors.unknown
-      }
-      title={condition.name}
-      info={''}
-      name={condition.name}
-      tooltipTitle={data.type}
-      required={true}
-      id={data.id + "|" + `condition${condition.conditionID}` + '|' + data.id}
-      left={condition.left}
-      type={`condition`}
-      key={data.id + 'condition' + `${idx}`}
-      priority={condition.priority}
-      conditionID={condition.conditionID}
-      transitionType={condition.transitionType}
-    />
-  }) : [])
+  // console.log(globalConditions)
+
+
+  const [conditions, setConditions] = useState<any[]>(data.node.conditions ? [
+    ...data.node.conditions.map((condition, idx) => {
+      return <ParameterComponent
+        data={data}
+        color={
+          nodeColors[types.default_nodes] ??
+          nodeColors.unknown
+        }
+        title={condition.name}
+        info={''}
+        name={condition.name}
+        tooltipTitle={data.type}
+        required={true}
+        id={data.id + "|" + `condition${condition.conditionID}` + '|' + data.id}
+        left={condition.left}
+        type={`condition`}
+        key={data.id + 'condition' + `${idx}`}
+        priority={condition.priority}
+        conditionID={condition.conditionID}
+        transitionType={condition.transitionType}
+      />
+    }),
+  ] : [])
   useEffect(() => {
     setConditions(data.node.conditions ? data.node.conditions.map((condition, idx) => {
       return <ParameterComponent
@@ -542,6 +575,7 @@ export default function GenericNode({
                   {nodeParamsList}
                   {links}
                   {conditions}
+                  {globalConditions}
                 </div>
                 <div
                   className={classNames(
@@ -556,44 +590,46 @@ export default function GenericNode({
                 })} */}
                 {(data.node.base_classes[0] === "default_node" || data.node.base_classes[0] === "llm_node") && (
                   <div className="flex w-full items-center justify-center mt-1">
-                    <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back border-[1px] border-border " : "bg-card hover:bg-muted border-[1px] border-muted"} py-1 px-6 transition-all rounded-lg new-cnd-btn  `} onClick={(e) => {
-                      // console.log(conditionCounter)
-                      const newCondition: ConditionClassType = {
-                        conditionID: conditionCounter,
-                        left: false,
-                        name: `dft_cnd${conditionCounter}`,
-                        priority: 1,
-                        required: true,
-                        type: `condition`,
-                        transitionType: "default"
-                      }
-                      const newConditionJSX =
-                        <ParameterComponent
-                          data={data}
-                          color={
-                            nodeColors[types[data.node.template["response"].type]] ??
-                            nodeColors.unknown
-                          }
-                          title={newCondition.name}
-                          info={''}
-                          name={newCondition.name}
-                          tooltipTitle={data.node.template["response"].type}
-                          required={data.node.template["response"].required}
-                          id={data.id + "|" + `condition${newCondition.conditionID}` + '|' + data.id}
-                          left={false}
-                          type={`condition`}
-                          key={data.node.template["response"].display_name + `${conditionCounter}`}
-                          priority={1}
-                          conditionID={conditionCounter}
-                          transitionType={newCondition.transitionType}
-                        />
-                      openPopUp(<EditConditionModal conditionID={newCondition.conditionID} data={data} />)
-                      data.node.conditions.push(newCondition)
-                      setConditions(prev => [...prev, newConditionJSX])
-                      setConditionCounter(prev => prev + 1)
-                    }} >
-                      <ConditionPlusIcon fill="var(--condition-default)" />
-                    </button>
+                    {!disableCopyPaste && (
+                      <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back border-[1px] border-border " : "bg-card hover:bg-muted border-[1px] border-muted"} py-1 px-6 transition-all rounded-lg new-cnd-btn  `} onClick={(e) => {
+                        // console.log(conditionCounter)
+                        const newCondition: ConditionClassType = {
+                          conditionID: conditionCounter,
+                          left: false,
+                          name: `dft_cnd${conditionCounter}`,
+                          priority: 1,
+                          required: true,
+                          type: `condition`,
+                          transitionType: "default"
+                        }
+                        const newConditionJSX =
+                          <ParameterComponent
+                            data={data}
+                            color={
+                              nodeColors[types[data.node.template["response"].type]] ??
+                              nodeColors.unknown
+                            }
+                            title={newCondition.name}
+                            info={''}
+                            name={newCondition.name}
+                            tooltipTitle={data.node.template["response"].type}
+                            required={data.node.template["response"].required}
+                            id={data.id + "|" + `condition${newCondition.conditionID}` + '|' + data.id}
+                            left={false}
+                            type={`condition`}
+                            key={data.node.template["response"].display_name + `${conditionCounter}`}
+                            priority={1}
+                            conditionID={conditionCounter}
+                            transitionType={newCondition.transitionType}
+                          />
+                        openPopUp(<EditConditionModal conditionID={newCondition.conditionID} data={data} />)
+                        data.node.conditions.push(newCondition)
+                        setConditions(prev => [...prev, newConditionJSX])
+                        setConditionCounter(prev => prev + 1)
+                      }} >
+                        <ConditionPlusIcon fill="var(--condition-default)" />
+                      </button>
+                    )}
                   </div>
                 )}
               </>

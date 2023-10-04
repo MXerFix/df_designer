@@ -215,25 +215,36 @@ export default function ExtraSidebar() {
           {flows.map((flow, i) => {
             const active = (flow.id == tabId)
             return (
-              <span className=" block">
-                <Link
-                  to={`/flow/${flow.id}`}
-                  key={flow.id}
-                  onClick={e => {
-                    setTabId(flow.id);
-                    setTimeout(() => {
-                      reactFlowInstance.fitView({ maxZoom: 1 })
-                    }, 75);
-                  }}
-                  className={` w-full ${flow.id == tabId && 'bg-muted'} ${flow.id != 'GLOBAL' ? 'pl-4' : 'pl-1'} py-1.5 px-3 flex flex-row items-center justify-between text-sm bg-background rounded-lg `}>
-                  <div className={`flex flex-row items-center `}>
-                    <FlowColorSVG fill={flow.color} />
-                    <span className="ml-3"> {flow.name} </span>
-                  </div>
-                  <div className="flex flex-row gap-2">
-                    {active && <CheckSVG fill={dark ? "white" : "black"} />}
-                  </div>
-                </Link>
+              <span className="relative h-max">
+                <span className="block relative">
+                  <Link
+                    to={`/flow/${flow.id}`}
+                    key={flow.id}
+                    onClick={e => {
+                      setTabId(flow.id);
+                      setTimeout(() => {
+                        reactFlowInstance.fitView({ maxZoom: 1 })
+                      }, 75);
+                    }}
+                    className={`w-full ${flow.id == tabId && 'bg-muted'} ${flow.id != 'GLOBAL' ? 'pl-4' : 'pl-1'} py-1.5 px-3 flex flex-row items-center justify-between text-sm bg-background rounded-lg `}>
+                    <div className={`flex flex-row items-center relative `}>
+                      {flow.id !== "GLOBAL" && i !== flows.length - 1 && <span className="block absolute w-1 h-[1px] bg-neutral-300"></span>}
+                      {i === flows.length - 1 && (
+                        <svg className="-rotate-90 absolute -left-[1.5px] top-[7px] " xmlns="http://www.w3.org/2000/svg" width="6" height="6" viewBox="0 0 6 6" fill="none">
+                          <path d="M0.5 5C0.5 5.27614 0.723858 5.5 1 5.5C1.27614 5.5 1.5 5.27614 1.5 5H0.5ZM5 1.5H5.5V0.5H5V1.5ZM1.5 5V3H0.5V5H1.5ZM3 1.5H5V0.5H3V1.5ZM1.5 3C1.5 2.17157 2.17157 1.5 3 1.5V0.5C1.61929 0.5 0.5 1.61929 0.5 3H1.5Z" fill="#D4D4D4" />
+                        </svg>
+                      )}
+                      <FlowColorSVG fill={flow.color} />
+                      <span className="ml-3"> {flow.name} </span>
+                    </div>
+                    <div className="flex flex-row gap-2">
+                      {active && <CheckSVG fill={dark ? "white" : "black"} />}
+                    </div>
+                  </Link>
+                </span>
+                {flow.id == "GLOBAL" && (
+                  <span style={{ height: `${flows.length * 36 - 55}px`, zIndex: 99 }} className={`block absolute w-[1px] bg-neutral-300 z-10 left-[15px] pb-10 rounded-lg `}> </span>
+                )}
               </span>
             )
           })}

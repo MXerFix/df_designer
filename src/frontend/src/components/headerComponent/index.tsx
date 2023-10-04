@@ -27,6 +27,7 @@ import { NodesPlacementIcon } from "../../icons/NodesPlacementIcon";
 
 export default function Header() {
   const { flows, addFlow, tabId, setTabId, removeFlow } = useContext(TabsContext);
+  const { setDisableCopyPaste, disableCopyPaste } = useContext(TabsContext)
   const { openPopUp } = useContext(PopUpContext);
   const { templates } = useContext(typesContext);
   const { id } = useParams();
@@ -37,7 +38,7 @@ export default function Header() {
   const location = useLocation();
 
   const [stars, setStars] = useState(null);
-  const [workSpaceMode, setWorkSpaceMode] = useState(false)
+  const [workSpaceMode, setWorkSpaceMode] = useState(disableCopyPaste)
   const [nodesPlacement, setNodesPlacement] = useState(false)
   const navigate = useNavigate()
 
@@ -52,6 +53,12 @@ export default function Header() {
     }
   }
 
+  const workSpaceModeHandler = (bool: boolean) => {
+    setWorkSpaceMode(bool)
+    setDisableCopyPaste(bool)
+  }
+
+  // console.log(workSpaceMode, disableCopyPaste)
 
   const indexOfCurrFlow = flows.indexOf(flows.find(({ id }) => id == tabId))
   const currRefToDelete = (indexOfCurrFlow >= 0) ? (indexOfCurrFlow == 0 ? (flows.length > 1 ? `/flow/${flows[1].id}` : `/`) : `/flow/${flows[indexOfCurrFlow - 1].id}`) : `/`
@@ -72,7 +79,7 @@ export default function Header() {
         )}
         {tabId !== '' && (
           <>
-            <DoubleButton setFunction={setWorkSpaceMode} isActive={workSpaceMode} First={CursorIcon} Second={GrabberIcon} />
+            <DoubleButton setFunction={workSpaceModeHandler} isActive={workSpaceMode} First={CursorIcon} Second={GrabberIcon} />
             <DoubleButton setFunction={setNodesPlacement} isActive={nodesPlacement} First={WorkSpaceModeIcon} Second={NodesPlacementIcon} />
           </>
         )}

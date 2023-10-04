@@ -953,6 +953,10 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply text-sm text-neutral-500 mb-3 block
   }
 
+  .flow-list-link {
+    @apply border-l
+  }
+
 }
 
 .border-tab {
