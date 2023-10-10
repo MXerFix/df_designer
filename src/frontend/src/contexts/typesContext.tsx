@@ -5,6 +5,7 @@ import { getAll } from "../controllers/API";
 import { APIClassType, APIKindType, DefaultLinkClassType } from "../types/api";
 import { cond } from "lodash";
 import { TabsContext } from "./tabsContext";
+import { alertContext } from "./alertContext";
 
 //context to share types adn functions from nodes to flow
 
@@ -29,6 +30,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
   const [templates, setTemplates] = useState({});
   const [data, setData] = useState({});
   const { flows } = useContext(TabsContext)
+  const { setErrorData } = useContext(alertContext)
 
   const extConditions = {}
   for (let i = 1; i <= 99; i++) {
@@ -379,14 +381,17 @@ export function TypesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   function deleteNode(idx: string) {
-    reactFlowInstance.setNodes(
-      reactFlowInstance.getNodes().filter((n: Node) => n.id !== idx),
-    );
-    reactFlowInstance.setEdges(
-      reactFlowInstance
-        .getEdges()
-        .filter((ns) => ns.source !== idx && ns.target !== idx),
-    );
+    console.log(idx)
+    if (idx !== "GLOBAL_NODE") {
+      reactFlowInstance.setNodes(
+        reactFlowInstance.getNodes().filter((n: Node) => n.id !== idx),
+      );
+      reactFlowInstance.setEdges(
+        reactFlowInstance
+          .getEdges()
+          .filter((ns) => ns.source !== idx && ns.target !== idx),
+      );
+    } else setErrorData({title: "You can't delete Global Node!"})
   }
 
   // console.log(data)

@@ -162,6 +162,8 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
     setNodeValue(!nodeValue);
   }
 
+  const IS_GLOBAL_NODE = data.id === "GLOBAL_NODE" || data.id === "LOCAL_NODE"
+
 
   return (
     <Dialog open={true} onOpenChange={setModalOpen}>
@@ -176,7 +178,7 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
         <div>
           <label htmlFor="">
             <span className={`text-sm mb-2 block font-semibold`}>Name</span>
-            <InputComponent onChange={e => setName(e)} password={false} value={name} />
+            <InputComponent placeholder={IS_GLOBAL_NODE ? data.node.display_name : ""} disabled={IS_GLOBAL_NODE} onChange={e => setName(e)} password={false} value={name} />
           </label>
         </div>
         <div>

@@ -7,6 +7,9 @@ import EditNodeModal from "../../../../modals/EditNodeModal";
 import ShadTooltip from "../../../../components/ShadTooltipComponent";
 import EditLinkModal from "../../../../modals/editLinkModal";
 import { DeleteIcon } from "../../../../icons/DeleteIcon";
+import _ from "lodash";
+import { NodeType } from "../../../../types/flow";
+import { alertContext } from "../../../../contexts/alertContext";
 
 const NodeToolbarComponent = (props) => {
   const [nodeLength, setNodeLength] = useState(
@@ -25,6 +28,11 @@ const NodeToolbarComponent = (props) => {
     ).length
   );
 
+  const { setErrorData, setSuccessData } = useContext(alertContext);
+  const { flows, tabId } = useContext(TabsContext)
+
+  const IS_GLOBAL_LOCAL_NODE = props.data.id === "GLOBAL_NODE" || props.data.id === "LOCAL_NODE"
+
   const { setLastCopiedSelection, paste, disableCopyPaste } = useContext(TabsContext);
   const reactFlowInstance = useReactFlow();
 
@@ -34,42 +42,51 @@ const NodeToolbarComponent = (props) => {
     <>
       <div className="w-26 h-10">
         <span className="isolate inline-flex rounded-md shadow-sm">
-          <ShadTooltip content="Delete" side="top">
-            <button
-              className="relative inline-flex items-center rounded-l-md  bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset ring-ring transition-all duration-500 ease-in-out hover:bg-muted focus:z-10"
-              onClick={() => {
-                props.deleteNode(props.data.id);
-              }}
-            >
-              <Trash2 className="h-4 w-4"></Trash2>
-            </button>
-          </ShadTooltip>
+          {!IS_GLOBAL_LOCAL_NODE && (
+            <ShadTooltip content="Delete" side="top">
+              <button
+                className={`relative inline-flex items-center rounded-l-md  bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset ring-ring transition-all duration-500 ease-in-out hover:bg-muted focus:z-10 `}
+                onClick={() => {
+                  props.deleteNode(props.data.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4"></Trash2>
+              </button>
+            </ShadTooltip>
+          )}
 
-          <ShadTooltip content="Duplicate" side="top">
-            <button
-              className={classNames(
-                "relative -ml-px inline-flex items-center bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset ring-ring  transition-all duration-500 ease-in-out hover:bg-muted focus:z-10"
-              )}
-              onClick={(event) => {
-                event.preventDefault();
-                // console.log(reactFlowInstance.getNode(props.data.id));
-                paste(
-                  {
-                    nodes: [reactFlowInstance.getNode(props.data.id)],
-                    edges: [],
-                  },
-                  {
-                    x: 50,
-                    y: 10,
-                    paneX: reactFlowInstance.getNode(props.data.id).position.x,
-                    paneY: reactFlowInstance.getNode(props.data.id).position.y,
-                  }
-                );
-              }}
-            >
-              <Copy className="h-4 w-4"></Copy>
-            </button>
-          </ShadTooltip>
+          {!IS_GLOBAL_LOCAL_NODE && (
+            <ShadTooltip content="Copy" side="top">
+              <button
+                className={`relative -ml-px inline-flex items-center bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset ring-ring  transition-all duration-500 ease-in-out hover:bg-muted focus:z-10 `}
+                onClick={(event) => {
+                  event.preventDefault();
+                  const node = flows.find((flow) => flow.id === tabId).data.nodes.find((node: NodeType) => node.id === props.data.id)
+                  console.log(node)
+                  _.cloneDeep({
+                    nodes: [node],
+                    edges: []
+                  }) 
+                  setSuccessData({title: "Node was succesfully copied!"})
+                  // console.log(reactFlowInstance.getNode(props.data.id));
+                  // paste(
+                  //   {
+                  //     nodes: [reactFlowInstance.getNode(props.data.id)],
+                  //     edges: [],
+                  //   },
+                  //   {
+                  //     x: 420,
+                  //     y: 10,
+                  //     paneX: reactFlowInstance.getNode(props.data.id).position.x,
+                  //     paneY: reactFlowInstance.getNode(props.data.id).position.y,
+                  //   }
+                  // );
+                }}
+              >
+                <Copy className="h-4 w-4"></Copy>
+              </button>
+            </ShadTooltip>
+          )}
 
           <ShadTooltip
             content={
@@ -81,7 +98,7 @@ const NodeToolbarComponent = (props) => {
           >
             <a
               className={classNames(
-                "relative -ml-px inline-flex items-center bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset ring-ring  transition-all duration-500 ease-in-out hover:bg-muted focus:z-10" +
+                `relative -ml-px inline-flex items-center bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset ring-ring  transition-all duration-500 ease-in-out hover:bg-muted focus:z-10 ${IS_GLOBAL_LOCAL_NODE && 'rounded-l-md'} ` +
                 (props.data.node.documentation === ""
                   ? " text-muted-foreground"
                   : " text-foreground")

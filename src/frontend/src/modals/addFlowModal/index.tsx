@@ -59,15 +59,17 @@ export default function AddFlowModal() {
       setErrorData({ title: "Flow with same name already exists!" })
       return -1
     }
-    const flow = {
+    const flow: FlowType = {
       name: name,
       description: description,
       color: color,
     }
+    console.log(flow)
     try {
       addFlow(null, true, flow).then((id) => {
         // navigate("/flow/" + id);
       });
+      console.log(flows)
       // saveFlowStyleInDataBase();
     } catch (err) {
       setErrorData(err);

@@ -21,7 +21,7 @@ import { alertContext } from "./alertContext";
 import { typesContext } from "./typesContext";
 import { APIClassType, APITemplateType } from "../types/api";
 import ShortUniqueId from "short-unique-id";
-import { addEdge } from "reactflow";
+import { addEdge, useNodesState } from "reactflow";
 import {
   readFlowsFromDatabase,
   deleteFlowFromDatabase,
@@ -298,7 +298,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
             position: { x: 0, y: 0 },
             type: "genericNode",
             data: {
-              id:"GLOBAL_NODE",
+              id: "GLOBAL_NODE",
               type: "default_node",
               value: null,
               node: {
@@ -502,6 +502,9 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       let newId = getNodeId(n.data.type);
       idsMap[n.id] = newId;
 
+      const positionX = insidePosition.x + n.position.x - minimumX
+      const positionY = insidePosition.y + n.position.y - minimumY
+
       // Create a new node object
       const newNode: NodeType = {
         id: newId,
@@ -515,6 +518,20 @@ export function TabsProvider({ children }: { children: ReactNode }) {
           id: newId,
         },
       };
+        
+
+      // FIXME: CHECK WORK >>>>>>>
+      // check for intersections before paste
+      if (nodes.some(({ position, id, width, height }) => {
+        const xIntersect = ((positionX > position.x - width) && (positionX < (position.x + width)))
+        const yIntersect = ((positionY > position.y - height) && (positionY < (position.y + height)))
+        const result = xIntersect && yIntersect
+        // console.log({id: id, xIntersect: xIntersect, yIntersect: yIntersect, result: result})
+        return result
+      })) {
+        return setErrorData({title: "Invalid place! Nodes can't intersect!"})
+      }
+      // FIXME: CHECK WORK >>>>>>>>
 
       // Add the new node to the list of nodes in state
       nodes = nodes
@@ -586,10 +603,67 @@ export function TabsProvider({ children }: { children: ReactNode }) {
         newFlow.id = id;
 
         // Add the new flow to the list of flows.
-        addFlowToLocalState(newFlow);
 
+        const newNode = {
+          dragging: false,
+          width: 384,
+          height: 229,
+          id: "LOCAL_NODE",
+          position: { x: 0, y: 0 },
+          type: "genericNode",
+          data: {
+            id: "LOCAL_NODE",
+            type: "default_node",
+            value: null,
+            node: {
+              base_classes: ["default_node"],
+              description: "LOCAL_NODE",
+              display_name: "LOCAL_NODE",
+              documentation: "LOCAL_NODE",
+              pre_responses: [],
+              pre_transitions: [],
+              conditions: [
+                {
+                  conditionID: 0,
+                  left: false,
+                  name: 'dft_cnd0',
+                  priority: 1,
+                  required: true,
+                  type: `condition`,
+                  transitionType: 'default',
+                  intent: '',
+                  action: '',
+                  variables: '',
+                  APIKey: '',
+                  llm_model: '',
+                  prompt: '',
+                },
+              ],
+              template: {
+                response: {
+                  placeholder: "response",
+                  name: "response",
+                  list: false,
+                  required: true,
+                  show: true,
+                  type: "str",
+                  multiline: false,
+                  value: "",
+                  display_name: "Some response",
+                  APIKey: '',
+                  llm_model: '',
+                  prompt: '',
+                  quote: '',
+                },
+              }
+            }
+          },
+        }
+        newFlow.data.nodes = [newNode]
+        addFlowToLocalState(newFlow);
         // Return the id
         return id;
+
       } catch (error) {
         // Handle the error if needed
         console.error("Error while adding flow:", error);
@@ -604,6 +678,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
   };
 
   const extractDataFromFlow = (flow) => {
+    console.log(flow?.data)
     let data = flow?.data ? flow.data : null;
     const description = flow?.description ? flow.description : "";
 
@@ -658,7 +733,10 @@ export function TabsProvider({ children }: { children: ReactNode }) {
   const createNewFlow = (flowData, flow, newFlow) => ({
     description: newFlow?.description ? newFlow.description : flowData.description,
     name: newFlow?.name ? newFlow.name : flows.find(({ name }) => name === `Flow ${flows.length}`) ? `Flow ${flows.length + 1}` : `Flow ${flows.length}`,
-    data: flowData.data,
+    data: flowData.data ?? {
+      nodes: [],
+      edges: [],
+    },
     color: newFlow?.color ? newFlow.color : findUnPickedColor(flows)[0],
     id: "",
   });

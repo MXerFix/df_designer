@@ -34,6 +34,8 @@ import { undoRedoContext } from "../../../../contexts/undoRedoContext";
 import { PopUpContext } from "../../../../contexts/popUpContext";
 import EditLinkModal from "../../../../modals/editLinkModal";
 import ErrorAlert from "../../../../alerts/error";
+import { animated, useSpring, useTransition } from '@react-spring/web'
+import { Preloader } from "../../../Preloader/Preloader";
 
 const nodeTypes = {
   genericNode: GenericNode,
@@ -52,6 +54,7 @@ export default function Page({ flow }: { flow: FlowType }) {
     saveFlow,
     setTabsState,
     tabId,
+    flows
   } = useContext(TabsContext);
   const { types, reactFlowInstance, setReactFlowInstance, templates } =
     useContext(typesContext);
@@ -60,8 +63,10 @@ export default function Page({ flow }: { flow: FlowType }) {
 
 
   const { takeSnapshot, undo } = useContext(undoRedoContext);
+  const { getIntersectingNodes } = useReactFlow();
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isMouseOnNode, setIsMouseOnNode] = useState<boolean>()
   const [lastSelection, setLastSelection] =
     useState<OnSelectionChangeParams>(null);
 
@@ -74,6 +79,15 @@ export default function Page({ flow }: { flow: FlowType }) {
     // this effect is used to attach the global event handlers
 
     const onKeyDown = (event: KeyboardEvent) => {
+      // console.log(event)
+
+      if ((event.key === "Delete" || event.key === "Backspace") && (lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
+        event.preventDefault()
+        // console.log(event.key)
+        setErrorData({ title: "You can't delete Global/Local Node!" })
+        undo() // FIXME: mb fix it?
+      }
+
       if (
         (event.ctrlKey || event.metaKey) &&
         event.key === "c" &&
@@ -81,7 +95,11 @@ export default function Page({ flow }: { flow: FlowType }) {
         !disableCopyPaste
       ) {
         event.preventDefault();
-        setLastCopiedSelection(_.cloneDeep(lastSelection));
+        console.log(lastSelection)
+        if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
+          setLastCopiedSelection(_.cloneDeep(lastSelection));
+        } else setErrorData({ title: "You can't copy Global/Local Node!" })
+        // setLastCopiedSelection(_.cloneDeep(lastSelection));
       }
       if (
         (event.ctrlKey || event.metaKey) &&
@@ -91,10 +109,18 @@ export default function Page({ flow }: { flow: FlowType }) {
       ) {
         event.preventDefault();
         let bounds = reactFlowWrapper.current.getBoundingClientRect();
-        paste(lastCopiedSelection, {
-          x: position.x - bounds.left,
-          y: position.y - bounds.top,
-        });
+        const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
+        if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
+          if (!isMouseOnNode) {
+            if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) console.log(1)
+            paste(lastCopiedSelection, {
+              x: position.x - bounds.left,
+              y: position.y - bounds.top,
+            });
+          } else {
+            setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
+          }
+        } else setErrorData({ title: "You can't paste Global/Local Node copy!" })
       }
       if (
         (event.ctrlKey || event.metaKey) &&
@@ -121,7 +147,6 @@ export default function Page({ flow }: { flow: FlowType }) {
   const [selectionMenuVisible, setSelectionMenuVisible] = useState(false);
 
   const { setExtraComponent, setExtraNavigation } = useContext(locationContext);
-  const { getIntersectingNodes } = useReactFlow();
   const { setErrorData } = useContext(alertContext);
   const [nodes, setNodes, onNodesChange] = useNodesState(
     flow.data?.nodes ?? [],
@@ -220,9 +245,17 @@ export default function Page({ flow }: { flow: FlowType }) {
     // 👉 you can place your event handlers here
   }, [takeSnapshot]);
 
+  const onNodeDragOver = (event: any, node: NodeType) => {
+    // console.log(event)
+    // console.log(node)
+  }
+
   const onNodeDragStop = useCallback((event: React.DragEvent, node: NodeType) => {
     if (getIntersectingNodes(node).length) {
+      const intersectingNodes = getIntersectingNodes(node)
+
       undo() // undo if nodes intersect
+      console.log(node)
       setErrorData({ title: "Nodes can't intersect!" })
     }
   }, [takeSnapshot])
@@ -263,13 +296,30 @@ export default function Page({ flow }: { flow: FlowType }) {
         y: event.clientY - reactflowBounds.top,
       });
 
+      const positionXY = reactFlowInstance.project({
+        x: event.clientX - reactflowBounds.left,
+        y: event.clientY - reactflowBounds.top,
+      });
+
+      // check for intersections before add new node
+      if (nodes.some(({ position, id, width, height }) => {
+        const xIntersect = ((positionXY.x > position.x - width) && (positionXY.x < (position.x + width)))
+        const yIntersect = ((positionXY.y > position.y - height) && (positionXY.y < (position.y + height)))
+        const result = xIntersect && yIntersect
+        // console.log({id: id, xIntersect: xIntersect, yIntersect: yIntersect, result: result})
+        return result
+      })) {
+        return setErrorData({ title: "Invalid place! Nodes can't intersect!" })
+      }
+      // FIXME: CHECK WORK
+
       // Generate a unique node ID
       let { type } = data;
       let newId = getNodeId(type);
       let newNode: NodeType;
 
       if (tabId === "GLOBAL") {
-        setErrorData({title: "You can't add new nodes on GLOBAL flow!"})
+        setErrorData({ title: "You can't add new nodes on GLOBAL flow!" })
         return
       }
 
@@ -386,6 +436,11 @@ export default function Page({ flow }: { flow: FlowType }) {
   }, []);
 
   const [selectionEnded, setSelectionEnded] = useState(false);
+  const [preloader, setPreloader] = useState(true)
+
+  // setTimeout(() => {
+  //   setPreloader(false)
+  // }, 1000);
 
   const onSelectionEnd = useCallback(() => {
     setSelectionEnded(true);
@@ -409,78 +464,100 @@ export default function Page({ flow }: { flow: FlowType }) {
 
   const { setDisableCopyPaste } = useContext(TabsContext);
 
+  const transitions = useTransition(location.pathname, {
+    config: { duration: 300 },
+    delay: 75,
+    from: { opacity: 0 },
+    enter: { opacity: 1 },
+    exitBeforeEnter: true,
+  })
+
+  const animation = useSpring({
+    config: { duration: 500 },
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+  })
+
 
   return (
-    <div className="flex h-full overflow-hidden">
-      <ExtraSidebar />
-      {/* Main area */}
-      <main className="flex flex-1">
-        {/* Primary column */}
-        <div className="h-full w-full">
-          <div className="h-full w-full" ref={reactFlowWrapper}>
-            {Object.keys(templates).length > 0 &&
-              Object.keys(types).length > 0 ? (
-              <div className="h-full w-full">
-                <ReactFlow
-                  nodes={nodes}
-                  onMove={() => {
-                    updateFlow({
-                      ...flow,
-                      data: reactFlowInstance.toObject(),
-                    });
-                  }}
-                  edges={edges}
-                  onPaneClick={() => {
-                    // setDisableCopyPaste(false); FIXME: was active
-                  }}
-                  onPaneMouseLeave={() => {
-                    // setDisableCopyPaste(true); FIXME: was active
-                  }}
-                  onPaneMouseEnter={() => {
-                    // setDisableCopyPaste(false); FIXME: was active
-                  }}
-                  onNodesChange={onNodesChangeMod}
-                  onEdgesChange={onEdgesChangeMod}
-                  onConnect={disableCopyPaste ? () => { } : onConnect}
-                  disableKeyboardA11y={true}
-                  onLoad={setReactFlowInstance}
-                  onInit={setReactFlowInstance}
-                  nodeTypes={nodeTypes}
-                  onEdgeUpdate={disableCopyPaste ? () => { } : onEdgeUpdate}
-                  onEdgeUpdateStart={disableCopyPaste ? () => { } : onEdgeUpdateStart}
-                  onEdgeUpdateEnd={onEdgeUpdateEnd}
-                  onNodeDragStart={onNodeDragStart}
-                  onNodeDragStop={onNodeDragStop}
-                  onSelectionDragStart={onSelectionDragStart}
-                  onSelectionEnd={onSelectionEnd}
-                  onSelectionStart={onSelectionStart}
-                  onEdgesDelete={onEdgesDelete}
-                  connectionLineComponent={ConnectionLineComponent}
-                  onDragOver={onDragOver}
-                  onDrop={onDrop}
-                  onNodesDelete={onDelete}
-                  onSelectionChange={onSelectionChange}
-                  nodesDraggable={!disableCopyPaste}
-                  panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
-                  zoomOnDoubleClick={!disableCopyPaste}
-                  selectNodesOnDrag={false}
-                  className="theme-attribution"
-                  minZoom={0.01}
-                  maxZoom={8}
-                >
-                  <Background className="" />
-                  <Controls
-                    className="bg-muted fill-foreground stroke-foreground text-primary [&>button]:border-b-border hover:[&>button]:bg-border"
-                  ></Controls>
-                </ReactFlow>
-                <Chat flow={flow} reactFlowInstance={reactFlowInstance} />
+    <>
+      <div className="flex h-full overflow-hidden">
+        {/* {preloader && <Preloader />} */}
+        <ExtraSidebar />
+        {/* Main area */}
+        <main className="flex flex-1 relative ">
+          {/* Primary column */}
+          {transitions((style, item) => (
+            <animated.div style={style} className="h-full w-full ">
+              <div className="h-full w-full" ref={reactFlowWrapper}>
+                {Object.keys(templates).length > 0 &&
+                  Object.keys(types).length > 0 ? (
+                  <div className="h-full w-full">
+                    <ReactFlow
+                      nodes={nodes}
+                      onMove={() => {
+                        updateFlow({
+                          ...flow,
+                          data: reactFlowInstance.toObject(),
+                        });
+                      }}
+                      edges={edges}
+                      onPaneClick={() => {
+                        // setDisableCopyPaste(false); FIXME: was active
+                      }}
+                      onPaneMouseLeave={() => {
+                        // setDisableCopyPaste(true); FIXME: was active
+                      }}
+                      onPaneMouseEnter={() => {
+                        // setDisableCopyPaste(false); FIXME: was active
+                      }}
+                      elementsSelectable
+                      onNodesChange={onNodesChangeMod}
+                      onEdgesChange={onEdgesChangeMod}
+                      onConnect={disableCopyPaste ? () => { } : onConnect}
+                      disableKeyboardA11y={true}
+                      onLoad={setReactFlowInstance}
+                      onInit={setReactFlowInstance}
+                      nodeTypes={nodeTypes}
+                      onEdgeUpdate={disableCopyPaste ? () => { } : onEdgeUpdate}
+                      onEdgeUpdateStart={disableCopyPaste ? () => { } : onEdgeUpdateStart}
+                      onEdgeUpdateEnd={onEdgeUpdateEnd}
+                      onNodeDragStart={onNodeDragStart}
+                      onNodeMouseEnter={e => setIsMouseOnNode(true)}
+                      onNodeMouseLeave={e => setIsMouseOnNode(false)}
+                      onNodeDragStop={onNodeDragStop}
+                      onSelectionDragStart={onSelectionDragStart}
+                      onSelectionEnd={onSelectionEnd}
+                      onSelectionStart={onSelectionStart}
+                      onEdgesDelete={onEdgesDelete}
+                      connectionLineComponent={ConnectionLineComponent}
+                      onDragOver={onDragOver}
+                      onDrop={onDrop}
+                      onNodesDelete={onDelete}
+                      onSelectionChange={onSelectionChange}
+                      nodesDraggable={!disableCopyPaste}
+                      panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
+                      zoomOnDoubleClick={!disableCopyPaste}
+                      selectNodesOnDrag={false}
+                      className="theme-attribution"
+                      minZoom={0.01}
+                      maxZoom={8}
+                    >
+                      <Background className="" />
+                      <Controls
+                        className="bg-muted fill-foreground stroke-foreground text-primary [&>button]:border-b-border hover:[&>button]:bg-border"
+                      ></Controls>
+                    </ReactFlow>
+                    <Chat flow={flow} reactFlowInstance={reactFlowInstance} />
+                  </div>
+                ) : (
+                  <></>
+                )}
               </div>
-            ) : (
-              <></>
-            )}
-          </div>
-        </div>
-      </main>
-    </div>
+            </animated.div>
+          ))}
+        </main>
+      </div>
+    </>
   );
 }

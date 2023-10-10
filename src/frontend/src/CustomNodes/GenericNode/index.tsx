@@ -90,7 +90,7 @@ export default function GenericNode({
   }, [setEdges, setNodes, edges.length])
 
   const [globalConditions, setGlobalConditions] = useState<any>(
-    data.id !== 'GLOBAL_NODE' && data.node.base_classes[0] == 'default_node' && (
+    data.id !== 'GLOBAL_NODE' && data.node?.base_classes[0] == 'default_node' && (
       flows.find(({ id }) => id == 'GLOBAL').data?.nodes?.find((node: NodeType) => node.id == "GLOBAL_NODE")?.data?.node?.conditions?.map((condition: ConditionClassType, idx: number) => {
         const global_data = flows.find(({ id }) => id == 'GLOBAL').data.nodes.find((node: NodeType) => node.id == "GLOBAL_NODE").data
         return (
@@ -117,11 +117,39 @@ export default function GenericNode({
       })
     )
   )
+  const [localConditions, setLocalConditions] = useState<any>(
+    data.id !== 'LOCAL_NODE' && data.node?.base_classes[0] == 'default_node' && (
+      flows.find(({ id }) => id == tabId).data?.nodes?.find((node: NodeType) => node.id == "LOCAL_NODE")?.data?.node?.conditions?.map((condition: ConditionClassType, idx: number) => {
+        const global_data = flows.find(({ id }) => id == tabId).data.nodes.find((node: NodeType) => node.id == "LOCAL_NODE").data
+        return (
+          <ParameterComponent
+            data={global_data}
+            color={
+              nodeColors[types.default_nodes] ??
+              nodeColors.unknown
+            }
+            title={`LOCAL_${condition.name}`}
+            info={''}
+            name={`${condition.name}`}
+            tooltipTitle={global_data.type}
+            required={true}
+            id={global_data.id + "|" + `condition${condition.conditionID}` + '|' + global_data.id}
+            left={condition.left}
+            type={`local_condition`}
+            key={global_data.id + 'condition' + `${idx}`}
+            priority={condition.priority}
+            conditionID={condition.conditionID}
+            transitionType={condition.transitionType}
+          />
+        )
+      })
+    )
+  )
 
   // console.log(globalConditions)
 
 
-  const [conditions, setConditions] = useState<any[]>(data.node.conditions ? [
+  const [conditions, setConditions] = useState<any[]>(data.node?.conditions ? [
     ...data.node.conditions.map((condition, idx) => {
       return <ParameterComponent
         data={data}
@@ -253,7 +281,7 @@ export default function GenericNode({
         setValidationStatus(null)
       }
     }
-  }, [data.node.conditions, closePopUp, data.node.template['response']?.value, data.node.links])
+  }, [data.node?.conditions, closePopUp, data.node?.template['response']?.value, data.node?.links])
 
   const handleClassNameForNodeName = () => {
     // switch (data.node.base_classes[0]) {
@@ -479,7 +507,9 @@ export default function GenericNode({
       >
         {data.node.base_classes[0] == 'links' ? (
           <div className={`generic-node-div-title bg-accent ${dark ? "border-0" : ''} gap-0 relative rounded-[15px] flex flex-col justify-center items-start`}>
-            {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 mt-2", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
+            {data.type != 'start_node' &&
+              // data.type != 'llm_node' &&
+              <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 mt-2", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
             <span className="text-foreground font-semibold mb-2">
               {data.node.links[0].to}
             </span>
@@ -496,7 +526,9 @@ export default function GenericNode({
         ) : (
           <>
             <div className={`generic-node-div-title ${dark && 'bg-background'} relative rounded-t-[15px]`}>
-              {data.type != 'start_node' && data.type != 'llm_node' && <Handle type="target" position={Position.Left} id={data.id} className={classNames(`-ml-0.5 ${inputLinks.length != 0 && "mt-2"}`, "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
+              {data.type != 'start_node' &&
+                // data.type != 'llm_node' &&
+                <Handle type="target" position={Position.Left} id={data.id} className={classNames(`-ml-0.5 ${inputLinks.length != 0 && "mt-2"}`, "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
               {data.node.base_classes[0] == 'default_node' && inputLinks.length != 0 && <button className={`absolute -left-8 top-2.5 px-1 text-[10px] border-blue-condition border-[2px] font-semibold rounded-s-lg rounded-e ${!dark ? "bg-white" : "bg-muted"}`} onClick={e => openPopUp(<InputConditionsModal goToHandler={goToNodeHandler} data={data} />)}>
                 Links
               </button>}
@@ -576,6 +608,7 @@ export default function GenericNode({
                   {links}
                   {conditions}
                   {globalConditions}
+                  {localConditions}
                 </div>
                 <div
                   className={classNames(
