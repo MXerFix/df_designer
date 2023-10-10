@@ -1,5 +1,6 @@
-import { createContext } from "react";
+import { createContext, useContext } from "react";
 import React, { useState } from "react";
+import { TabsContext } from "./tabsContext";
 
 // context to set JSX element on the DOM
 export const PopUpContext = createContext({

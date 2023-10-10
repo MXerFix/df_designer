@@ -33,10 +33,10 @@ const NodeToolbarComponent = (props) => {
 
   const IS_GLOBAL_LOCAL_NODE = props.data.id === "GLOBAL_NODE" || props.data.id === "LOCAL_NODE"
 
-  const { setLastCopiedSelection, paste, disableCopyPaste } = useContext(TabsContext);
+  const { setLastCopiedSelection, paste, disableCopyPaste, managerMode } = useContext(TabsContext);
   const reactFlowInstance = useReactFlow();
 
-  if (disableCopyPaste) return <></>
+  if (managerMode) return <></>
 
   return (
     <>
@@ -55,7 +55,7 @@ const NodeToolbarComponent = (props) => {
             </ShadTooltip>
           )}
 
-          {!IS_GLOBAL_LOCAL_NODE && (
+          {/* {!IS_GLOBAL_LOCAL_NODE && (
             <ShadTooltip content="Copy" side="top">
               <button
                 className={`relative -ml-px inline-flex items-center bg-background px-2 py-2 text-foreground shadow-md ring-1 ring-inset ring-ring  transition-all duration-500 ease-in-out hover:bg-muted focus:z-10 `}
@@ -86,7 +86,7 @@ const NodeToolbarComponent = (props) => {
                 <Copy className="h-4 w-4"></Copy>
               </button>
             </ShadTooltip>
-          )}
+          )} */}
 
           <ShadTooltip
             content={

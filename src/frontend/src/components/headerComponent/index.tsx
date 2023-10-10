@@ -27,7 +27,7 @@ import { NodesPlacementIcon } from "../../icons/NodesPlacementIcon";
 
 export default function Header() {
   const { flows, addFlow, tabId, setTabId, removeFlow } = useContext(TabsContext);
-  const { setDisableCopyPaste, disableCopyPaste } = useContext(TabsContext)
+  const { setDisableCopyPaste, disableCopyPaste, managerMode, setManagerMode } = useContext(TabsContext)
   const { openPopUp } = useContext(PopUpContext);
   const { templates } = useContext(typesContext);
   const { id } = useParams();
@@ -55,7 +55,7 @@ export default function Header() {
 
   const workSpaceModeHandler = (bool: boolean) => {
     setWorkSpaceMode(bool)
-    setDisableCopyPaste(bool)
+    setManagerMode(bool)
   }
 
   // console.log(workSpaceMode, disableCopyPaste)

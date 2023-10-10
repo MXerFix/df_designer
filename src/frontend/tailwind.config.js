@@ -43,6 +43,7 @@ module.exports = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       colors: {
+        "text": "var(--text)",
         "condition-default": "var(--condition-default)",
         "res-trans-color": "rgba(51, 153, 204, 0.10)",
         "node-back": "#F9FAFC",

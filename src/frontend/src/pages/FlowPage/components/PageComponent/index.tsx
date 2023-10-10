@@ -45,6 +45,7 @@ export default function Page({ flow }: { flow: FlowType }) {
   let {
     updateFlow,
     disableCopyPaste,
+    managerMode,
     addFlow,
     getNodeId,
     paste,
@@ -436,11 +437,19 @@ export default function Page({ flow }: { flow: FlowType }) {
   }, []);
 
   const [selectionEnded, setSelectionEnded] = useState(false);
-  const [preloader, setPreloader] = useState(true)
+  const [preloader, setPreloader] = useState(false)
 
-  // setTimeout(() => {
-  //   setPreloader(false)
-  // }, 1000);
+  // console.log(document.readyState)
+
+  // document.onreadystatechange = function(e: Event) {
+  //   const state = document.readyState
+  //   console.log(state)
+  //   if (state == 'interactive') {
+  //     setTimeout(() => {
+  //       setPreloader(false)
+  //     }, 1000);
+  //   }
+  // }
 
   const onSelectionEnd = useCallback(() => {
     setSelectionEnded(true);
@@ -483,79 +492,86 @@ export default function Page({ flow }: { flow: FlowType }) {
     <>
       <div className="flex h-full overflow-hidden">
         {/* {preloader && <Preloader />} */}
-        <ExtraSidebar />
-        {/* Main area */}
-        <main className="flex flex-1 relative ">
-          {/* Primary column */}
-          {transitions((style, item) => (
-            <animated.div style={style} className="h-full w-full ">
-              <div className="h-full w-full" ref={reactFlowWrapper}>
-                {Object.keys(templates).length > 0 &&
-                  Object.keys(types).length > 0 ? (
-                  <div className="h-full w-full">
-                    <ReactFlow
-                      nodes={nodes}
-                      onMove={() => {
-                        updateFlow({
-                          ...flow,
-                          data: reactFlowInstance.toObject(),
-                        });
-                      }}
-                      edges={edges}
-                      onPaneClick={() => {
-                        // setDisableCopyPaste(false); FIXME: was active
-                      }}
-                      onPaneMouseLeave={() => {
-                        // setDisableCopyPaste(true); FIXME: was active
-                      }}
-                      onPaneMouseEnter={() => {
-                        // setDisableCopyPaste(false); FIXME: was active
-                      }}
-                      onNodesChange={onNodesChangeMod}
-                      onEdgesChange={onEdgesChangeMod}
-                      onConnect={disableCopyPaste ? () => { } : onConnect}
-                      disableKeyboardA11y={false}
-                      onLoad={setReactFlowInstance}
-                      onInit={setReactFlowInstance}
-                      nodeTypes={nodeTypes}
-                      onEdgeUpdate={disableCopyPaste ? () => { } : onEdgeUpdate}
-                      onEdgeUpdateStart={disableCopyPaste ? () => { } : onEdgeUpdateStart}
-                      onEdgeUpdateEnd={onEdgeUpdateEnd}
-                      onNodeDragStart={onNodeDragStart}
-                      onNodeMouseEnter={e => setIsMouseOnNode(true)}
-                      onNodeMouseLeave={e => setIsMouseOnNode(false)}
-                      onNodeDragStop={onNodeDragStop}
-                      onSelectionDragStart={onSelectionDragStart}
-                      onSelectionEnd={onSelectionEnd}
-                      onSelectionStart={onSelectionStart}
-                      onEdgesDelete={onEdgesDelete}
-                      connectionLineComponent={ConnectionLineComponent}
-                      onDragOver={onDragOver}
-                      onDrop={onDrop}
-                      onNodesDelete={onDelete}
-                      onSelectionChange={onSelectionChange}
-                      nodesDraggable={!disableCopyPaste}
-                      panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
-                      zoomOnDoubleClick={!disableCopyPaste}
-                      selectNodesOnDrag={false}
-                      className="theme-attribution"
-                      minZoom={0.01}
-                      maxZoom={8}
-                    >
-                      <Background className="" />
-                      <Controls
-                        className="bg-muted fill-foreground stroke-foreground text-primary [&>button]:border-b-border hover:[&>button]:bg-border"
-                      ></Controls>
-                    </ReactFlow>
-                    <Chat flow={flow} reactFlowInstance={reactFlowInstance} />
+        {preloader ? <Preloader /> : (
+          <>
+            <ExtraSidebar />
+            {/* Main area */}
+            <main className="flex flex-1 relative ">
+              {/* Primary column */}
+              {transitions((style, item) => (
+                <animated.div style={style} className="h-full w-full ">
+                  <div className="h-full w-full" ref={reactFlowWrapper}>
+                    {Object.keys(templates).length > 0 &&
+                      Object.keys(types).length > 0 ? (
+                      <div className="h-full w-full">
+                        <ReactFlow
+                          nodes={nodes}
+                          onMove={() => {
+                            updateFlow({
+                              ...flow,
+                              data: reactFlowInstance.toObject(),
+                            });
+                          }}
+                          edges={edges}
+                          onPaneClick={() => {
+                            setDisableCopyPaste(false);
+                            // FIXME: was active
+                          }}
+                          onPaneMouseLeave={() => {
+                            setDisableCopyPaste(true);
+                            // FIXME: was active
+                          }}
+                          onPaneMouseEnter={() => {
+                            setDisableCopyPaste(false);
+                            // FIXME: was active
+                          }}
+                          onNodesChange={onNodesChangeMod}
+                          onEdgesChange={onEdgesChangeMod}
+                          onConnect={managerMode ? () => { } : onConnect}
+                          disableKeyboardA11y={false}
+                          onLoad={setReactFlowInstance}
+                          onInit={setReactFlowInstance}
+                          nodeTypes={nodeTypes}
+                          onEdgeUpdate={managerMode ? () => { } : onEdgeUpdate}
+                          onEdgeUpdateStart={managerMode ? () => { } : onEdgeUpdateStart}
+                          onEdgeUpdateEnd={onEdgeUpdateEnd}
+                          onNodeDragStart={onNodeDragStart}
+                          onNodeMouseEnter={e => setIsMouseOnNode(true)}
+                          onNodeMouseLeave={e => setIsMouseOnNode(false)}
+                          onNodeDragStop={onNodeDragStop}
+                          onSelectionDragStart={onSelectionDragStart}
+                          onSelectionEnd={onSelectionEnd}
+                          onSelectionStart={onSelectionStart}
+                          onEdgesDelete={onEdgesDelete}
+                          connectionLineComponent={ConnectionLineComponent}
+                          onDragOver={onDragOver}
+                          onDrop={onDrop}
+                          onNodesDelete={onDelete}
+                          onSelectionChange={onSelectionChange}
+                          nodesDraggable={!managerMode}
+                          panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
+                          zoomOnDoubleClick={!managerMode}
+                          selectNodesOnDrag={false}
+                          className="theme-attribution"
+                          minZoom={0.01}
+                          maxZoom={8}
+                        >
+                          <Background className="" />
+                          <Controls
+                            className="bg-muted fill-foreground stroke-foreground text-primary [&>button]:border-b-border hover:[&>button]:bg-border"
+                          ></Controls>
+                        </ReactFlow>
+                        <Chat flow={flow} reactFlowInstance={reactFlowInstance} />
+                      </div>
+                    ) : (
+                      <></>
+                    )}
                   </div>
-                ) : (
-                  <></>
-                )}
-              </div>
-            </animated.div>
-          ))}
-        </main>
+                </animated.div>
+              ))}
+            </main>
+          </>
+        )}
       </div>
     </>
   );

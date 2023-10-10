@@ -237,8 +237,8 @@ export default function ExtraSidebar() {
           {flows.map((flow, i) => {
             const active = (flow.id == tabId)
             return (
-              <span className="relative h-max">
-                <span className="block relative">
+              <div key={flow.id} className="relative h-max">
+                <div className="block relative">
                   <Link
                     to={`/flow/${flow.id}`}
                     key={flow.id}
@@ -263,11 +263,11 @@ export default function ExtraSidebar() {
                       {active && <CheckSVG fill={dark ? "white" : "black"} />}
                     </div>
                   </Link>
-                </span>
+                </div>
                 {flow.id == "GLOBAL" && (
                   <span style={{ height: `${flows.length * 36 - 55}px`, zIndex: 99 }} className={`block absolute w-[1px] bg-neutral-300 z-10 left-[15px] rounded-lg `}> </span>
                 )}
-              </span>
+              </div>
             )
           })}
         </div>

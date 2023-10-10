@@ -23,6 +23,8 @@ export type TabsContextType = {
   //disable CopyPaste
   disableCopyPaste: boolean;
   setDisableCopyPaste: (value: boolean) => void;
+  managerMode: boolean,
+  setManagerMode: (state: boolean) => void,
   getNodeId: (nodeType: string) => string;
   tabsState: TabsState;
   setTabsState: Dispatch<SetStateAction<TabsState>>;

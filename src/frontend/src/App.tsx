@@ -15,12 +15,13 @@ import { TabsContext } from "./contexts/tabsContext";
 import { getVersion } from "./controllers/API";
 import Router from "./routes";
 import Header from "./components/headerComponent";
+import { Preloader } from "./pages/Preloader/Preloader";
 
 export default function App() {
   let { setCurrent, setShowSideBar, setIsStackedOpen } =
     useContext(locationContext);
   let location = useLocation();
-  
+
 
   useEffect(() => {
     setCurrent(location.pathname.replace(/\/$/g, "").split("/"));
@@ -56,7 +57,7 @@ export default function App() {
       if (
         alertsList.length > 0 &&
         JSON.stringify(alertsList[alertsList.length - 1].data) ===
-          JSON.stringify(errorData)
+        JSON.stringify(errorData)
       ) {
         return;
       }
@@ -74,7 +75,7 @@ export default function App() {
       if (
         alertsList.length > 0 &&
         JSON.stringify(alertsList[alertsList.length - 1].data) ===
-          JSON.stringify(noticeData)
+        JSON.stringify(noticeData)
       ) {
         return;
       }
@@ -92,7 +93,7 @@ export default function App() {
       if (
         alertsList.length > 0 &&
         JSON.stringify(alertsList[alertsList.length - 1].data) ===
-          JSON.stringify(successData)
+        JSON.stringify(successData)
       ) {
         return;
       }
@@ -124,9 +125,19 @@ export default function App() {
     );
   };
 
+  const [preloader, setPreloader] = useState(true)
+
+  if (document.readyState == 'complete') {
+    setTimeout(() => {
+      setPreloader(false)
+    }, 1000);
+  }
+
+
   return (
     //need parent component with width and height
     <div className="flex h-full flex-col">
+      {preloader && <Preloader />}
       <ErrorBoundary
         onReset={() => {
           window.localStorage.removeItem("tabsData");

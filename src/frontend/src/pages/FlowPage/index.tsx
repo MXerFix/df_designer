@@ -21,7 +21,7 @@ export default function FlowPage() {
   }, [id]);
 
   // Initialize state variable for the version
-  const [version, setVersion] = useState("0.0.34a");
+  const [version, setVersion] = useState("0.0.35a");
   // useEffect(() => {
   //   getVersion().then((data) => {
   //     setVersion(data.version);
@@ -41,7 +41,7 @@ export default function FlowPage() {
       {flows.length > 0 &&
         tabId !== "" &&
         flows.findIndex((flow) => flow.id === tabId) !== -1 && (
-          <AnimatedPage style={{...animation}} flow={flows.find((flow) => flow.id === tabId)} />
+          <Page flow={flows.find((flow) => flow.id === tabId)} />
         )}
       <a
         target={"_blank"}

@@ -51,6 +51,8 @@ const TabsContextInitialValue: TabsContextType = {
   saveFlow: async (flow: FlowType) => { },
   disableCopyPaste: false,
   setDisableCopyPaste: (state: boolean) => { },
+  managerMode: false,
+  setManagerMode: (state: boolean) => { },
   lastCopiedSelection: null,
   setLastCopiedSelection: (selection: any) => { },
   tabsState: {},
@@ -309,21 +311,21 @@ export function TabsProvider({ children }: { children: ReactNode }) {
                 pre_responses: [],
                 pre_transitions: [],
                 conditions: [
-                  {
-                    conditionID: 0,
-                    left: false,
-                    name: 'dft_cnd0',
-                    priority: 1,
-                    required: true,
-                    type: `condition`,
-                    transitionType: 'default',
-                    intent: '',
-                    action: '',
-                    variables: '',
-                    APIKey: '',
-                    llm_model: '',
-                    prompt: '',
-                  },
+                  // {
+                  //   conditionID: 0,
+                  //   left: false,
+                  //   name: 'dft_cnd0',
+                  //   priority: 1,
+                  //   required: true,
+                  //   type: `condition`,
+                  //   transitionType: 'default',
+                  //   intent: '',
+                  //   action: '',
+                  //   variables: '',
+                  //   APIKey: '',
+                  //   llm_model: '',
+                  //   prompt: '',
+                  // },
                 ],
                 template: {
                   response: {
@@ -623,21 +625,21 @@ export function TabsProvider({ children }: { children: ReactNode }) {
               pre_responses: [],
               pre_transitions: [],
               conditions: [
-                {
-                  conditionID: 0,
-                  left: false,
-                  name: 'dft_cnd0',
-                  priority: 1,
-                  required: true,
-                  type: `condition`,
-                  transitionType: 'default',
-                  intent: '',
-                  action: '',
-                  variables: '',
-                  APIKey: '',
-                  llm_model: '',
-                  prompt: '',
-                },
+                // {
+                //   conditionID: 0,
+                //   left: false,
+                //   name: 'dft_cnd0',
+                //   priority: 1,
+                //   required: true,
+                //   type: `condition`,
+                //   transitionType: 'default',
+                //   intent: '',
+                //   action: '',
+                //   variables: '',
+                //   APIKey: '',
+                //   llm_model: '',
+                //   prompt: '',
+                // },
               ],
               template: {
                 response: {
@@ -798,6 +800,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
   }
 
   const [disableCopyPaste, setDisableCopyPaste] = useState(false);
+  const [managerMode, setManagerMode] = useState(false)
 
 
   return (
@@ -808,6 +811,8 @@ export function TabsProvider({ children }: { children: ReactNode }) {
         setLastCopiedSelection,
         disableCopyPaste,
         setDisableCopyPaste,
+        managerMode,
+        setManagerMode,
         hardReset,
         tabId,
         setTabId,

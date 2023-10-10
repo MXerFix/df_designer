@@ -59,7 +59,7 @@ export default function GenericNode({
   const { closePopUp, openPopUp } = useContext(PopUpContext);
   const showError = useRef(true);
   const { types, deleteNode } = useContext(typesContext);
-  const { flows, tabId, disableCopyPaste } = useContext(TabsContext)
+  const { flows, tabId, disableCopyPaste, managerMode } = useContext(TabsContext)
   const { setViewport, getEdges, setEdges, setNodes } = useReactFlow();
   const navigate = useNavigate()
   const edges = getEdges()
@@ -194,7 +194,7 @@ export default function GenericNode({
         transitionType={condition.transitionType}
       />
     }) : [])
-  }, [flows])
+  }, [flows, closePopUp])
   const [conditionCounter, setConditionCounter] = useState(conditions.length)
 
 
@@ -623,7 +623,7 @@ export default function GenericNode({
                 })} */}
                 {(data.node.base_classes[0] === "default_node" || data.node.base_classes[0] === "llm_node") && (
                   <div className="flex w-full items-center justify-center mt-1">
-                    {!disableCopyPaste && (
+                    {!managerMode && (
                       <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back border-[1px] border-border " : "bg-card hover:bg-muted border-[1px] border-muted"} py-1 px-6 transition-all rounded-lg new-cnd-btn  `} onClick={(e) => {
                         // console.log(conditionCounter)
                         const newCondition: ConditionClassType = {

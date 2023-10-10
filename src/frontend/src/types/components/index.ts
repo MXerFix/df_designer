@@ -9,6 +9,8 @@ export type SVGElementInterface = {
   viewbox?: string
   fill?: string
   pathClassName?: string
+  strokeWidth?: number
+  stroke?: string
 }
 
 export type InputComponentType = {

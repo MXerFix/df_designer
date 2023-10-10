@@ -78,7 +78,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
 
   useEffect(() => { }, [closePopUp, data.node.template]);
 
-  const conditions = data.node.conditions.length ? data.node.conditions : null
+  let conditions = data.node.conditions.length ? data.node.conditions : null
   const condition = data.node?.conditions[conditionID] ? data.node?.conditions[conditionID] : null
 
   const [title, setTitle] = useState(condition?.name ? condition.name : '')
@@ -126,14 +126,14 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
           <DialogHeader className="flex flex-row justify-between items-start">
             <DialogTitle>
               <span className="flex flex-row items-center mb-2">
-                <EditConditionIcon />
+                <EditConditionIcon fill="var(--text)" />
                 <p className="ml-1">Edit Conditions</p>
               </span>
               <Badge variant="secondary" > {data.id} | {condition.name ? condition.name : 'noname'} </Badge>
             </DialogTitle>
             <label className="flex flex-row mr-4 items-center" htmlFor="">
               <span className={`${custom && 'text-neutral-400'}  flex flex-row items-center`}>
-                <Custom_cnd_icon className="" fill={` ${custom ? '#8D96B5' : 'black'} `} />
+                <Custom_cnd_icon className="" fill={` ${custom ? '#999' : 'var(--text)'} `} />
                 Custom
               </span>
               <ToggleShadComponent
@@ -144,17 +144,28 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
                 disabled={false}
                 size="small" />
               <span className={`${!custom && 'text-neutral-400'} flex flex-row items-center`}>
-                <LLM_cnd_icon className="mr-1" fill={` ${!custom ? '#8D96B5' : 'black'} `} />
+                <LLM_cnd_icon className="mr-1" fill={` ${!custom ? '#999' : 'var(--text)'} `} />
                 Using llm
               </span>
             </label>
           </DialogHeader>
           <div>
             <DialogDescription>
-              <div className="flex pt-3">
-                <span className="edit-node-modal-span">
+              <div className="flex pt-3 mb-1 flex-row justify-between items-center">
+                <span className="edit-node-modal-span text-text">
                   Title
                 </span>
+                <button
+                  className=" bg-background p-2 hover:bg-muted rounded-lg transition "
+                  onClick={e => {
+                    if (confirm("Are you sure?")) {
+                      data.node.conditions = conditions.filter((cond) => cond.conditionID !== condition.conditionID)
+                      closePopUp()
+                    }
+                  }}
+                >
+                  <DeleteIcon fill="var(--text)" />
+                </button>
               </div>
             </DialogDescription>
             <InputComponent onChange={e => { setTitle(e) }} password={false} value={title} />
@@ -162,15 +173,15 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
               <>
                 <span className="flex flex-row justify-between items-center mt-4 mb-4">
                   <span className="w-full mr-2">
-                    <label className="text-neutral-400 text-sm" htmlFor="">Intent</label>
+                    <label className="text-text text-sm" htmlFor="">Intent</label>
                     <Dropdown options={condition_intents} onSelect={e => { setIntent(e) }} value={intent} />
                   </span>
                   <span className="w-full mr-2">
-                    <label className="text-neutral-400 text-sm" htmlFor="">Action</label>
+                    <label className="text-text text-sm" htmlFor="">Action</label>
                     <Dropdown options={condition_actions} onSelect={e => { setAction(e) }} value={action} />
                   </span>
                   <span className="w-full mr-2">
-                    <label className="text-neutral-400 text-sm" htmlFor="">Variables</label>
+                    <label className="text-text text-sm" htmlFor="">Variables</label>
                     <Dropdown options={condition_variables} onSelect={e => { setVariables(e) }} value={variables} />
                   </span>
                   <button
@@ -196,21 +207,21 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
               <>
                 <span className="flex flex-row items-end mt-4 mb-4 justify-between">
                   <label className="flex flex-col w-full" htmlFor="">
-                    <span className="text-neutral-400 text-sm">Model name</span>
+                    <span className="text-text text-sm">Model name</span>
                     <Dropdown onSelect={e => setLLM_Model(e)} options={condition_llms} value={llm_model} />
                   </label>
                   <label className="flex flex-col w-full ml-2" htmlFor="">
-                    <span className="text-neutral-400 text-sm">API Key</span>
+                    <span className="text-text text-sm">API Key</span>
                     <InputComponent className="mt-1" onChange={e => setApi_key(e)} password={false} value={api_key} />
                   </label>
                 </span>
                 <label className="mb-4 block" htmlFor="">
-                  <span className="text-neutral-400 text-sm"> Prompt </span>
-                  <textarea defaultValue={prompt} onChange={e => setPrompt(e.target.value)} name="prompt" id="condition_prompt" className="w-full rounded-lg mt-1 cond-textarea" rows={10}></textarea>
+                  <span className="text-text text-sm"> Prompt </span>
+                  <textarea defaultValue={prompt} onChange={e => setPrompt(e.target.value)} name="prompt" id="condition_prompt" className="w-full rounded-lg mt-1 cond-textarea bg-background" rows={10}></textarea>
                 </label>
                 <label className="flex flex-col w-full" htmlFor="">
-                  <span className="text-black text-sm font-semibold mb-1"> Condition satisfaction triggers </span>
-                  <textarea placeholder="# if the following is true, the condition is satisfied" className="w-full h-[60px] overflow-y-scroll p-3 py-1 border-[#8d96b5] border-[1px] rounded-md outline-[#8d96b5] outline-2 text-sm font-normal " />
+                  <span className="text-text text-sm font-semibold mb-1"> Condition satisfaction triggers </span>
+                  <textarea placeholder="# if the following is true, the condition is satisfied" className="w-full h-[60px] overflow-y-scroll p-3 py-1 border-border border-[1px] rounded-md outline-[#8d96b5] outline-2 text-sm font-normal " />
                 </label>
               </>
             )}
@@ -238,19 +249,19 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
         </div>
         {promptTestWindow && custom && (
           <>
-            <span className="min-h-[572px] max-h-full ml-2.5 w-[1px] bg-neutral-300 rounded-lg block"></span>
+            <span className="min-h-[572px] max-h-full ml-2.5 w-[1px] bg-border rounded-lg block"></span>
             <div className={` flex flex-col justify-between text-lg font-semibold min-w-[0px] max-w-[220px] test-anim-for-modal ml-3 `}>
               <div className="w-full flex flex-col justify-between h-full">
                 <div>
                   <Title className="flex flex-row items-center gap-2 mb-3">
-                    <PlayIcon />
+                    <PlayIcon fill="var(--text)" />
                     Prompt testing
                   </Title>
                   <div>
                     <Title className="font-semibold text-sm mb-3">
                       User input
                     </Title>
-                    <textarea placeholder="Type something" className="w-full h-[70px] p-3 py-1 border-[#8d96b5] border-[1px] rounded-md outline-[#8d96b5] outline-2 text-sm font-normal "></textarea>
+                    <textarea placeholder="Type something" className="w-full h-[70px] p-3 py-1 border-border border-[1px] rounded-md oborder outline-2 text-sm font-normal "></textarea>
                     <Button className=" flex flex-row gap-2 text-xs w-full h-7 mb-4 ">
                       <Play2Icon />
                       Run
@@ -271,7 +282,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
                   <Title className="font-semibold text-sm mb-3">
                     Response output
                   </Title>
-                  <textarea placeholder="Test response will be displayed here." className="w-full h-[200px] p-3 border-[#8d96b5] border-[1px] rounded-md outline-[#8d96b5] outline-2 text-sm font-normal " name="" id="" rows={10}></textarea>
+                  <textarea placeholder="Test response will be displayed here." className="w-full h-[200px] p-3 border-border border-[1px] rounded-md outline-border outline-2 text-sm font-normal " name="" id="" rows={10}></textarea>
                   <Button className="bg-white text-black hover:bg-neutral-200 border-black border-[1px] h-7 ">
                     Test triggers
                   </Button>

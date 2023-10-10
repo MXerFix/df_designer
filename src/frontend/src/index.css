@@ -27,6 +27,8 @@
     --radius: 0.5rem;
     --ring: 215 20.2% 65.1%; /* hsl(215 20% 65%) */
 
+    --text: black;
+
     --double-active: #fff;
     --double-inactive: hsl(210 40% 98%);
 
@@ -87,6 +89,8 @@
 
     --ring: 0 1% 21%; /* hsl(0 1% 30%) */
 
+    --text: white;
+
     --radius: 0.5rem;
 
     --round-btn-shadow: #00000063;
@@ -143,6 +147,10 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+textarea {
+  @apply bg-background text-foreground scrollbar-hide
 }
 
 /* The style below sets the cursor property of the element with the class .react-flow__pane to the default cursor.

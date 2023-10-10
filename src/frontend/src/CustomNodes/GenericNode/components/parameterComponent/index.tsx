@@ -38,6 +38,7 @@ import useTraceUpdate from "../../../../hooks/useTraceUpdate";
 import EditLLMPromptModal from "../../../../modals/llmPromptEdit";
 import { darkContext } from "../../../../contexts/darkContext";
 import { Globe2Icon } from "lucide-react";
+import { LocalNodeIcon } from "../../../../icons/LocalNodeIcon";
 
 export default function ParameterComponent({
   left,
@@ -211,7 +212,7 @@ export default function ParameterComponent({
   return (
     <div
       ref={ref}
-      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full rounded-none" : 'mb-1 bg-secondary new-templates border-[1px] border-border') + ' ' + (type == 'condition' || type == 'global_condition' ? 'py-3' : 'py-2') + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
+      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full rounded-none" : 'mb-1 bg-secondary new-templates border-[1px] border-border') + ' ' + (type == 'condition' ? 'py-3' : (type == 'global_condition' || type == 'local_condition' ? 'py-2' : '')) + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
     >
       <>
         {
@@ -223,9 +224,10 @@ export default function ParameterComponent({
                 (info !== "" ? " flex items-center" : "")
               }
             >
-              <div className={`flex flex-row ${type == 'global_condition' && 'text-neutral-500'} items-center`}>
+              <div className={`flex flex-row ${(type == 'global_condition' || type == 'local_condition' )&& 'text-neutral-500'} items-center`}>
                 {type == `condition` ? <PersonIcon fill='var(--condition-default)' className="mr-2" /> : <></>}
                 { type == 'global_condition' ? <Globe2Icon className="mr-2" strokeWidth={1.5} stroke="var(--medium-indigo)" /> : <></> }
+                { type == 'local_condition' ? <LocalNodeIcon className="mr-2" strokeWidth={1.5} stroke="var(--medium-indigo)" /> : <></> }
                 {title}
               </div>
               <div className="flex flex-row items-center">
