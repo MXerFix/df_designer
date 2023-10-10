@@ -79,7 +79,7 @@ export default function EditConditionModal({ data, conditionID }: { data: NodeDa
   useEffect(() => { }, [closePopUp, data.node.template]);
 
   let conditions = data.node.conditions.length ? data.node.conditions : null
-  const condition = data.node?.conditions[conditionID] ? data.node?.conditions[conditionID] : null
+  const condition = data.node?.conditions.find((cond) => conditionID === cond.conditionID) ?? null
 
   const [title, setTitle] = useState(condition?.name ? condition.name : '')
   const [intent, setIntent] = useState(condition?.intent ? condition.intent : '')

@@ -655,6 +655,7 @@ export default function GenericNode({
                             conditionID={conditionCounter}
                             transitionType={newCondition.transitionType}
                           />
+                        console.log(newCondition)
                         openPopUp(<EditConditionModal conditionID={newCondition.conditionID} data={data} />)
                         data.node.conditions.push(newCondition)
                         setConditions(prev => [...prev, newConditionJSX])
