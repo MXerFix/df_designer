@@ -511,11 +511,10 @@ export default function Page({ flow }: { flow: FlowType }) {
                       onPaneMouseEnter={() => {
                         // setDisableCopyPaste(false); FIXME: was active
                       }}
-                      elementsSelectable
                       onNodesChange={onNodesChangeMod}
                       onEdgesChange={onEdgesChangeMod}
                       onConnect={disableCopyPaste ? () => { } : onConnect}
-                      disableKeyboardA11y={true}
+                      disableKeyboardA11y={false}
                       onLoad={setReactFlowInstance}
                       onInit={setReactFlowInstance}
                       nodeTypes={nodeTypes}
