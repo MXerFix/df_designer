@@ -16,6 +16,8 @@ import { getVersion } from "./controllers/API";
 import Router from "./routes";
 import Header from "./components/headerComponent";
 import { Preloader } from "./pages/Preloader/Preloader";
+import ContextMenuDemo from "./context_test";
+import { PopUpContext } from "./contexts/popUpContext";
 
 export default function App() {
   let { setCurrent, setShowSideBar, setIsStackedOpen } =
@@ -40,6 +42,8 @@ export default function App() {
     successOpen,
     setSuccessOpen,
   } = useContext(alertContext);
+
+  const { closePopUp } = useContext(PopUpContext)
 
   // Initialize state variable for the list of alerts
   const [alertsList, setAlertsList] = useState<
@@ -132,6 +136,10 @@ export default function App() {
       setPreloader(false)
     }, 1000);
   }
+
+  useEffect(() => {
+    document.body.style = 'width: 100vw; height: 100vh;'
+  }, [closePopUp])
 
 
   return (

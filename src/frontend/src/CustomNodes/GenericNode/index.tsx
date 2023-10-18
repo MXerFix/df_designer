@@ -8,7 +8,7 @@ import {
 } from "../../utils";
 import ParameterComponent from "./components/parameterComponent";
 import { typesContext } from "../../contexts/typesContext";
-import React, { useContext, useState, useEffect, useRef, useId } from "react";
+import React, { useContext, useState, useEffect, useRef, useId, useCallback } from "react";
 import { FlowType, NodeDataType, NodeType } from "../../types/flow";
 import { alertContext } from "../../contexts/alertContext";
 import { PopUpContext } from "../../contexts/popUpContext";
@@ -37,6 +37,12 @@ import InputConditionsModal from "../../modals/inputConditionsModal";
 import { EditLinkIcon } from "../../icons/EditLinkIcon";
 import { Links_ } from "../../icons/Links";
 import { darkContext } from "../../contexts/darkContext";
+import * as ContextMenu from '@radix-ui/react-context-menu'
+import { CopyIcon } from "@radix-ui/react-icons";
+import { ClipboardPasteIcon, Combine, FileText, ReplaceIcon, Settings2, Trash2 } from "lucide-react";
+import EditNodeModal from "../../modals/EditNodeModal";
+import _ from "lodash";
+import { ManageIcon } from "../../icons/ManageIcon";
 
 export default function GenericNode({
   data,
@@ -55,11 +61,11 @@ export default function GenericNode({
 
   const { reactFlowInstance, setReactFlowInstance } =
     useContext(typesContext);
-  const { setErrorData } = useContext(alertContext);
+  const { setErrorData, setSuccessData } = useContext(alertContext);
   const { closePopUp, openPopUp } = useContext(PopUpContext);
   const showError = useRef(true);
   const { types, deleteNode } = useContext(typesContext);
-  const { flows, tabId, disableCopyPaste, managerMode } = useContext(TabsContext)
+  const { flows, tabId, disableCopyPaste, managerMode, lastCopiedSelection, setLastCopiedSelection } = useContext(TabsContext)
   const { setViewport, getEdges, setEdges, setNodes } = useReactFlow();
   const navigate = useNavigate()
   const edges = getEdges()
@@ -117,6 +123,7 @@ export default function GenericNode({
       })
     )
   )
+
   const [localConditions, setLocalConditions] = useState<any>(
     data.id !== 'LOCAL_NODE' && data.node?.base_classes[0] == 'default_node' && (
       flows.find(({ id }) => id == tabId).data?.nodes?.find((node: NodeType) => node.id == "LOCAL_NODE")?.data?.node?.conditions?.map((condition: ConditionClassType, idx: number) => {
@@ -194,6 +201,63 @@ export default function GenericNode({
         transitionType={condition.transitionType}
       />
     }) : [])
+    setGlobalConditions(
+      data.id !== 'GLOBAL_NODE' && data.node?.base_classes[0] == 'default_node' && (
+        flows.find(({ id }) => id == 'GLOBAL').data?.nodes?.find((node: NodeType) => node.id == "GLOBAL_NODE")?.data?.node?.conditions?.map((condition: ConditionClassType, idx: number) => {
+          const global_data = flows.find(({ id }) => id == 'GLOBAL').data.nodes.find((node: NodeType) => node.id == "GLOBAL_NODE").data
+          return (
+            <ParameterComponent
+              data={global_data}
+              color={
+                nodeColors[types.default_nodes] ??
+                nodeColors.unknown
+              }
+              title={`GLOBAL_${condition.name}`}
+              info={''}
+              name={`${condition.name}`}
+              tooltipTitle={global_data.type}
+              required={true}
+              id={global_data.id + "|" + `condition${condition.conditionID}` + '|' + global_data.id}
+              left={condition.left}
+              type={`global_condition`}
+              key={global_data.id + 'condition' + `${idx}`}
+              priority={condition.priority}
+              conditionID={condition.conditionID}
+              transitionType={condition.transitionType}
+            />
+          )
+        })
+      )
+    )
+
+    setLocalConditions(
+      data.id !== 'LOCAL_NODE' && data.node?.base_classes[0] == 'default_node' && (
+        flows.find(({ id }) => id == tabId).data?.nodes?.find((node: NodeType) => node.id == "LOCAL_NODE")?.data?.node?.conditions?.map((condition: ConditionClassType, idx: number) => {
+          const global_data = flows.find(({ id }) => id == tabId).data.nodes.find((node: NodeType) => node.id == "LOCAL_NODE").data
+          return (
+            <ParameterComponent
+              data={global_data}
+              color={
+                nodeColors[types.default_nodes] ??
+                nodeColors.unknown
+              }
+              title={`LOCAL_${condition.name}`}
+              info={''}
+              name={`${condition.name}`}
+              tooltipTitle={global_data.type}
+              required={true}
+              id={global_data.id + "|" + `condition${condition.conditionID}` + '|' + global_data.id}
+              left={condition.left}
+              type={`local_condition`}
+              key={global_data.id + 'condition' + `${idx}`}
+              priority={condition.priority}
+              conditionID={condition.conditionID}
+              transitionType={condition.transitionType}
+            />
+          )
+        })
+      )
+    )
   }, [flows, closePopUp])
   const [conditionCounter, setConditionCounter] = useState(conditions.length)
 
@@ -487,190 +551,267 @@ export default function GenericNode({
 
   const [idBadge, setIdBadge] = useState(false)
 
+  const copy = (e: any) => {
+    // e.preventDefault();
+    const node = flows.find((flow) => flow.id === tabId).data.nodes.find((node: NodeType) => node.id === data.id)
+    console.log(node)
+    setLastCopiedSelection(_.cloneDeep({
+      nodes: [node],
+      edges: []
+    }))
+    setSuccessData({ title: "Node was succesfully copied!" })
+  }
+
 
   return (
     <>
-      <NodeToolbar>
+      {/* <NodeToolbar>
         <NodeToolbarComponent
           data={data}
           openPopUp={openPopUp}
           deleteNode={deleteNode}
         ></NodeToolbarComponent>
-      </NodeToolbar>
+      </NodeToolbar> */}
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>
+          <div
+            className={classNames(
+              "generic-node-div new-node-style",
+              selected ? "border border-ring" : "border",
 
-      <div
-        className={classNames(
-          "generic-node-div new-node-style",
-          selected ? "border border-ring" : "border",
-
-        )}
-      >
-        {data.node.base_classes[0] == 'links' ? (
-          <div className={`generic-node-div-title bg-accent ${dark ? "border-0" : ''} gap-0 relative rounded-[15px] flex flex-col justify-center items-start`}>
-            {data.type != 'start_node' &&
-              // data.type != 'llm_node' &&
-              <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 mt-2", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
-            <span className="text-foreground font-semibold mb-2">
-              {data.node.links[0].to}
-            </span>
-            <div className="flex flex-row items-center justify-between w-full gap-3 mb-4 ml-3">
-              <div className="flex flex-row items-center">
-                <EditLinkIcon fill={dark ? "white" : "black"} />
-                <h5 className="ml-1"> {flows.find((flow) => flow.name == data.node.links[0].to)?.data?.nodes?.find((node: NodeType) => node.id == data.node.links[1].to)?.data?.node?.display_name ?? ''} </h5>
-              </div>
-              <button onClick={e => {
-                goToNodeHandler(flows.find((flow) => flow.name == data.node.links[0].to), data.node.links[1].to)
-              }} className="bg-background px-2 rounded-lg curr-shadow border-[1px] mr-3 font-semibold"> go to node -&gt; </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className={`generic-node-div-title ${dark && 'bg-background'} relative rounded-t-[15px]`}>
-              {data.type != 'start_node' &&
-                // data.type != 'llm_node' &&
-                <Handle type="target" position={Position.Left} id={data.id} className={classNames(`-ml-0.5 ${inputLinks.length != 0 && "mt-2"}`, "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
-              {data.node.base_classes[0] == 'default_node' && inputLinks.length != 0 && <button className={`absolute -left-8 top-2.5 px-1 text-[10px] border-blue-condition border-[2px] font-semibold rounded-s-lg rounded-e ${!dark ? "bg-white" : "bg-muted"}`} onClick={e => openPopUp(<InputConditionsModal goToHandler={goToNodeHandler} data={data} />)}>
-                Links
-              </button>}
-              <div className="generic-node-title-arrangement">
-                <div className="generic-node-tooltip-div">
+            )}
+          >
+            {data.node.base_classes[0] == 'links' ? (
+              <div className={`generic-node-div-title bg-accent ${dark ? "border-0" : ''} gap-0 relative rounded-[15px] flex flex-col justify-center items-start`}>
+                {data.type != 'start_node' &&
+                  // data.type != 'llm_node' &&
+                  <Handle type="target" position={Position.Left} id={data.id} className={classNames("-ml-0.5 mt-2", "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
+                <span className="text-foreground font-semibold mb-2">
+                  {data.node.links[0].to}
+                </span>
+                <div className="flex flex-row items-center justify-between w-full gap-3 mb-4 ml-3">
                   <div className="flex flex-row items-center">
-                    <div
-                      onMouseLeave={e => setIdBadge(false)}
-                      onMouseDownCapture={e => setIdBadge(true)}
-                      className={handleClassNameForNodeName() + ` w-full h-full px-2 py-0.5 rounded-xl font-medium id-node-name ${dark ? `bg-background` : "bg-muted"} `}>
-                      <span>
-                        {data.node.display_name}
-                      </span>
+                    <EditLinkIcon fill={dark ? "white" : "black"} />
+                    <h5 className="ml-1"> {flows.find((flow) => flow.name == data.node.links[0].to)?.data?.nodes?.find((node: NodeType) => node.id == data.node.links[1].to)?.data?.node?.display_name ?? ''} </h5>
+                  </div>
+                  <button onClick={e => {
+                    goToNodeHandler(flows.find((flow) => flow.name == data.node.links[0].to), data.node.links[1].to)
+                  }} className="bg-background px-2 rounded-lg curr-shadow border-[1px] mr-3 font-semibold"> go to node -&gt; </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className={`generic-node-div-title ${dark && 'bg-background'} relative rounded-t-[15px]`}>
+                  {data.type != 'start_node' &&
+                    // data.type != 'llm_node' &&
+                    <Handle type="target" position={Position.Left} id={data.id} className={classNames(`-ml-0.5 ${inputLinks.length != 0 && "mt-2"}`, "h-3 w-3 rounded-full border-2 bg-background border-blue-condition")} />}
+                  {data.node.base_classes[0] == 'default_node' && inputLinks.length != 0 && <button className={`absolute -left-8 top-2.5 px-1 text-[10px] border-blue-condition border-[2px] font-semibold rounded-s-lg rounded-e ${!dark ? "bg-white" : "bg-muted"}`} onClick={e => openPopUp(<InputConditionsModal goToHandler={goToNodeHandler} data={data} />)}>
+                    Links
+                  </button>}
+                  <div className="generic-node-title-arrangement">
+                    <div className="generic-node-tooltip-div">
+                      <div className="flex flex-row items-center">
+                        <div
+                          onMouseLeave={e => setIdBadge(false)}
+                          onMouseDownCapture={e => setIdBadge(true)}
+                          className={handleClassNameForNodeName() + ` w-full h-full px-2 py-0.5 rounded-xl font-medium id-node-name ${dark ? `bg-background` : "bg-muted"} `}>
+                          <span>
+                            {data.node.display_name}
+                          </span>
+                        </div>
+                        <Badge variant="default" className={` ${idBadge ? "id-after-node-name" : "id-after-node-name-reverse"} ml-3`}>
+                          ID: {data.id}
+                        </Badge>
+                      </div>
                     </div>
-                    <Badge variant="default" className={` ${idBadge ? "id-after-node-name" : "id-after-node-name-reverse"} ml-3`}>
-                      ID: {data.id}
-                    </Badge>
+                  </div>
+                  <div className="round-button-div">
+                    <button
+                      className="relative"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        openPopUp(<NodeModal data={data} />);
+                      }}
+                    ></button>
+                  </div>
+                  <div className="round-button-div">
+                    <div className="flex flex-row items-center gap-2">
+                      <button onClick={e => openPopUp(<EditNodeModal data={data} />)}>
+                        <ManageIcon fill={dark ? 'white' : 'black'} />
+                      </button>
+                      <Tooltip
+                        title={
+                          !validationStatus ? (
+                            "Validating..."
+                          ) : (
+                            <div className="generic-node-validation-div">
+                              <span> Ready for connection </span>
+                            </div>
+                          )
+                        }
+                      >
+                        <div className="generic-node-status-position">
+                          <div
+                            className={classNames(
+                              validationStatus && validationStatus.valid
+                                ? "green-status"
+                                : "status-build-animation",
+                              "status-div"
+                            )}
+                          ></div>
+                          <div
+                            className={classNames(
+                              validationStatus && !validationStatus.valid
+                                ? "red-status"
+                                : "status-build-animation",
+                              "status-div"
+                            )}
+                          ></div>
+                          <div
+                            className={classNames(
+                              !validationStatus || isBuilding
+                                ? "yellow-status"
+                                : "status-build-animation",
+                              "status-div"
+                            )}
+                          ></div>
+                        </div>
+                      </Tooltip>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="round-button-div">
-                <button
-                  className="relative"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    openPopUp(<NodeModal data={data} />);
-                  }}
-                ></button>
-              </div>
-              <div className="round-button-div">
-                <div>
-                  <Tooltip
-                    title={
-                      !validationStatus ? (
-                        "Validating..."
-                      ) : (
-                        <div className="generic-node-validation-div">
-                          <span> Ready for connection </span>
-                        </div>
-                      )
-                    }
-                  >
-                    <div className="generic-node-status-position">
-                      <div
-                        className={classNames(
-                          validationStatus && validationStatus.valid
-                            ? "green-status"
-                            : "status-build-animation",
-                          "status-div"
-                        )}
-                      ></div>
-                      <div
-                        className={classNames(
-                          validationStatus && !validationStatus.valid
-                            ? "red-status"
-                            : "status-build-animation",
-                          "status-div"
-                        )}
-                      ></div>
-                      <div
-                        className={classNames(
-                          !validationStatus || isBuilding
-                            ? "yellow-status"
-                            : "status-build-animation",
-                          "status-div"
-                        )}
-                      ></div>
+                <div className="generic-node-desc bg-card m-0 py-2 pt-0 rounded-b-[15px]">
+                  <>
+                    <div className="flex flex-col items-center w-full">
+                      {nodeParamsList}
+                      {links}
+                      {conditions}
+                      {globalConditions}
+                      {localConditions}
                     </div>
-                  </Tooltip>
-                </div>
-              </div>
-            </div>
-            <div className="generic-node-desc bg-card m-0 py-2 pt-0 rounded-b-[15px]">
-              <>
-                <div className="flex flex-col items-center w-full">
-                  {nodeParamsList}
-                  {links}
-                  {conditions}
-                  {globalConditions}
-                  {localConditions}
-                </div>
-                <div
-                  className={classNames(
-                    Object.keys(data.node.template).length < 1 ? "hidden" : "",
-                    "flex-max-width justify-center"
-                  )}
-                >
-                  {" "}
-                </div>
-                {/* {data.node.base_classes.map((base_class, idx) => {
+                    <div
+                      className={classNames(
+                        Object.keys(data.node.template).length < 1 ? "hidden" : "",
+                        "flex-max-width justify-center"
+                      )}
+                    >
+                      {" "}
+                    </div>
+                    {/* {data.node.base_classes.map((base_class, idx) => {
 
                 })} */}
-                {(data.node.base_classes[0] === "default_node" || data.node.base_classes[0] === "llm_node") && (
-                  <div className="flex w-full items-center justify-center mt-1">
-                    {!managerMode && (
-                      <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back border-[1px] border-border " : "bg-card hover:bg-muted border-[1px] border-muted"} py-1 px-6 transition-all rounded-lg new-cnd-btn  `} onClick={(e) => {
-                        // console.log(conditionCounter)
-                        const newCondition: ConditionClassType = {
-                          conditionID: conditionCounter,
-                          left: false,
-                          name: `dft_cnd${conditionCounter}`,
-                          priority: 1,
-                          required: true,
-                          type: `condition`,
-                          transitionType: "default"
-                        }
-                        const newConditionJSX =
-                          <ParameterComponent
-                            data={data}
-                            color={
-                              nodeColors[types[data.node.template["response"].type]] ??
-                              nodeColors.unknown
+                    {(data.node.base_classes[0] === "default_node" || data.node.base_classes[0] === "llm_node") && (
+                      <div className="flex w-full items-center justify-center mt-1">
+                        {!managerMode && (
+                          <button className={` text-center flex flex-col justify-center items-center text-xl  ${!dark ? "bg-white hover:bg-node-back border-[1px] border-border " : "bg-card hover:bg-muted border-[1px] border-muted"} py-1 px-6 transition-all rounded-lg new-cnd-btn  `} onClick={(e) => {
+                            // console.log(conditionCounter)
+                            const newCondition: ConditionClassType = {
+                              conditionID: conditionCounter,
+                              left: false,
+                              name: `dft_cnd${conditionCounter}`,
+                              priority: 1,
+                              required: true,
+                              type: `condition`,
+                              transitionType: "default"
                             }
-                            title={newCondition.name}
-                            info={''}
-                            name={newCondition.name}
-                            tooltipTitle={data.node.template["response"].type}
-                            required={data.node.template["response"].required}
-                            id={data.id + "|" + `condition${newCondition.conditionID}` + '|' + data.id}
-                            left={false}
-                            type={`condition`}
-                            key={data.node.template["response"].display_name + `${conditionCounter}`}
-                            priority={1}
-                            conditionID={conditionCounter}
-                            transitionType={newCondition.transitionType}
-                          />
-                        console.log(newCondition)
-                        openPopUp(<EditConditionModal conditionID={newCondition.conditionID} data={data} />)
-                        data.node.conditions.push(newCondition)
-                        setConditions(prev => [...prev, newConditionJSX])
-                        setConditionCounter(prev => prev + 1)
-                      }} >
-                        <ConditionPlusIcon fill="var(--condition-default)" />
-                      </button>
+                            const newConditionJSX =
+                              <ParameterComponent
+                                data={data}
+                                color={
+                                  nodeColors[types[data.node.template["response"].type]] ??
+                                  nodeColors.unknown
+                                }
+                                title={newCondition.name}
+                                info={''}
+                                name={newCondition.name}
+                                tooltipTitle={data.node.template["response"].type}
+                                required={data.node.template["response"].required}
+                                id={data.id + "|" + `condition${newCondition.conditionID}` + '|' + data.id}
+                                left={false}
+                                type={`condition`}
+                                key={data.node.template["response"].display_name + `${conditionCounter}`}
+                                priority={1}
+                                conditionID={conditionCounter}
+                                transitionType={newCondition.transitionType}
+                              />
+                            console.log(newCondition)
+                            openPopUp(<EditConditionModal conditionID={newCondition.conditionID} data={data} />)
+                            data.node.conditions.push(newCondition)
+                            setConditions(prev => [...prev, newConditionJSX])
+                            setConditionCounter(prev => prev + 1)
+                          }} >
+                            <ConditionPlusIcon fill="var(--condition-default)" />
+                          </button>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
+                  </>
+                </div>
               </>
-            </div>
-          </>
-        )}
-      </div>
+            )}
+          </div>
+        </ContextMenu.Trigger>
+        <ContextMenu.Portal container={document.getElementById('modal_root')}>
+          <ContextMenu.Content className="context-wrapper">
+            {data.id !== "LOCAL_NODE" && data.id !== "GLOBAL_NODE" && (
+              <>
+                <ContextMenu.Item onClick={e => copy(e)}
+                  className=" context-item">
+                  <div className="flex flex-row items-center gap-1">
+                    <CopyIcon />
+                    <p>Copy</p>
+                  </div>
+                  <span className="text-neutral-400"> Ctrl+C </span>
+                </ContextMenu.Item>
+                <ContextMenu.Item disabled onClick={e => {}}
+                  className=" context-item context-item-disabled">
+                  <div className="flex flex-row items-center gap-1">
+                    <ReplaceIcon className="w-4 h-4" />
+                    <p>Paste to replace</p>
+                  </div>
+                  <span className="text-neutral-400"> Ctrl+Shift+V </span>
+                </ContextMenu.Item>
+                <ContextMenu.Item disabled onClick={e => {}}
+                  className=" context-item context-item-disabled">
+                  <div className="flex flex-row items-center gap-1">
+                    <Combine className="w-4 h-4" />
+                    <p>Create preset</p>
+                  </div>
+                  <span className="text-neutral-400"> Shift+A </span>
+                </ContextMenu.Item>
+              </>
+            )}
+            <ContextMenu.Item onSelect={e => e.preventDefault()} onClick={e => openPopUp(<EditNodeModal data={data} />)}
+              className=" context-item "
+            >
+              <div className="flex flex-row items-center gap-1">
+                <Settings2 className="w-4 h-4" />
+                <p>Settings</p>
+              </div>
+              {/* <span className="text-neutral-400">  </span> */}
+            </ContextMenu.Item>
+            <ContextMenu.Item className=" context-item ">
+              <div className="flex flex-row items-center gap-1">
+                <FileText className="w-4 h-4" />
+                <p>Doc</p>
+              </div>
+              {/* <span className="text-neutral-400"> Ctrl+C </span> */}
+            </ContextMenu.Item>
+            {data.id !== "LOCAL_NODE" && data.id !== "GLOBAL_NODE" && (
+              <>
+                <ContextMenu.Separator className="w-[90%] mx-auto h-[1px] bg-[#666] " />
+                <ContextMenu.Item onClick={e => { deleteNode(data.id) }} className=" context-item ">
+                  <div className="flex flex-row items-center gap-1">
+                    <Trash2 className="w-4 h-4" />
+                    <p>Delete</p>
+                  </div>
+                  <span className="text-neutral-400"> Del </span>
+                </ContextMenu.Item>
+              </>
+            )}
+          </ContextMenu.Content>
+        </ContextMenu.Portal>
+      </ContextMenu.Root>
     </>
   );
 }

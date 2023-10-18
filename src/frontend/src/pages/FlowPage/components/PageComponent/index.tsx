@@ -36,6 +36,9 @@ import EditLinkModal from "../../../../modals/editLinkModal";
 import ErrorAlert from "../../../../alerts/error";
 import { animated, useSpring, useTransition } from '@react-spring/web'
 import { Preloader } from "../../../Preloader/Preloader";
+import * as ContextMenu from '@radix-ui/react-context-menu';
+import { BoxSelect, ClipboardPasteIcon } from "lucide-react";
+import { LayoutGrid } from 'lucide-react';
 
 const nodeTypes = {
   genericNode: GenericNode,
@@ -99,6 +102,7 @@ export default function Page({ flow }: { flow: FlowType }) {
         console.log(lastSelection)
         if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
           setLastCopiedSelection(_.cloneDeep(lastSelection));
+          console.log(lastSelection)
         } else setErrorData({ title: "You can't copy Global/Local Node!" })
         // setLastCopiedSelection(_.cloneDeep(lastSelection));
       }
@@ -500,73 +504,116 @@ export default function Page({ flow }: { flow: FlowType }) {
               {/* Primary column */}
               {transitions((style, item) => (
                 <animated.div style={style} className="h-full w-full ">
-                  <div className="h-full w-full" ref={reactFlowWrapper}>
-                    {Object.keys(templates).length > 0 &&
-                      Object.keys(types).length > 0 ? (
-                      <div className="h-full w-full">
-                        <ReactFlow
-                          nodes={nodes}
-                          onMove={() => {
-                            updateFlow({
-                              ...flow,
-                              data: reactFlowInstance.toObject(),
-                            });
-                          }}
-                          edges={edges}
-                          onPaneClick={() => {
-                            setDisableCopyPaste(false);
-                            // FIXME: was active
-                          }}
-                          onPaneMouseLeave={() => {
-                            setDisableCopyPaste(true);
-                            // FIXME: was active
-                          }}
-                          onPaneMouseEnter={() => {
-                            setDisableCopyPaste(false);
-                            // FIXME: was active
-                          }}
-                          onNodesChange={onNodesChangeMod}
-                          onEdgesChange={onEdgesChangeMod}
-                          onConnect={managerMode ? () => { } : onConnect}
-                          disableKeyboardA11y={false}
-                          onLoad={setReactFlowInstance}
-                          onInit={setReactFlowInstance}
-                          nodeTypes={nodeTypes}
-                          onEdgeUpdate={managerMode ? () => { } : onEdgeUpdate}
-                          onEdgeUpdateStart={managerMode ? () => { } : onEdgeUpdateStart}
-                          onEdgeUpdateEnd={onEdgeUpdateEnd}
-                          onNodeDragStart={onNodeDragStart}
-                          onNodeMouseEnter={e => setIsMouseOnNode(true)}
-                          onNodeMouseLeave={e => setIsMouseOnNode(false)}
-                          onNodeDragStop={onNodeDragStop}
-                          onSelectionDragStart={onSelectionDragStart}
-                          onSelectionEnd={onSelectionEnd}
-                          onSelectionStart={onSelectionStart}
-                          onEdgesDelete={onEdgesDelete}
-                          connectionLineComponent={ConnectionLineComponent}
-                          onDragOver={onDragOver}
-                          onDrop={onDrop}
-                          onNodesDelete={onDelete}
-                          onSelectionChange={onSelectionChange}
-                          nodesDraggable={!managerMode}
-                          panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
-                          zoomOnDoubleClick={!managerMode}
-                          selectNodesOnDrag={false}
-                          className="theme-attribution"
-                          minZoom={0.01}
-                          maxZoom={8}
-                        >
-                          <Background className="" />
-                          <Controls
-                            className="bg-muted fill-foreground stroke-foreground text-primary [&>button]:border-b-border hover:[&>button]:bg-border"
-                          ></Controls>
-                        </ReactFlow>
-                        <Chat flow={flow} reactFlowInstance={reactFlowInstance} />
+                  <ContextMenu.Root>
+                    <ContextMenu.Trigger>
+                      <div className="h-full w-full" ref={reactFlowWrapper}>
+                        {Object.keys(templates).length > 0 &&
+                          Object.keys(types).length > 0 ? (
+                          <div className="h-full w-full">
+                            <ReactFlow
+                              nodes={nodes}
+                              onMove={() => {
+                                updateFlow({
+                                  ...flow,
+                                  data: reactFlowInstance.toObject(),
+                                });
+                              }}
+                              edges={edges}
+                              onPaneClick={() => {
+                                setDisableCopyPaste(false);
+                                // FIXME: was active
+                              }}
+                              onPaneMouseLeave={() => {
+                                setDisableCopyPaste(true);
+                                // FIXME: was active
+                              }}
+                              onPaneMouseEnter={() => {
+                                setDisableCopyPaste(false);
+                                // FIXME: was active
+                              }}
+                              onNodesChange={onNodesChangeMod}
+                              onEdgesChange={onEdgesChangeMod}
+                              onConnect={managerMode ? () => { } : onConnect}
+                              disableKeyboardA11y={false}
+                              onLoad={setReactFlowInstance}
+                              onInit={setReactFlowInstance}
+                              nodeTypes={nodeTypes}
+                              onEdgeUpdate={managerMode ? () => { } : onEdgeUpdate}
+                              onEdgeUpdateStart={managerMode ? () => { } : onEdgeUpdateStart}
+                              onEdgeUpdateEnd={onEdgeUpdateEnd}
+                              onNodeDragStart={onNodeDragStart}
+                              onNodeMouseEnter={e => setIsMouseOnNode(true)}
+                              onNodeMouseLeave={e => setIsMouseOnNode(false)}
+                              onNodeDragStop={onNodeDragStop}
+                              onSelectionDragStart={onSelectionDragStart}
+                              onSelectionEnd={onSelectionEnd}
+                              onSelectionStart={onSelectionStart}
+                              onEdgesDelete={onEdgesDelete}
+                              connectionLineComponent={ConnectionLineComponent}
+                              onDragOver={onDragOver}
+                              onDrop={onDrop}
+                              onNodesDelete={onDelete}
+                              onSelectionChange={onSelectionChange}
+                              nodesDraggable={!managerMode}
+                              panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
+                              zoomOnDoubleClick={!managerMode}
+                              selectNodesOnDrag={false}
+                              className="theme-attribution"
+                              minZoom={0.01}
+                              maxZoom={8}
+                            >
+                              <Background className="" />
+                              <Controls
+                                className="bg-muted fill-foreground stroke-foreground text-primary [&>button]:border-b-border hover:[&>button]:bg-border"
+                              ></Controls>
+                            </ReactFlow>
+                            <Chat flow={flow} reactFlowInstance={reactFlowInstance} />
+                          </div>
+                        ) : (
+                          <></>
+                        )}
                       </div>
-                    ) : (
-                      <></>
-                    )}
-                  </div>
+                    </ContextMenu.Trigger>
+                    <ContextMenu.Portal container={document.getElementById('modal_root')}>
+                      <ContextMenu.Content className="context-wrapper">
+                        <ContextMenu.Item onClick={e => {
+                          let bounds = reactFlowWrapper.current.getBoundingClientRect();
+                          const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
+                          if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
+                            if (!isMouseOnNode) {
+                              if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) console.log(1)
+                              paste(lastCopiedSelection, {
+                                x: position.x - bounds.left,
+                                y: position.y - bounds.top,
+                              });
+                            } else {
+                              setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
+                            }
+                          } else setErrorData({ title: "You can't paste Global/Local Node copy!" })
+                        }} className=" context-item ">
+                          <div className="flex flex-row items-center gap-1">
+                            <ClipboardPasteIcon className="w-4 h-4" />
+                            <p>Paste here</p>
+                          </div>
+                          <span className="text-neutral-400"> Ctrl+V </span>
+                        </ContextMenu.Item>
+                        <ContextMenu.Item disabled className=" context-item context-item-disabled " >
+                          <div className="flex flex-row items-center gap-1">
+                            <LayoutGrid className="w-4 h-4" />
+                            <p>Show/hide grid</p>
+                          </div>
+                          <span className="text-neutral-400"> Shift+G </span>
+                        </ContextMenu.Item>
+                        <ContextMenu.Item disabled className=" context-item context-item-disabled " >
+                          <div className="flex flex-row items-center gap-1">
+                            <BoxSelect className="w-4 h-4" />
+                            <p>Select all</p>
+                          </div>
+                          <span className="text-neutral-400"> Ctrl+A </span>
+                        </ContextMenu.Item>
+                      </ContextMenu.Content>
+                    </ContextMenu.Portal>
+                  </ContextMenu.Root>
                 </animated.div>
               ))}
             </main>
