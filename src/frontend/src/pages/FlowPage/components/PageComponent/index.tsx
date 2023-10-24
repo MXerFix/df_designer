@@ -559,7 +559,7 @@ export default function Page({ flow }: { flow: FlowType }) {
                               panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
                               zoomOnDoubleClick={!managerMode}
                               selectNodesOnDrag={false}
-                              multiSelectionKeyCode={['Meta', 'Ctrl']}
+                              multiSelectionKeyCode={['Meta', 'Control']}
                               className="theme-attribution"
                               minZoom={0.01}
                               maxZoom={8}
