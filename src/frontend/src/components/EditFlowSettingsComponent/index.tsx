@@ -5,6 +5,7 @@ import { Input } from "../../components/ui/input";
 import { findUnPickedColor, flow_colors } from "../../utils";
 import { TabsContext } from "../../contexts/tabsContext";
 import { FlowColorSVG } from "../../icons/FlowColorSVG";
+import { Check } from "lucide-react";
 
 type InputProps = {
   name?: string | null;
@@ -60,7 +61,7 @@ export const EditFlowSettings: React.FC<InputProps> = ({
 
   return (
     <>
-      <Label>
+      <Label className="mt-4">
         <div className="edit-flow-arrangement">
           <span className="font-medium">Name</span>{" "}
           {isMaxLength && (
@@ -80,7 +81,7 @@ export const EditFlowSettings: React.FC<InputProps> = ({
           maxLength={maxLength}
         />
       </Label>
-      <Label>
+      <Label className="mt-4">
         <span className="font-medium">Description (optional)</span>
         <Textarea
           name="description"
@@ -92,13 +93,13 @@ export const EditFlowSettings: React.FC<InputProps> = ({
           rows={3}
         />
       </Label>
-      <Label>
+      <Label className="mt-4">
         <span className="font-medium"> Display color </span>
         <div className="flex flex-row gap-4 mt-3">
           {flow_colors.map((color) => {
             return (
-              <button key={color} onClick={e => { setActiveColor(color); handleColorChange(color) }} className={`scale-150 ${activeColor == color && 'border-2'} rounded-full border-stone-500 `}>
-                <FlowColorSVG fill={color} />
+              <button key={color} onClick={e => { setActiveColor(color); handleColorChange(color) }} style={{backgroundColor: color}} className={` flex items-center justify-center w-10 h-10  border  ${activeColor == color && 'border-white scale-110'} rounded-full `}>
+                { activeColor === color && <Check stroke="white" /> }
               </button>
             )
           })}

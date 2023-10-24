@@ -170,7 +170,7 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className="sm:max-w-[600px] lg:max-w-[700px]">
         <DialogTitle className="flex items-center">
-          <EditConditionIcon />
+          <EditConditionIcon fill="var(--text)" />
           <span className="pr-2">Edit node </span>
           <Badge variant="secondary">Name: {data.node.display_name}</Badge>
           <Badge className="ml-2" variant="secondary">ID: {data.id}</Badge>

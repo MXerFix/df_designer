@@ -506,7 +506,7 @@ export default function Page({ flow }: { flow: FlowType }) {
                 <animated.div style={style} className="h-full w-full ">
                   <ContextMenu.Root>
                     <ContextMenu.Trigger>
-                      <div className="h-full w-full" ref={reactFlowWrapper}>
+                      <div id="reactFlowWrapper" className="h-full w-full" ref={reactFlowWrapper}>
                         {Object.keys(templates).length > 0 &&
                           Object.keys(types).length > 0 ? (
                           <div className="h-full w-full">
@@ -554,10 +554,12 @@ export default function Page({ flow }: { flow: FlowType }) {
                               onDrop={onDrop}
                               onNodesDelete={onDelete}
                               onSelectionChange={onSelectionChange}
+                              // snapToGrid={true}
                               nodesDraggable={!managerMode}
                               panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
                               zoomOnDoubleClick={!managerMode}
                               selectNodesOnDrag={false}
+                              multiSelectionKeyCode={['Meta', 'Ctrl']}
                               className="theme-attribution"
                               minZoom={0.01}
                               maxZoom={8}
@@ -581,11 +583,14 @@ export default function Page({ flow }: { flow: FlowType }) {
                           const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
                           if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
                             if (!isMouseOnNode) {
-                              if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) console.log(1)
+                              if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) {
+                                console.log('1')
+                              }
                               paste(lastCopiedSelection, {
                                 x: position.x - bounds.left,
                                 y: position.y - bounds.top,
                               });
+                              console.log('first')
                             } else {
                               setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
                             }
@@ -604,7 +609,10 @@ export default function Page({ flow }: { flow: FlowType }) {
                           </div>
                           <span className="text-neutral-400"> Shift+G </span>
                         </ContextMenu.Item>
-                        <ContextMenu.Item disabled className=" context-item context-item-disabled " >
+                        <ContextMenu.Item onClick={e => {
+                          onSelectionChange({nodes: flow.data.nodes, edges: flow.data.edges})
+                          
+                        }} className=" context-item context-item-disabled " >
                           <div className="flex flex-row items-center gap-1">
                             <BoxSelect className="w-4 h-4" />
                             <p>Select all</p>

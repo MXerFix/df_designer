@@ -14,7 +14,7 @@ import {
 import { Button } from "../../components/ui/button";
 import { SETTINGS_DIALOG_SUBTITLE } from "../../constants";
 import EditFlowSettings from "../../components/EditFlowSettingsComponent";
-import { Settings2 } from "lucide-react";
+import { PlusCircle, Settings2 } from "lucide-react";
 import { updateFlowInDatabase } from "../../controllers/API";
 import { FlowType } from "../../types/flow";
 import { useNavigate } from "react-router-dom";
@@ -38,7 +38,7 @@ export default function AddFlowModal() {
     if (x === false) {
       setTimeout(() => {
         closePopUp();
-      }, 300);
+      }, 20);
     }
   }
   function handleClick() {
@@ -81,13 +81,13 @@ export default function AddFlowModal() {
   return (
     <Dialog open={true} onOpenChange={setModalOpen}>
       <DialogTrigger asChild></DialogTrigger>
-      <DialogContent className="h-[390px] lg:max-w-[600px]">
+      <DialogContent className="lg:max-w-[720px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <span className="pr-2"> Add Flow </span>
-            <Settings2 className="mr-2 h-4 w-4 " />
+            <PlusCircle className="mr-2 h-4 w-4 " />
+            <span className=""> Add Flow </span>
           </DialogTitle>
-          <DialogDescription>{SETTINGS_DIALOG_SUBTITLE}</DialogDescription>
+          {/* <DialogDescription>  </DialogDescription> */}
         </DialogHeader>
 
         <EditFlowSettings
@@ -101,11 +101,11 @@ export default function AddFlowModal() {
           updateFlow={updateFlow}
         />
 
-        <DialogFooter>
+        <div className="flex flex-row items-center justify-end w-full">
           <Button onClick={handleAddFlow} type="submit">
-            Add
+            Create flow
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

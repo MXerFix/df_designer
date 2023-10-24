@@ -1108,6 +1108,10 @@ The cursor: default; property value restores the browser's default cursor style 
   @apply hover:bg-[#47525C] px-3 py-1 cursor-pointer flex flex-row items-center justify-between gap-4
 }
 
+.context-item span {
+  @apply text-xs
+}
+
 .context-item-disabled {
   @apply text-neutral-400 cursor-default hover:bg-[#404040]
 }

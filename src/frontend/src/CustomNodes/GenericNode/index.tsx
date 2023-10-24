@@ -14,7 +14,7 @@ import { alertContext } from "../../contexts/alertContext";
 import { PopUpContext } from "../../contexts/popUpContext";
 import NodeModal from "../../modals/NodeModal";
 import Tooltip from "../../components/TooltipComponent";
-import { Handle, NodeToolbar, Position, useReactFlow } from "reactflow";
+import { Handle, NodeToolbar, Position, getNodePositionWithOrigin, useReactFlow } from "reactflow";
 import NodeToolbarComponent from "../../pages/FlowPage/components/nodeToolbarComponent";
 import ShadTooltip from "../../components/ShadTooltipComponent";
 import { useSSE } from "../../contexts/SSEContext";
@@ -52,6 +52,8 @@ export default function GenericNode({
   selected: boolean;
 }) {
 
+  useEffect(() => {console.log(data)}, [selected])
+
   const [activePreRes, setActivePreRes] = useState<string[]>([])
   const [activePreTrans, setActivePreTrans] = useState<string[]>([])
 
@@ -65,7 +67,7 @@ export default function GenericNode({
   const { closePopUp, openPopUp } = useContext(PopUpContext);
   const showError = useRef(true);
   const { types, deleteNode } = useContext(typesContext);
-  const { flows, tabId, disableCopyPaste, managerMode, lastCopiedSelection, setLastCopiedSelection } = useContext(TabsContext)
+  const { flows, tabId, disableCopyPaste, managerMode, lastCopiedSelection, setLastCopiedSelection, paste } = useContext(TabsContext)
   const { setViewport, getEdges, setEdges, setNodes } = useReactFlow();
   const navigate = useNavigate()
   const edges = getEdges()
@@ -293,8 +295,24 @@ export default function GenericNode({
     setNameInput(false)
   })
 
+  const [position, setPosition] = useState<{ x: number, y: number }>()
+
+
+  const mouseMoveHandler = (e: MouseEvent) => {
+    setPosition({
+      x: e.clientX,
+      y: e.clientY
+    })
+  }
+
+  useEffect(() => { }, [position])
+
   useEffect(() => {
     setName(data.node.display_name)
+    window.addEventListener("mousemove", mouseMoveHandler)
+    // return (
+    //   window.removeEventListener("mousemove", mouseMoveHandler)
+    // )
   }, [])
 
   useEffect(() => {
@@ -763,7 +781,24 @@ export default function GenericNode({
                   </div>
                   <span className="text-neutral-400"> Ctrl+C </span>
                 </ContextMenu.Item>
-                <ContextMenu.Item disabled onClick={e => {}}
+                <ContextMenu.Item disabled onClick={e => {
+                  let bounds = document.getElementById('reactFlowWrapper').getBoundingClientRect()
+                  // console.log(bounds)
+                  const node = reactFlowInstance.getNode(data.id)
+                  console.log(node)
+                  console.log(getNodePositionWithOrigin(node))
+                  const pos = getNodePositionWithOrigin(node)
+                  // console.log(node)
+                  deleteNode(data.id)
+                  setTimeout(() => {
+                    paste(
+                      lastCopiedSelection,
+                      {
+                        x: position.x - bounds.left,
+                        y: position.y - bounds.top
+                      })
+                  }, 20);
+                }}
                   className=" context-item context-item-disabled">
                   <div className="flex flex-row items-center gap-1">
                     <ReplaceIcon className="w-4 h-4" />
@@ -771,7 +806,7 @@ export default function GenericNode({
                   </div>
                   <span className="text-neutral-400"> Ctrl+Shift+V </span>
                 </ContextMenu.Item>
-                <ContextMenu.Item disabled onClick={e => {}}
+                <ContextMenu.Item disabled onClick={e => { }}
                   className=" context-item context-item-disabled">
                   <div className="flex flex-row items-center gap-1">
                     <Combine className="w-4 h-4" />
