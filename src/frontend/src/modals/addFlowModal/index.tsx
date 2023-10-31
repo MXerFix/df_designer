@@ -64,12 +64,12 @@ export default function AddFlowModal() {
       description: description,
       color: color,
     }
-    console.log(flow)
+    // console.log(flow)
     try {
       addFlow(null, true, flow).then((id) => {
         // navigate("/flow/" + id);
       });
-      console.log(flows)
+      // console.log(flows)
       // saveFlowStyleInDataBase();
     } catch (err) {
       setErrorData(err);

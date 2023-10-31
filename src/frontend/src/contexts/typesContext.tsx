@@ -381,7 +381,7 @@ export function TypesProvider({ children }: { children: ReactNode }) {
   }, []);
 
   function deleteNode(idx: string) {
-    console.log(idx)
+    // console.log(idx)
     if (idx !== "GLOBAL_NODE") {
       reactFlowInstance.setNodes(
         reactFlowInstance.getNodes().filter((n: Node) => n.id !== idx),

@@ -212,7 +212,7 @@ export default function ParameterComponent({
   return (
     <div
       ref={ref}
-      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-5 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full rounded-none" : 'mb-1 bg-secondary new-templates border-[1px] border-border') + ' ' + (type == 'condition' ? 'py-3' : (type == 'global_condition' || type == 'local_condition' ? 'py-2' : '')) + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
+      className={`my-1 flex w-[95%] flex-wrap items-center justify-between px-4 rounded-[8px]` + ' ' + (name == 'response' ? "bg-card mb-1 w-full rounded-none" : 'mb-1 bg-secondary py-2 new-templates border-[1px] border-border') + ' ' + (type == 'condition' ? 'py-3' : (type == 'global_condition' || type == 'local_condition' ? 'py-2' : '')) + ' ' + (name == 'pre-transition' ? 'mb-5' : 'mb-1')}
     >
       <>
         {
@@ -314,7 +314,7 @@ export default function ParameterComponent({
                 onChange={handleOnNewValue}
               />
             ) : (
-              <div className="flex flex-row w-full mt-0 items-center">
+              <div className="flex flex-row w-full mt-1 items-center">
                 {name == 'response' && <BotIcon fill={dark ? "white" : "black"} className="mr-2" />}
                 {name == 'response' ?
                   <>
@@ -333,7 +333,7 @@ export default function ParameterComponent({
                     />
                   </>
                 }
-                {name == 'prompt' && <button onClick={e => openPopUp(<EditLLMPromptModal data={data} template={data.node.template[name]} />)}> <ChangeConditionIcon className="ml-8" /> </button>}
+                {name == 'prompt' && <button onClick={e => openPopUp(<EditLLMPromptModal data={data} template={data.node.template[name]} />)}> <ChangeConditionIcon className="ml-8" fill={dark ? "white" : "black"} /> </button>}
               </div>
             )}
           </div>
@@ -361,7 +361,7 @@ export default function ParameterComponent({
         ) : left === true &&
           type === "str" &&
           data.node.template[name].options ? (
-          <div className="mt-1 w-full">
+          <div className="mt-0 w-full">
             <Dropdown
               options={data.node.template[name].options}
               onSelect={handleOnNewValue}

@@ -52,7 +52,7 @@ export default function GenericNode({
   selected: boolean;
 }) {
 
-  useEffect(() => {console.log(data)}, [selected])
+  useEffect(() => { console.log(data) }, [selected])
 
   const [activePreRes, setActivePreRes] = useState<string[]>([])
   const [activePreTrans, setActivePreTrans] = useState<string[]>([])
@@ -67,7 +67,7 @@ export default function GenericNode({
   const { closePopUp, openPopUp } = useContext(PopUpContext);
   const showError = useRef(true);
   const { types, deleteNode } = useContext(typesContext);
-  const { flows, tabId, disableCopyPaste, managerMode, lastCopiedSelection, setLastCopiedSelection, paste } = useContext(TabsContext)
+  const { flows, tabId, disableCopyPaste, managerMode, lastCopiedSelection, setLastCopiedSelection, paste, lastSelection, setLastSelection } = useContext(TabsContext)
   const { setViewport, getEdges, setEdges, setNodes } = useReactFlow();
   const navigate = useNavigate()
   const edges = getEdges()
@@ -572,11 +572,8 @@ export default function GenericNode({
   const copy = (e: any) => {
     // e.preventDefault();
     const node = flows.find((flow) => flow.id === tabId).data.nodes.find((node: NodeType) => node.id === data.id)
-    console.log(node)
-    setLastCopiedSelection(_.cloneDeep({
-      nodes: [node],
-      edges: []
-    }))
+    // console.log(node)
+    setLastCopiedSelection(_.cloneDeep(lastSelection))
     setSuccessData({ title: "Node was succesfully copied!" })
   }
 
@@ -752,7 +749,7 @@ export default function GenericNode({
                                 conditionID={conditionCounter}
                                 transitionType={newCondition.transitionType}
                               />
-                            console.log(newCondition)
+                            // console.log(newCondition)
                             openPopUp(<EditConditionModal conditionID={newCondition.conditionID} data={data} />)
                             data.node.conditions.push(newCondition)
                             setConditions(prev => [...prev, newConditionJSX])
@@ -785,8 +782,8 @@ export default function GenericNode({
                   let bounds = document.getElementById('reactFlowWrapper').getBoundingClientRect()
                   // console.log(bounds)
                   const node = reactFlowInstance.getNode(data.id)
-                  console.log(node)
-                  console.log(getNodePositionWithOrigin(node))
+                  // console.log(node)
+                  // console.log(getNodePositionWithOrigin(node))
                   const pos = getNodePositionWithOrigin(node)
                   // console.log(node)
                   deleteNode(data.id)

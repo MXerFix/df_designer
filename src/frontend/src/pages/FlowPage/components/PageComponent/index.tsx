@@ -58,7 +58,9 @@ export default function Page({ flow }: { flow: FlowType }) {
     saveFlow,
     setTabsState,
     tabId,
-    flows
+    flows,
+    lastSelection,
+    setLastSelection
   } = useContext(TabsContext);
   const { types, reactFlowInstance, setReactFlowInstance, templates } =
     useContext(typesContext);
@@ -70,9 +72,37 @@ export default function Page({ flow }: { flow: FlowType }) {
   const { getIntersectingNodes } = useReactFlow();
 
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isCloneVisible, setIsCloneVisible] = useState(false)
   const [isMouseOnNode, setIsMouseOnNode] = useState<boolean>()
-  const [lastSelection, setLastSelection] =
-    useState<OnSelectionChangeParams>(null);
+
+  // console.log(position)
+
+  // const [lastSelection, setLastSelection] =
+  //   useState<OnSelectionChangeParams>(null);
+
+  const pasteClickHandler = (event: Event) => {
+    if (isCloneVisible) {
+      event.preventDefault();
+      setIsCloneVisible(false)
+      document.removeEventListener('click', pasteClickHandler)
+      let bounds = reactFlowWrapper.current.getBoundingClientRect();
+      const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
+      if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
+        if (!isMouseOnNode) {
+          if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) console.log(1)
+          paste(lastCopiedSelection, {
+            x: position.x - bounds.left,
+            y: position.y - bounds.top,
+          });
+          console.log(position)
+        } else {
+          setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
+        }
+      } else setErrorData({ title: "You can't paste Global/Local Node copy!" })
+    } else {
+      return
+    }
+  }
 
 
   useEffect(() => {
@@ -112,20 +142,8 @@ export default function Page({ flow }: { flow: FlowType }) {
         lastCopiedSelection &&
         !disableCopyPaste
       ) {
-        event.preventDefault();
-        let bounds = reactFlowWrapper.current.getBoundingClientRect();
-        const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
-        if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
-          if (!isMouseOnNode) {
-            if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) console.log(1)
-            paste(lastCopiedSelection, {
-              x: position.x - bounds.left,
-              y: position.y - bounds.top,
-            });
-          } else {
-            setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
-          }
-        } else setErrorData({ title: "You can't paste Global/Local Node copy!" })
+        setIsCloneVisible(true)
+        // document.addEventListener('click', pasteClickHandler)
       }
       if (
         (event.ctrlKey || event.metaKey) &&
@@ -135,15 +153,33 @@ export default function Page({ flow }: { flow: FlowType }) {
         event.preventDefault();
         // addFlow(newFlow, false);
       }
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key === "a"
+      ) {
+        event.preventDefault()
+        selectAllHandler()
+      }
     };
     const handleMouseMove = (event) => {
       setPosition({ x: event.clientX, y: event.clientY });
     };
 
+    if (isCloneVisible) {
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          setIsCloneVisible(false)
+          document.removeEventListener('click', pasteClickHandler)
+        }
+      })
+    }
+
+    document.addEventListener('click', pasteClickHandler)
     document.addEventListener("keydown", onKeyDown);
     document.addEventListener("mousemove", handleMouseMove);
 
     return () => {
+      document.removeEventListener('click', pasteClickHandler)
       document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("mousemove", handleMouseMove);
     };
@@ -491,9 +527,54 @@ export default function Page({ flow }: { flow: FlowType }) {
     to: { opacity: 1 },
   })
 
+  const selectAllHandler = () => {
+    const nodes = reactFlowInstance.getNodes()
+    nodes.map((node) => node.selected = true)
+    // console.log(nodes)
+    reactFlowInstance.setNodes(nodes)
+  }
+
+  const getNodesSelectionZone = (nodes: NodeType[]) => {
+    const positions = nodes.map((node) => node.position)
+    // console.log(first)
+    // get min and max values of x and y for calculate width and height of paste zone
+    const getMinMax = () => {
+      let minX = 999999
+      let maxX = -999999
+      let minY = 999999
+      let maxY = -999999
+      positions.forEach((position, i) => {
+        if (position.x < minX) {
+          minX = position.x
+        } 
+        if (position.x + 384 > maxX) {
+          maxX = position.x + 384
+        }
+      })
+      positions.forEach((position, i) => {
+        if (position.y < minY) {
+          minY = position.y
+        } 
+        if (position.y + reactFlowInstance.getNode(nodes[i].id).height > maxY) {
+          maxY = position.y + reactFlowInstance.getNode(nodes[i].id).height
+        }
+      })
+      // console.log({maxX, minX})
+      // console.log({maxY, minY})
+      return {maxX: maxX, minX: minX, maxY: maxY, minY: minY}
+    }
+    const width = getMinMax().maxX - getMinMax().minX
+    const height = getMinMax().maxY - getMinMax().minY
+    // console.log(maxX, minX)
+    // console.log(maxY, minY)
+    // console.log({ width: width, height: height })
+    return { width: width, height: height }
+  }
+
 
   return (
     <>
+      {isCloneVisible && <div className=" absolute z-50 rounded-xl border border-dashed border-[#39C] flex flex-col items-center justify-center font-extrabold text-xl " style={{ backgroundColor: "rgba(51, 153, 204, 0.2)", top: position.y, left: position.x, width: getNodesSelectionZone(lastCopiedSelection.nodes).width * reactFlowInstance.getZoom(), height: getNodesSelectionZone(lastCopiedSelection.nodes).height * reactFlowInstance.getZoom(), color: 'rgba(255,255,255, 0.9)' }} >  </div>}
       <div className="flex h-full overflow-hidden">
         {/* {preloader && <Preloader />} */}
         {preloader ? <Preloader /> : (
@@ -559,7 +640,7 @@ export default function Page({ flow }: { flow: FlowType }) {
                               panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
                               zoomOnDoubleClick={!managerMode}
                               selectNodesOnDrag={false}
-                              multiSelectionKeyCode={['Meta', 'Control']}
+                              multiSelectionKeyCode={['Meta', 'Shift']}
                               className="theme-attribution"
                               minZoom={0.01}
                               maxZoom={8}
@@ -584,13 +665,13 @@ export default function Page({ flow }: { flow: FlowType }) {
                           if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
                             if (!isMouseOnNode) {
                               if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) {
-                                console.log('1')
+                                // console.log('1')
                               }
                               paste(lastCopiedSelection, {
                                 x: position.x - bounds.left,
                                 y: position.y - bounds.top,
                               });
-                              console.log('first')
+                              // console.log('first')
                             } else {
                               setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
                             }
@@ -610,9 +691,9 @@ export default function Page({ flow }: { flow: FlowType }) {
                           <span className="text-neutral-400"> Shift+G </span>
                         </ContextMenu.Item>
                         <ContextMenu.Item onClick={e => {
-                          onSelectionChange({nodes: flow.data.nodes, edges: flow.data.edges})
-                          
-                        }} className=" context-item context-item-disabled " >
+                          // onSelectionChange({nodes: flow.data.nodes, edges: flow.data.edges})
+                          selectAllHandler()
+                        }} className=" context-item " >
                           <div className="flex flex-row items-center gap-1">
                             <BoxSelect className="w-4 h-4" />
                             <p>Select all</p>

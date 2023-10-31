@@ -36,6 +36,8 @@ export type TabsContextType = {
   setLastCopiedSelection: (selection: { nodes: any; edges: any }) => void;
   setTweak: (tweak: any) => void;
   getTweak: any;
+  lastSelection: { nodes: any[], edges: any[] }
+  setLastSelection: (selection: { nodes: any; edges: any }) => void;
 };
 
 export type TabsState = {

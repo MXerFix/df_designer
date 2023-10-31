@@ -86,9 +86,9 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
 
   const onDragStartHandler = (e: DragEvent | any, cond: ConditionClassType) => {
     // e.preventDefault()
-    console.log(cond)
+    // console.log(cond)
     setDragCnd(cond)
-    console.log(conditions);
+    // console.log(conditions);
   }
 
   const onDragOverHandler = (e: DragEvent | any) => {
@@ -109,10 +109,10 @@ export default function EditNodeModal({ data }: { data: NodeDataType }) {
 
   const onDropHandler = (e: any, cond: ConditionClassType) => {
     e.preventDefault()
-    console.log(cond)
+    // console.log(cond)
     setConditionsState(conditions.map((condition, idx) => {
       if (condition.conditionID == cond.conditionID) {
-        console.log(dragCnd)
+        // console.log(dragCnd)
         return dragCnd
       }
       if (condition.conditionID == dragCnd.conditionID) {

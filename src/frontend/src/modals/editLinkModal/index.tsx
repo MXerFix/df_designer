@@ -92,7 +92,7 @@ export default function EditLinkModal({ data }: { data: NodeDataType }) {
 
   // console.log(conditions);
 
-  console.log(data);
+  // console.log(data);
 
 
 

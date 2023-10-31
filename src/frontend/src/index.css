@@ -87,7 +87,8 @@
     --destructive: 0 63% 31%; /* hsl(0 63% 31%) */
     --destructive-foreground: 0 0% 100%; /* hsl(0 0% 100%) */
 
-    --ring: 0 1% 21%; /* hsl(0 1% 30%) */
+    --ring: 0 1% 36%;  /* hsl(0 1% 36%) */
+    /* --ring: 47 90% 48%; hsl(47 90% 48%) */
 
     --text: white;
 

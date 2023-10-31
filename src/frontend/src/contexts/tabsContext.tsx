@@ -21,7 +21,7 @@ import { alertContext } from "./alertContext";
 import { typesContext } from "./typesContext";
 import { APIClassType, APITemplateType } from "../types/api";
 import ShortUniqueId from "short-unique-id";
-import { addEdge, useNodesState } from "reactflow";
+import { OnSelectionChangeParams, addEdge, useNodesState } from "reactflow";
 import {
   readFlowsFromDatabase,
   deleteFlowFromDatabase,
@@ -55,6 +55,8 @@ const TabsContextInitialValue: TabsContextType = {
   setManagerMode: (state: boolean) => { },
   lastCopiedSelection: null,
   setLastCopiedSelection: (selection: any) => { },
+  lastSelection: null,
+  setLastSelection: (selection: any) => { },
   tabsState: {},
   setTabsState: (state: TabsState) => { },
   getNodeId: (nodeType: string) => "",
@@ -64,6 +66,7 @@ const TabsContextInitialValue: TabsContextType = {
     selection: { nodes: any; edges: any },
     position: { x: number; y: number; paneX?: number; paneY?: number }
   ) => { },
+
 };
 
 export const TabsContext = createContext<TabsContextType>(
@@ -79,6 +82,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
   const [id, setId] = useState(uid());
   const { templates, reactFlowInstance } = useContext(typesContext);
   const [lastCopiedSelection, setLastCopiedSelection] = useState(null);
+  const [lastSelection, setLastSelection] = useState<OnSelectionChangeParams>(null)
   const [tabsState, setTabsState] = useState<TabsState>({});
   const [getTweak, setTweak] = useState({});
 
@@ -499,6 +503,8 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       ? { x: position.paneX + position.x, y: position.paneY + position.y }
       : reactFlowInstance.project({ x: position.x, y: position.y });
 
+      const resultNodes: any[] = []
+
     selectionInstance.nodes.forEach((n: NodeType) => {
       // Generate a unique node ID
       let newId = getNodeId(n.data.type);
@@ -535,11 +541,13 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       }
       // FIXME: CHECK WORK >>>>>>>>
 
-      // Add the new node to the list of nodes in state
-      nodes = nodes
-        .map((e) => ({ ...e, selected: false }))
-        .concat({ ...newNode, selected: false });
+      resultNodes.push({...newNode, selected: true})
+
     });
+    // Add the new node to the list of nodes in state
+    nodes = nodes
+      .map((e) => ({ ...e, selected: false }))
+      .concat(resultNodes);
     reactFlowInstance.setNodes(nodes);
 
     selectionInstance.edges.forEach((e) => {
@@ -606,6 +614,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
 
         // Add the new flow to the list of flows.
 
+        // add local node
         const newNode = {
           dragging: false,
           width: 384,
@@ -809,6 +818,8 @@ export function TabsProvider({ children }: { children: ReactNode }) {
         saveFlow,
         lastCopiedSelection,
         setLastCopiedSelection,
+        lastSelection,
+        setLastSelection,
         disableCopyPaste,
         setDisableCopyPaste,
         managerMode,

@@ -44,7 +44,7 @@ export default function SettingsModal() {
 
   const langOptions = [
     { name: 'English', Icon: EnglishLangIcon },
-    { name: 'Russian', Icon: RussianLangIcon }
+    { name: 'Russian (soon...)', Icon: RussianLangIcon }
   ]
 
   const langOptionsJSX = langOptions.map((option: { name: string, Icon: Function }) => (
