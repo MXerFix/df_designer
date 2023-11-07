@@ -52,7 +52,7 @@ export default function GenericNode({
   selected: boolean;
 }) {
 
-  useEffect(() => { console.log(data) }, [selected])
+  // useEffect(() => { console.log(data) }, [selected])
 
   const [activePreRes, setActivePreRes] = useState<string[]>([])
   const [activePreTrans, setActivePreTrans] = useState<string[]>([])
@@ -571,7 +571,7 @@ export default function GenericNode({
 
   const copy = (e: any) => {
     // e.preventDefault();
-    const node = flows.find((flow) => flow.id === tabId).data.nodes.find((node: NodeType) => node.id === data.id)
+    // const node = flows.find((flow) => flow.id === tabId).data.nodes.find((node: NodeType) => node.id === data.id)
     // console.log(node)
     setLastCopiedSelection(_.cloneDeep(lastSelection))
     setSuccessData({ title: "Node was succesfully copied!" })

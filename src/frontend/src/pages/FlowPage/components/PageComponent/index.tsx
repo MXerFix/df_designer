@@ -1,4 +1,4 @@
-import _, { set } from "lodash";
+import _, { min, set } from "lodash";
 import { useContext, useRef, useState, useEffect, useCallback } from "react";
 import ReactFlow, {
   OnSelectionChangeParams,
@@ -37,7 +37,7 @@ import ErrorAlert from "../../../../alerts/error";
 import { animated, useSpring, useTransition } from '@react-spring/web'
 import { Preloader } from "../../../Preloader/Preloader";
 import * as ContextMenu from '@radix-ui/react-context-menu';
-import { BoxSelect, ClipboardPasteIcon } from "lucide-react";
+import { BoxSelect, ClipboardPasteIcon, Copy } from "lucide-react";
 import { LayoutGrid } from 'lucide-react';
 
 const nodeTypes = {
@@ -90,11 +90,12 @@ export default function Page({ flow }: { flow: FlowType }) {
       if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
         if (!isMouseOnNode) {
           if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) console.log(1)
+          takeSnapshot()
           paste(lastCopiedSelection, {
             x: position.x - bounds.left,
             y: position.y - bounds.top,
           });
-          console.log(position)
+          // console.log(position)
         } else {
           setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
         }
@@ -129,10 +130,10 @@ export default function Page({ flow }: { flow: FlowType }) {
         !disableCopyPaste
       ) {
         event.preventDefault();
-        console.log(lastSelection)
+        // console.log(lastSelection)
         if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
           setLastCopiedSelection(_.cloneDeep(lastSelection));
-          console.log(lastSelection)
+          // console.log(lastSelection)
         } else setErrorData({ title: "You can't copy Global/Local Node!" })
         // setLastCopiedSelection(_.cloneDeep(lastSelection));
       }
@@ -143,6 +144,8 @@ export default function Page({ flow }: { flow: FlowType }) {
         !disableCopyPaste
       ) {
         setIsCloneVisible(true)
+        getNodesSelectionZone(lastCopiedSelection.nodes)
+        getRightestNode(lastCopiedSelection.nodes)
         // document.addEventListener('click', pasteClickHandler)
       }
       if (
@@ -167,7 +170,7 @@ export default function Page({ flow }: { flow: FlowType }) {
 
     if (isCloneVisible) {
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+        if (e.key === 'Escape' || e.key === "Delete" || e.key === "Backspace") {
           setIsCloneVisible(false)
           document.removeEventListener('click', pasteClickHandler)
         }
@@ -443,13 +446,15 @@ export default function Page({ flow }: { flow: FlowType }) {
 
   const onDelete = useCallback(
     (mynodes) => {
-      takeSnapshot();
-      setEdges(
-        edges.filter(
-          (ns) =>
-            !mynodes.some((n) => ns.source === n.id || ns.target === n.id),
-        ),
-      );
+      if (!isCloneVisible) {
+        takeSnapshot();
+        setEdges(
+          edges.filter(
+            (ns) =>
+              !mynodes.some((n) => ns.source === n.id || ns.target === n.id),
+          ),
+        );
+      }
     },
     [takeSnapshot, edges, setEdges],
   );
@@ -534,6 +539,8 @@ export default function Page({ flow }: { flow: FlowType }) {
     reactFlowInstance.setNodes(nodes)
   }
 
+  const [selectionZone, setSelectionZone] = useState<{ width: number, height: number }>({ width: 0, height: 0 })
+
   const getNodesSelectionZone = (nodes: NodeType[]) => {
     const positions = nodes.map((node) => node.position)
     // console.log(first)
@@ -546,7 +553,7 @@ export default function Page({ flow }: { flow: FlowType }) {
       positions.forEach((position, i) => {
         if (position.x < minX) {
           minX = position.x
-        } 
+        }
         if (position.x + 384 > maxX) {
           maxX = position.x + 384
         }
@@ -554,27 +561,70 @@ export default function Page({ flow }: { flow: FlowType }) {
       positions.forEach((position, i) => {
         if (position.y < minY) {
           minY = position.y
-        } 
+        }
         if (position.y + reactFlowInstance.getNode(nodes[i].id).height > maxY) {
           maxY = position.y + reactFlowInstance.getNode(nodes[i].id).height
         }
       })
       // console.log({maxX, minX})
       // console.log({maxY, minY})
-      return {maxX: maxX, minX: minX, maxY: maxY, minY: minY}
+      return { maxX: maxX, minX: minX, maxY: maxY, minY: minY }
     }
     const width = getMinMax().maxX - getMinMax().minX
     const height = getMinMax().maxY - getMinMax().minY
     // console.log(maxX, minX)
     // console.log(maxY, minY)
-    // console.log({ width: width, height: height })
+    console.log({ width: width, height: height })
+    setSelectionZone({ width: width, height: height })
     return { width: width, height: height }
   }
 
 
+  const [nodeCopiedClones, setNodeCopiedClones] = useState<NodeType[]>()
+  const [topRightPos, setTopRightPos] = useState({ x: 0, y: 0 })
+
+  const getRightestNode = (nodes: NodeType[]) => {
+    let minX = 999999
+    let minY = 999999
+    let rightestPosition = { x: minX, y: minY }
+    // let rightestNode: NodeType
+    nodes.forEach((node) => {
+      if (node.position.x < minX) {
+        minX = node.position.x
+        // rightestNode = {...node}
+        // console.log(rightestNode)
+      }
+      if (node.position.y < minY) {
+        minY = node.position.y
+      }
+    })
+    const filteredNodes = [...nodes]
+    filteredNodes.map((node) => node.position = { x: node.position.x - minX, y: node.position.y - minY })
+    // console.log(filteredNodes[0].position)
+    // console.log([rightestNode, ...filteredNodes])
+    setNodeCopiedClones([...filteredNodes])
+    return [...filteredNodes]
+  }
+
+
+
+
   return (
     <>
-      {isCloneVisible && <div className=" absolute z-50 rounded-xl border border-dashed border-[#39C] flex flex-col items-center justify-center font-extrabold text-xl " style={{ backgroundColor: "rgba(51, 153, 204, 0.2)", top: position.y, left: position.x, width: getNodesSelectionZone(lastCopiedSelection.nodes).width * reactFlowInstance.getZoom(), height: getNodesSelectionZone(lastCopiedSelection.nodes).height * reactFlowInstance.getZoom(), color: 'rgba(255,255,255, 0.9)' }} >  </div>}
+      {isCloneVisible && (
+        <>
+          <div className=" absolute z-50 rounded-xl border border-dashed border-[#39C] flex flex-col items-center justify-center font-extrabold text-xl " style={{ backgroundColor: "rgba(51, 153, 204, 0.2)", top: position.y, left: position.x, width: selectionZone.width * reactFlowInstance.getZoom(), height: selectionZone.height * reactFlowInstance.getZoom(), color: 'rgba(255,255,255, 0.9)' }} >
+          </div>
+          {nodeCopiedClones.map((node, idx) => {
+            // console.log(position.x, node.position.x, position.x + node.position.x)
+            return (
+              <div key={node.id} className=" absolute rounded-xl z-50 border-[#39C] border " style={{ backgroundColor: "rgba(51, 153, 204, 0.275)", top: (node.position.y * reactFlowInstance.getZoom()) + position.y, left: (node.position.x * reactFlowInstance.getZoom()) + position.x, width: reactFlowInstance.getNode(node.id).width * reactFlowInstance.getZoom(), height: reactFlowInstance.getNode(node.id).height * reactFlowInstance.getZoom() }} >
+
+              </div>
+            )
+          })}
+        </>
+      )}
       <div className="flex h-full overflow-hidden">
         {/* {preloader && <Preloader />} */}
         {preloader ? <Preloader /> : (
@@ -659,24 +709,39 @@ export default function Page({ flow }: { flow: FlowType }) {
                     </ContextMenu.Trigger>
                     <ContextMenu.Portal container={document.getElementById('modal_root')}>
                       <ContextMenu.Content className="context-wrapper">
+                        {(lastSelection?.nodes?.length > 0 || lastSelection?.edges?.length > 0) && (
+                          <ContextMenu.Item onClick={e => {
+                            setLastCopiedSelection(_.cloneDeep(lastSelection))
+                          }} className=" context-item " >
+                            <div className="flex flex-row items-center gap-1">
+                              <Copy className="w-4 h-4" />
+                              <p>Copy</p>
+                            </div>
+                            <span className="text-neutral-400"> Ctrl+C </span>
+                          </ContextMenu.Item>
+                        )}
                         <ContextMenu.Item onClick={e => {
-                          let bounds = reactFlowWrapper.current.getBoundingClientRect();
-                          const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
-                          if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
-                            if (!isMouseOnNode) {
-                              if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) {
-                                // console.log('1')
-                              }
-                              paste(lastCopiedSelection, {
-                                x: position.x - bounds.left,
-                                y: position.y - bounds.top,
-                              });
-                              // console.log('first')
-                            } else {
-                              setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
-                            }
-                          } else setErrorData({ title: "You can't paste Global/Local Node copy!" })
-                        }} className=" context-item ">
+                          //    let bounds = reactFlowWrapper.current.getBoundingClientRect();
+                          //    const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
+                          //    if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
+                          //      if (!isMouseOnNode) {
+                          //        if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) {
+                          //          // console.log('1')
+                          //        }
+                          //        paste(lastCopiedSelection, {
+                          //          x: position.x - bounds.left,
+                          //          y: position.y - bounds.top,
+                          //        });
+                          //        // console.log('first')
+                          //      } else {
+                          //        setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
+                          //      }
+                          //    } else setErrorData({ title: "You can't paste Global/Local Node copy!" })
+                          setIsCloneVisible(true)
+                          getNodesSelectionZone(lastCopiedSelection.nodes)
+                          getRightestNode(lastCopiedSelection.nodes)
+                        }}
+                          className=" context-item ">
                           <div className="flex flex-row items-center gap-1">
                             <ClipboardPasteIcon className="w-4 h-4" />
                             <p>Paste here</p>

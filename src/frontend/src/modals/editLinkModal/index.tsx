@@ -76,7 +76,7 @@ export default function EditLinkModal({ data }: { data: NodeDataType }) {
   function handleClick() {
     let savedFlow = flows.find((f) => f.id === tabId);
     data.node.links = data.node.links
-    console.log(data.node.links);
+    // console.log(data.node.links);
     saveFlow(savedFlow);
     closePopUp();
   }

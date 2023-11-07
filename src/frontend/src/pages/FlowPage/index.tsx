@@ -21,7 +21,7 @@ export default function FlowPage() {
   }, [id]);
 
   // Initialize state variable for the version
-  const [version, setVersion] = useState("0.0.38");
+  const [version, setVersion] = useState("0.0.39");
   // useEffect(() => {
   //   getVersion().then((data) => {
   //     setVersion(data.version);

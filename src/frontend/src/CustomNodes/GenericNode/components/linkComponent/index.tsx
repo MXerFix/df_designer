@@ -27,12 +27,12 @@ export const LinkComponent = ({ options, type, linkType, setTarget, defaultValue
       ''
       : ''
 
-      console.log(options)
+      // console.log(options)
 
 
   return (
     <div className='mb-3'>
-      <select className='bg-background border-[1px] border-foreground w-full h-10 rounded-lg px-4 py-1' value={option} onChange={(e) => { console.log(e.target.value) ;setOption(e.target.value); setTarget(e.target.value); link.to = e.target.value;}}>
+      <select className='bg-background border-[1px] border-foreground w-full h-10 rounded-lg px-4 py-1' value={option} onChange={(e) => {setOption(e.target.value); setTarget(e.target.value); link.to = e.target.value;}}>
         <option value="">Choose option...</option>
         {options.map((option) => {
           return (
