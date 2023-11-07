@@ -544,6 +544,11 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       resultNodes.push({...newNode, selected: true})
 
     });
+
+    if (resultNodes.length < selectionInstance.nodes.length) {
+      return
+    }
+
     // Add the new node to the list of nodes in state
     nodes = nodes
       .map((e) => ({ ...e, selected: false }))

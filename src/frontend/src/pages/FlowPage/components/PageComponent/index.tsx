@@ -188,6 +188,11 @@ export default function Page({ flow }: { flow: FlowType }) {
     };
   }, [position, lastCopiedSelection, lastSelection]);
 
+  // useEffect(() => {
+  //   const positions = reactFlowInstance.getNodes()
+  //   console.log(positions, position)
+  // }, [position])
+
   const [selectionMenuVisible, setSelectionMenuVisible] = useState(false);
 
   const { setExtraComponent, setExtraNavigation } = useContext(locationContext);
