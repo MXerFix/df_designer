@@ -7,7 +7,7 @@ import {
   nodeNames,
   titleNodeColors,
 } from "../../../../utils";
-import { ChangeEvent, useCallback, useContext, useState } from "react";
+import { ChangeEvent, useCallback, useContext, useEffect, useState } from "react";
 import { typesContext } from "../../../../contexts/typesContext";
 import { APIClassType, APIObjectType } from "../../../../types/api";
 import ShadTooltip from "../../../../components/ShadTooltipComponent";
@@ -35,10 +35,12 @@ import EditFlowSettings from "../../../../components/EditFlowSettingsComponent";
 import { darkContext } from "../../../../contexts/darkContext";
 import { FlowType, NodeType } from "../../../../types/flow";
 import { FilterNodesType } from "../../../../types/components";
+import { MyStorageIcon } from "../../../../icons/MyStorageIcon";
+import MyStorageModal from "../../../../modals/MyStorageModal";
 
 export default function ExtraSidebar() {
   const { data } = useContext(typesContext);
-  const { openPopUp } = useContext(PopUpContext);
+  const { openPopUp, closePopUp } = useContext(PopUpContext);
   const { dark } = useContext(darkContext)
   const { flows, tabId, uploadFlow, tabsState, saveFlow, save, setTabId, addFlow, removeFlow } =
     useContext(TabsContext);
@@ -120,6 +122,7 @@ export default function ExtraSidebar() {
     }
   }
 
+
   const Highlight = (props) => {
     const { filter, str } = props
     if (!filter) return str
@@ -140,6 +143,14 @@ export default function ExtraSidebar() {
   const light = useCallback((str) => {
     return <Highlight filter={search} str={str} />
   }, [search])
+
+  useEffect(() => {
+    dataFilter.presets = {
+      ...dataFilter.presets,
+      ...JSON.parse(localStorage.getItem('presets'))
+    }
+  }, [JSON.parse(localStorage.getItem('presets')), closePopUp])
+
 
 
   return (
@@ -273,110 +284,119 @@ export default function ExtraSidebar() {
         </div>
       </div>
       <Separator />
-      <div className="side-bar-components-div-arrangement">
-        <h5 className="mb-2 mt-4 ml-2 extra-title"> Available components </h5>
-        <div className="max-h-[320px] overflow-y-scroll scrollbar-hide">
-          {Object.keys(dataFilter)
-            .sort()
-            .map((d: keyof APIObjectType, i) =>
-              Object.keys(dataFilter[d]).length > 0 ? (
-                <DisclosureComponent
-                  openDisc={search.length == 0 ? false : true}
-                  key={nodeNames[d]}
-                  button={{
-                    title: nodeNames[d] ?? nodeNames.unknown,
-                    Icon: nodeIconsLucide[d] ?? nodeIconsLucide.unknown,
-                  }}
-                >
-                  <div className="side-bar-components-gap">
-                    {Object.keys(dataFilter[d])
-                      .sort()
-                      .map((t: string, k) => {
-                        // console.log(d, t)
-                        return (
-                          <ShadTooltip
-                            content={data[d][t].display_name}
-                            side="right"
-                            key={data[d][t].display_name}
-                          >
-                            <div key={k} data-tooltip-id={t}>
-                              <div
-                                draggable
-                                className={"side-bar-components-border"}
-                                style={{
-                                  borderLeftColor:
-                                    titleNodeColors[t] ?? nodeColors.unknown,
-                                }}
-                                onDragStart={(event) => {
-                                  onDragStart(event, {
-                                    type: t,
-                                    node: data[d][t],
-                                  })
-                                }
-                                }
-                                onDragEnd={() => {
-                                  document.body.removeChild(
-                                    document.getElementsByClassName(
-                                      "cursor-grabbing"
-                                    )[0]
-                                  );
-                                }}
-                              >
-                                <div className="side-bar-components-div-form">
-                                  <span className="side-bar-components-text">
-                                    {data[d][t].display_name}
-                                  </span>
-                                  <Menu className="side-bar-components-icon " />
+      <div className="flex flex-col justify-between h-full pb-10">
+        <div className="side-bar-components-div-arrangement">
+          <h5 className="mb-2 mt-4 ml-2 extra-title"> Available components </h5>
+          <div className="max-h-[320px] overflow-y-scroll scrollbar-hide">
+            {Object.keys(dataFilter)
+              .sort()
+              .map((d: keyof APIObjectType, i) =>
+                Object.keys(dataFilter[d]).length > 0 ? (
+                  <DisclosureComponent
+                    openDisc={search.length == 0 ? false : true}
+                    key={nodeNames[d]}
+                    button={{
+                      title: nodeNames[d] ?? nodeNames.unknown,
+                      Icon: nodeIconsLucide[d] ?? nodeIconsLucide.unknown,
+                    }}
+                  >
+                    <div className="side-bar-components-gap">
+                      {Object.keys(dataFilter[d])
+                        .sort()
+                        .map((t: string, k) => {
+                          // console.log(d, t)
+                          return (
+                            <ShadTooltip
+                              content={data[d][t]?.display_name ?? ""}
+                              side="right"
+                              key={data[d][t]?.display_name ?? ""}
+                            >
+                              <div key={k} data-tooltip-id={t}>
+                                <div
+                                  draggable
+                                  className={"side-bar-components-border"}
+                                  style={{
+                                    borderLeftColor:
+                                      titleNodeColors[t] ?? (dataFilter[d][t].color ?? nodeColors.unknown),
+                                  }}
+                                  onDragStart={(event) => {
+                                    onDragStart(event, {
+                                      type: t,
+                                      node: data[d][t],
+                                    })
+                                  }
+                                  }
+                                  onDragEnd={() => {
+                                    document.body.removeChild(
+                                      document.getElementsByClassName(
+                                        "cursor-grabbing"
+                                      )[0]
+                                    );
+                                  }}
+                                >
+                                  <div className="side-bar-components-div-form">
+                                    <span className="side-bar-components-text">
+                                      {data[d][t]?.display_name ?? ""}
+                                    </span>
+                                    <Menu className="side-bar-components-icon " />
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </ShadTooltip>
-                        )
-                      })}
-                  </div>
-                </DisclosureComponent>
-              ) : (
-                <div key={i}></div>
-              )
-            )}
-        </div>
-        {search ? (
-          <div className="side-bar-components-gap pb-10">
-            <h5 className=" mt-4 extra-title extra-title"> Results </h5>
-            <div>
-              {nodesFilter?.map((nf: FilterNodesType) => {
-                if (nf.filteredNodes?.length) {
-                  return (
-                    <div className="mt-2">
-                      <div className="flex flex-row items-center justify-start gap-1.5">
-                        {/* <span className={` w-4 h-4 block rounded-full `} style={{ backgroundColor: nf.flow.color ?? "grey", opacity: 0.7 }} >  </span> */}
-                        <FlowColorSVG fill={nf.flow.color} />
-                        <p className="font-semibold"> {nf.flow.name ?? ''} </p>
-                      </div>
-                      <div className="mt-1">
-                        {nf.filteredNodes?.map((node) => {
-                          return (
-                            <div
-                              className={"side-bar-components-border mb-1 "}
-                              style={{
-                                borderLeftColor:
-                                  titleNodeColors[node.data.node.base_classes[0]] ?? nodeColors.unknown,
-                              }}
-                            >
-                              <div onClick={e => goToNodeHandler(nf.flow, node.id)} className="flex flex-row items-center justify-between side-bar-components-div-form px-3 py-1.5 cursor-pointer border-solid ">
-                                <p> {light(node.data.node.display_name)} </p>
-                              </div>
-                            </div>
+                            </ShadTooltip>
                           )
                         })}
-                      </div>
                     </div>
-                  )
-                }
-              })}
-            </div>
+                  </DisclosureComponent>
+                ) : (
+                  <div key={i}></div>
+                )
+              )}
           </div>
-        ) : <></>}
+          {search ? (
+            <div className="side-bar-components-gap pb-10">
+              <h5 className=" mt-4 extra-title extra-title"> Results </h5>
+              <div>
+                {nodesFilter?.map((nf: FilterNodesType) => {
+                  if (nf.filteredNodes?.length) {
+                    return (
+                      <div className="mt-2">
+                        <div className="flex flex-row items-center justify-start gap-1.5">
+                          {/* <span className={` w-4 h-4 block rounded-full `} style={{ backgroundColor: nf.flow.color ?? "grey", opacity: 0.7 }} >  </span> */}
+                          <FlowColorSVG fill={nf.flow.color} />
+                          <p className="font-semibold"> {nf.flow.name ?? ''} </p>
+                        </div>
+                        <div className="mt-1">
+                          {nf.filteredNodes?.map((node) => {
+                            return (
+                              <div
+                                className={"side-bar-components-border mb-1 "}
+                                style={{
+                                  borderLeftColor:
+                                    titleNodeColors[node.data.node.base_classes[0]] ?? nodeColors.unknown,
+                                }}
+                              >
+                                <div onClick={e => goToNodeHandler(nf.flow, node.id)} className="flex flex-row items-center justify-between side-bar-components-div-form px-3 py-1.5 cursor-pointer border-solid ">
+                                  <p> {light(node.data.node.display_name)} </p>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )
+                  }
+                })}
+              </div>
+            </div>
+          ) : <></>}
+
+        </div>
+        <div className="px-2">
+          <button onClick={e => openPopUp(<MyStorageModal dataFilter={dataFilter} />)} className=" flex flex-row items-center justify-center gap-1 bg-muted w-full rounded-lg py-0.5 pr-1 font-medium ">
+            <MyStorageIcon className="" fill={dark ? "white" : "black"} />
+            My Storage
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import { Node, Edge, Viewport } from "reactflow";
+import { NodeType } from "../flow";
 //kind and class are just representative names to represent the actual structure of the object received by the API
 
 export type APIObjectType = { kind: APIKindType;[key: string]: APIKindType };
@@ -18,8 +19,9 @@ export type APIClassType = {
   conditions?: ConditionClassType[]
   links?: LinkClassType[]
   from_links?: FromLinkType[]
+  nodes?: any[]
   name?: string
-  [key: string]: Array<string> | string | APITemplateType | ConditionClassType[] | LinkClassType[] | FromLinkType[];
+  [key: string]: Array<string> | string | APITemplateType | ConditionClassType[] | LinkClassType[] | FromLinkType[] | any[];
 };
 
 export type FromLinkType = {

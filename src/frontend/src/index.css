@@ -966,6 +966,14 @@ The cursor: default; property value restores the browser's default cursor style 
     @apply border-l
   }
 
+  .storage-modal-tab-list {
+    @apply flex flex-row items-center justify-start gap-2 border-b
+  }
+
+  .storage-modal-tab-trigger {
+    @apply bg-muted text-foreground rounded-t-lg px-3 py-1
+  }
+
 }
 
 .border-tab {
@@ -1010,10 +1018,10 @@ The cursor: default; property value restores the browser's default cursor style 
   outline-color: #999;
 }
 
-.edge-cust text {
+/* .edge-cust text {
   font-weight: 400 !important;
   strokeWidth: 0;
-}
+} */
 
 .header-menu-bar-fix {
   box-shadow: 0px 8px 15px 0px rgba(14, 1, 66, 0.08);

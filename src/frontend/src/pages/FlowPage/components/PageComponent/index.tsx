@@ -37,8 +37,10 @@ import ErrorAlert from "../../../../alerts/error";
 import { animated, useSpring, useTransition } from '@react-spring/web'
 import { Preloader } from "../../../Preloader/Preloader";
 import * as ContextMenu from '@radix-ui/react-context-menu';
-import { BoxSelect, ClipboardPasteIcon, Copy } from "lucide-react";
+import { BoxSelect, ClipboardPasteIcon, Combine, Copy } from "lucide-react";
 import { LayoutGrid } from 'lucide-react';
+import AddPresetModal from "../../../../modals/addPresetModal";
+import { darkContext } from "../../../../contexts/darkContext";
 
 const nodeTypes = {
   genericNode: GenericNode,
@@ -66,6 +68,8 @@ export default function Page({ flow }: { flow: FlowType }) {
     useContext(typesContext);
   const reactFlowWrapper = useRef(null);
   const { openPopUp } = useContext(PopUpContext)
+  const { grid, setGrid } = useContext(darkContext)
+
 
 
   const { takeSnapshot, undo } = useContext(undoRedoContext);
@@ -74,6 +78,7 @@ export default function Page({ flow }: { flow: FlowType }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isCloneVisible, setIsCloneVisible] = useState(false)
   const [isMouseOnNode, setIsMouseOnNode] = useState<boolean>()
+  const [redZone, setRedZone] = useState(false)
 
   // console.log(position)
 
@@ -81,7 +86,7 @@ export default function Page({ flow }: { flow: FlowType }) {
   //   useState<OnSelectionChangeParams>(null);
 
   const pasteClickHandler = (event: Event) => {
-    if (isCloneVisible) {
+    if (isCloneVisible && !redZone) {
       event.preventDefault();
       setIsCloneVisible(false)
       document.removeEventListener('click', pasteClickHandler)
@@ -151,21 +156,52 @@ export default function Page({ flow }: { flow: FlowType }) {
       if (
         (event.ctrlKey || event.metaKey) &&
         event.key === "g" &&
-        lastSelection
+        lastSelection?.nodes?.length &&
+        !disableCopyPaste
       ) {
         event.preventDefault();
+        openPopUp(<AddPresetModal lastSelection={lastSelection} />)
         // addFlow(newFlow, false);
       }
       if (
         (event.ctrlKey || event.metaKey) &&
-        event.key === "a"
+        event.key === "a" &&
+        !disableCopyPaste
       ) {
         event.preventDefault()
         selectAllHandler()
       }
+      // if (
+      //   (event.shiftKey) &&
+      //   event.key === "a" &&
+      //   !disableCopyPaste
+      // ) {
+      //   event.preventDefault()
+      //   openPopUp(<AddPresetModal lastSelection={lastSelection} />)
+      // }
     };
     const handleMouseMove = (event) => {
+      const reactflowBounds = reactFlowWrapper.current.getBoundingClientRect();
       setPosition({ x: event.clientX, y: event.clientY });
+      const p = reactFlowInstance.project({ x: event.clientX - reactflowBounds.left, y: event.clientY - reactflowBounds.top })
+      const currMousePos = {
+        x: p.x,
+        y: p.y
+      }
+
+      // console.log(redZone)
+      if (nodes.some((node) => {
+        if (((currMousePos.x + selectionZone.width > node.position.x) && (currMousePos.x < node.position.x + node.width)) && ((currMousePos.y + selectionZone.height > node.position.y) && (currMousePos.y < node.position.y + node.height))) {
+          return true
+        } else {
+          return false
+        }
+      })) {
+        setRedZone(true)
+      } else {
+        setRedZone(false)
+
+      }
     };
 
     if (isCloneVisible) {
@@ -332,6 +368,7 @@ export default function Page({ flow }: { flow: FlowType }) {
       // Get the current bounds of the ReactFlow wrapper element
       const reactflowBounds = reactFlowWrapper.current.getBoundingClientRect();
 
+
       // Extract the data from the drag event and parse it as a JSON object
       let data: { type: string; node?: APIClassType } = JSON.parse(
         event.dataTransfer.getData("json"),
@@ -373,31 +410,35 @@ export default function Page({ flow }: { flow: FlowType }) {
       }
 
       if (data.node.nodes !== undefined) {
-        const resultNodes = []
-        for (let item = 0; item < data.node.nodes.length; item++) {
-          const element = data.node.nodes[item]
-          // console.log(element)
-          let newNode: NodeType;
-          newNode = {
-            id: getNodeId(element.base_classes[0]),
-            type: "genericNode",
-            position: { x: position.x + 400 * item, y: position.y },
-            data: {
-              node: element,
-              id: getNodeId(element.base_classes[0]),
-              value: null,
-              type: element.base_classes[0]
-            }
-          }
-          // setNodes((nds) => nds.concat(newNode))
-          resultNodes.push(newNode)
-        }
-        for (let node of resultNodes) {
-          setNodes((nds) => {
-            // console.log(nds)
-            return nds.concat(node)
-          })
-        }
+        // const resultNodes = []
+        // data.node.nodes.forEach((element, idx) => {
+        //   // console.log(element)
+        //   let newNode: NodeType;
+        //   newNode = {
+        //     id: getNodeId(element.base_classes[0]),
+        //     type: "genericNode",
+        //     position: { x: position.x + 400 * idx, y: position.y },
+        //     data: {
+        //       node: element,
+        //       id: getNodeId(element.base_classes[0]),
+        //       value: null,
+        //       type: element.base_classes[0]
+        //     }
+        //   }
+        //   // setNodes((nds) => nds.concat(newNode))
+        //   console.log(newNode)
+        //   resultNodes.push(newNode)
+        // })
+        let bounds = reactFlowWrapper.current.getBoundingClientRect();
+        paste({ nodes: data.node.nodes, edges: data.node.edges ?? [] }, { x: event.clientX - bounds.left, y: event.clientY - bounds.top })
+        // reactFlowInstance.addNodes(resultNodes)
+
+        // for (let node of resultNodes) {
+        //   setNodes((nds) => {
+        //     // console.log(nds)
+        //     return nds.concat(node)
+        //   })
+        // }
         // setNodes((nds) => {
         //   return [...nds, ...resultNodes]
         // })
@@ -585,6 +626,7 @@ export default function Page({ flow }: { flow: FlowType }) {
   }
 
 
+
   const [nodeCopiedClones, setNodeCopiedClones] = useState<NodeType[]>()
   const [topRightPos, setTopRightPos] = useState({ x: 0, y: 0 })
 
@@ -613,17 +655,16 @@ export default function Page({ flow }: { flow: FlowType }) {
 
 
 
-
   return (
     <>
       {isCloneVisible && (
         <>
-          <div className=" absolute z-50 rounded-xl border border-dashed border-[#39C] flex flex-col items-center justify-center font-extrabold text-xl " style={{ backgroundColor: "rgba(51, 153, 204, 0.2)", top: position.y, left: position.x, width: selectionZone.width * reactFlowInstance.getZoom(), height: selectionZone.height * reactFlowInstance.getZoom(), color: 'rgba(255,255,255, 0.9)' }} >
+          <div className=" absolute z-50 rounded-xl border border-dashed flex flex-col items-center justify-center font-extrabold text-xl " style={{ backgroundColor: redZone ? "rgba(251, 79, 79, 0.5)" : "rgba(51, 153, 204, 0.2)", borderColor: redZone ? "#FF4747" : "#39C", top: position.y, left: position.x, width: selectionZone.width * reactFlowInstance.getZoom(), height: selectionZone.height * reactFlowInstance.getZoom(), color: 'rgba(255,255,255, 0.9)' }} >
           </div>
           {nodeCopiedClones.map((node, idx) => {
             // console.log(position.x, node.position.x, position.x + node.position.x)
             return (
-              <div key={node.id} className=" absolute rounded-xl z-50 border-[#39C] border " style={{ backgroundColor: "rgba(51, 153, 204, 0.275)", top: (node.position.y * reactFlowInstance.getZoom()) + position.y, left: (node.position.x * reactFlowInstance.getZoom()) + position.x, width: reactFlowInstance.getNode(node.id).width * reactFlowInstance.getZoom(), height: reactFlowInstance.getNode(node.id).height * reactFlowInstance.getZoom() }} >
+              <div key={node.id} className=" absolute rounded-xl z-50 border " style={{ backgroundColor: redZone ? "rgba(251, 79, 79, 0.8)" : "rgba(51, 153, 204, 0.275)", borderColor: redZone ? "#FF4747" : "#39C", top: (node.position.y * reactFlowInstance.getZoom()) + position.y, left: (node.position.x * reactFlowInstance.getZoom()) + position.x, width: reactFlowInstance.getNode(node.id).width * reactFlowInstance.getZoom(), height: reactFlowInstance.getNode(node.id).height * reactFlowInstance.getZoom() }} >
 
               </div>
             )
@@ -690,6 +731,8 @@ export default function Page({ flow }: { flow: FlowType }) {
                               onDrop={onDrop}
                               onNodesDelete={onDelete}
                               onSelectionChange={onSelectionChange}
+                              snapGrid={[96, 96]}
+                              snapToGrid={grid}
                               // snapToGrid={true}
                               nodesDraggable={!managerMode}
                               panOnDrag={true} // FIXME: TEST {!disableCopyPaste} was
@@ -700,7 +743,7 @@ export default function Page({ flow }: { flow: FlowType }) {
                               minZoom={0.01}
                               maxZoom={8}
                             >
-                              <Background className="" />
+                              <Background size={grid ? 3 : 1} gap={grid ? 96 : 25} className="" />
                               <Controls
                                 className="bg-muted fill-foreground stroke-foreground text-primary [&>button]:border-b-border hover:[&>button]:bg-border"
                               ></Controls>
@@ -753,12 +796,20 @@ export default function Page({ flow }: { flow: FlowType }) {
                           </div>
                           <span className="text-neutral-400"> Ctrl+V </span>
                         </ContextMenu.Item>
-                        <ContextMenu.Item disabled className=" context-item context-item-disabled " >
+                        <ContextMenu.Item onClick={e => setGrid(!grid)} className=" context-item " >
                           <div className="flex flex-row items-center gap-1">
                             <LayoutGrid className="w-4 h-4" />
                             <p>Show/hide grid</p>
                           </div>
                           <span className="text-neutral-400"> Shift+G </span>
+                        </ContextMenu.Item>
+                        <ContextMenu.Item disabled={lastSelection?.nodes?.length <= 0} onClick={e => { if(lastSelection?.nodes?.length > 0) openPopUp(<AddPresetModal lastSelection={lastSelection} />) }}
+                          className={` context-item ${lastSelection?.nodes?.length <= 0 && 'context-item-disabled'} `}>
+                          <div className="flex flex-row items-center gap-1">
+                            <Combine className="w-4 h-4" />
+                            <p>Create preset</p>
+                          </div>
+                          <span className="text-neutral-400"> Ctrl+G </span>
                         </ContextMenu.Item>
                         <ContextMenu.Item onClick={e => {
                           // onSelectionChange({nodes: flow.data.nodes, edges: flow.data.edges})

@@ -503,7 +503,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       ? { x: position.paneX + position.x, y: position.paneY + position.y }
       : reactFlowInstance.project({ x: position.x, y: position.y });
 
-      const resultNodes: any[] = []
+    const resultNodes: any[] = []
 
     selectionInstance.nodes.forEach((n: NodeType) => {
       // Generate a unique node ID
@@ -526,7 +526,7 @@ export function TabsProvider({ children }: { children: ReactNode }) {
           id: newId,
         },
       };
-        
+
 
       // FIXME: CHECK WORK >>>>>>>
       // check for intersections before paste
@@ -537,11 +537,11 @@ export function TabsProvider({ children }: { children: ReactNode }) {
         // console.log({id: id, xIntersect: xIntersect, yIntersect: yIntersect, result: result})
         return result
       })) {
-        return setErrorData({title: "Invalid place! Nodes can't intersect!"})
+        return setErrorData({ title: "Invalid place! Nodes can't intersect!" })
       }
       // FIXME: CHECK WORK >>>>>>>>
 
-      resultNodes.push({...newNode, selected: true})
+      resultNodes.push({ ...newNode, selected: true })
 
     });
 
@@ -560,14 +560,14 @@ export function TabsProvider({ children }: { children: ReactNode }) {
       let target = idsMap[e.target];
       let sourceHandleSplitted = e.sourceHandle.split("|");
       let sourceHandle =
-        sourceHandleSplitted[0] +
-        "|" +
         source +
         "|" +
-        sourceHandleSplitted.slice(2).join("|");
+        sourceHandleSplitted[1] +
+        "|" +
+        source
       let targetHandleSplitted = e.targetHandle.split("|");
       let targetHandle =
-        targetHandleSplitted.slice(0, -1).join("|") + "|" + target;
+        targetHandleSplitted.slice(0, -1).join("|") + target;
       let id =
         "reactflow__edge-" +
         source +
@@ -585,8 +585,8 @@ export function TabsProvider({ children }: { children: ReactNode }) {
           style: { stroke: "inherit" },
           className:
             targetHandle.split("|")[0] === "Text"
-              ? "stroke-gray-800 "
-              : "stroke-gray-900 ",
+              ? "stroke-foreground "
+              : "stroke-foreground ",
           animated: targetHandle.split("|")[0] === "Text",
           selected: false,
         },

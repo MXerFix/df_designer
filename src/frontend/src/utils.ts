@@ -54,6 +54,7 @@ import { Start_node } from './icons/start_node';
 import { End_node } from './icons/end_node';
 import { Nodes_sidebar } from './icons/NodesSidebarIcon';
 import { LLM_node } from './icons/LLMIcon';
+import { Presets_sidebar } from './icons/PresetsSidebarIcon';
 
 export function classNames(...classes: Array<string>) {
   return classes.filter(Boolean).join(" ");
@@ -239,6 +240,7 @@ export const nodeNames: { [char: string]: string } = {
   agents: "Agents",
   tools: "Tools",
   default_nodes: "Nodes",
+  presets: "Presets",
   links: "Links",
   samples: "samples",
   memories: "Memories",
@@ -275,6 +277,9 @@ export const nodeIconsLucide: {
   default_nodes: Nodes_sidebar as React.ForwardRefExoticComponent<
     ComponentType<SVGProps<SVGSVGElement>>
   >,
+  presets: Presets_sidebar as React.ForwardRefExoticComponent<
+  ComponentType<SVGProps<SVGSVGElement>>
+>,
   llm_node: LLM_node as React.ForwardRefExoticComponent<
     ComponentType<SVGProps<SVGSVGElement>>
   >,

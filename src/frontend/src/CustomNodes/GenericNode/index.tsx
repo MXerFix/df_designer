@@ -574,6 +574,7 @@ export default function GenericNode({
     // const node = flows.find((flow) => flow.id === tabId).data.nodes.find((node: NodeType) => node.id === data.id)
     // console.log(node)
     setLastCopiedSelection(_.cloneDeep(lastSelection))
+    // console.log(lastCopiedSelection)
     setSuccessData({ title: "Node was succesfully copied!" })
   }
 
@@ -803,14 +804,14 @@ export default function GenericNode({
                   </div>
                   <span className="text-neutral-400"> Ctrl+Shift+V </span>
                 </ContextMenu.Item>
-                <ContextMenu.Item disabled onClick={e => { }}
+                {/* <ContextMenu.Item disabled onClick={e => { }}
                   className=" context-item context-item-disabled">
                   <div className="flex flex-row items-center gap-1">
                     <Combine className="w-4 h-4" />
                     <p>Create preset</p>
                   </div>
                   <span className="text-neutral-400"> Shift+A </span>
-                </ContextMenu.Item>
+                </ContextMenu.Item> */}
               </>
             )}
             <ContextMenu.Item onSelect={e => e.preventDefault()} onClick={e => openPopUp(<EditNodeModal data={data} />)}

@@ -303,23 +303,24 @@ export function TypesProvider({ children }: { children: ReactNode }) {
         default_link: default_link
       }
 
-      // const samples = {
-      //   sample_1: {
-      //     display_name: "samples",
-      //     base_classes: ["samples"],
-      //     description: "sample 1",
-      //     nodes: [
-      //       start_node, default_node, default_node, end_node
-      //     ]
-      //   }
-      // }
+      const samples = {
+        sample_1: {
+          color: '#dad345',
+          display_name: "default_preset_1",
+          base_classes: ["samples"],
+          description: "sample 1",
+          nodes: [
+            start_node, default_node, default_node, fallback_node
+          ]
+        }
+      }
       try {
         const result = { data: {} }
         const ournode = result.data
         ournode['default_nodes'] = default_nodes
         ournode['links'] = links
         // FIXME: FIX SAMPLES
-        // ournode['samples'] = samples
+        ournode['presets'] = samples
         // Make sure to only update the state if the component is still mounted.
         if (isMounted) {
           setData(result.data);
