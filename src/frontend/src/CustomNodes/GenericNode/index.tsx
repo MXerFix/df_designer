@@ -779,7 +779,7 @@ export default function GenericNode({
                   </div>
                   <span className="text-neutral-400"> Ctrl+C </span>
                 </ContextMenu.Item>
-                <ContextMenu.Item disabled onClick={e => {
+                {/* <ContextMenu.Item disabled onClick={e => {
                   let bounds = document.getElementById('reactFlowWrapper').getBoundingClientRect()
                   // console.log(bounds)
                   const node = reactFlowInstance.getNode(data.id)
@@ -792,8 +792,8 @@ export default function GenericNode({
                     paste(
                       lastCopiedSelection,
                       {
-                        x: position.x - bounds.left,
-                        y: position.y - bounds.top
+                        x: node.position.x,
+                        y: node.position.y
                       })
                   }, 20);
                 }}
@@ -803,7 +803,7 @@ export default function GenericNode({
                     <p>Paste to replace</p>
                   </div>
                   <span className="text-neutral-400"> Ctrl+Shift+V </span>
-                </ContextMenu.Item>
+                </ContextMenu.Item> */}
                 {/* <ContextMenu.Item disabled onClick={e => { }}
                   className=" context-item context-item-disabled">
                   <div className="flex flex-row items-center gap-1">

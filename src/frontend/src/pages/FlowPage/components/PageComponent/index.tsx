@@ -653,6 +653,7 @@ export default function Page({ flow }: { flow: FlowType }) {
     return [...filteredNodes]
   }
 
+  // console.log(lastCopiedSelection)
 
 
   return (
@@ -757,7 +758,7 @@ export default function Page({ flow }: { flow: FlowType }) {
                     </ContextMenu.Trigger>
                     <ContextMenu.Portal container={document.getElementById('modal_root')}>
                       <ContextMenu.Content className="context-wrapper">
-                        {(lastSelection?.nodes?.length > 0 || lastSelection?.edges?.length > 0) && (
+                        {( lastSelection?.nodes?.length > 0 || lastSelection?.edges?.length > 0) && (
                           <ContextMenu.Item onClick={e => {
                             setLastCopiedSelection(_.cloneDeep(lastSelection))
                           }} className=" context-item " >
@@ -768,34 +769,40 @@ export default function Page({ flow }: { flow: FlowType }) {
                             <span className="text-neutral-400"> Ctrl+C </span>
                           </ContextMenu.Item>
                         )}
-                        <ContextMenu.Item onClick={e => {
-                          //    let bounds = reactFlowWrapper.current.getBoundingClientRect();
-                          //    const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
-                          //    if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
-                          //      if (!isMouseOnNode) {
-                          //        if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) {
-                          //          // console.log('1')
-                          //        }
-                          //        paste(lastCopiedSelection, {
-                          //          x: position.x - bounds.left,
-                          //          y: position.y - bounds.top,
-                          //        });
-                          //        // console.log('first')
-                          //      } else {
-                          //        setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
-                          //      }
-                          //    } else setErrorData({ title: "You can't paste Global/Local Node copy!" })
-                          setIsCloneVisible(true)
-                          getNodesSelectionZone(lastCopiedSelection.nodes)
-                          getRightestNode(lastCopiedSelection.nodes)
-                        }}
-                          className=" context-item ">
-                          <div className="flex flex-row items-center gap-1">
-                            <ClipboardPasteIcon className="w-4 h-4" />
-                            <p>Paste here</p>
-                          </div>
-                          <span className="text-neutral-400"> Ctrl+V </span>
-                        </ContextMenu.Item>
+                        { lastCopiedSelection?.nodes?.length > 0 && (
+                          <ContextMenu.Item onClick={e => {
+                            //    let bounds = reactFlowWrapper.current.getBoundingClientRect();
+                            //    const nodesPositions = flow.data.nodes.map((node: NodeType) => node.position)
+                            //    if (!(lastSelection.nodes.map((node) => node.id).includes("GLOBAL_NODE") || lastSelection.nodes.map((node) => node.id).includes("LOCAL_NODE"))) {
+                            //      if (!isMouseOnNode) {
+                            //        if ((nodesPositions[0].x) < (position.x - bounds.left) && (position.x - bounds.left) < (nodesPositions[0].x + 384)) {
+                            //          // console.log('1')
+                            //        }
+                            //        paste(lastCopiedSelection, {
+                            //          x: position.x - bounds.left,
+                            //          y: position.y - bounds.top,
+                            //        });
+                            //        // console.log('first')
+                            //      } else {
+                            //        setErrorData({ title: "You can't paste node over node! Nodes can't intersect!" })
+                            //      }
+                            //    } else setErrorData({ title: "You can't paste Global/Local Node copy!" })
+                            if (
+                              lastCopiedSelection
+                            ) {
+                              setIsCloneVisible(true)
+                              getNodesSelectionZone(lastCopiedSelection.nodes)
+                              getRightestNode(lastCopiedSelection.nodes)
+                            }
+                          }}
+                            className=" context-item ">
+                            <div className="flex flex-row items-center gap-1">
+                              <ClipboardPasteIcon className="w-4 h-4" />
+                              <p>Paste</p>
+                            </div>
+                            <span className="text-neutral-400"> Ctrl+V </span>
+                          </ContextMenu.Item>
+                        )}
                         <ContextMenu.Item onClick={e => setGrid(!grid)} className=" context-item " >
                           <div className="flex flex-row items-center gap-1">
                             <LayoutGrid className="w-4 h-4" />
@@ -803,7 +810,7 @@ export default function Page({ flow }: { flow: FlowType }) {
                           </div>
                           <span className="text-neutral-400"> Shift+G </span>
                         </ContextMenu.Item>
-                        <ContextMenu.Item disabled={lastSelection?.nodes?.length <= 0} onClick={e => { if(lastSelection?.nodes?.length > 0) openPopUp(<AddPresetModal lastSelection={lastSelection} />) }}
+                        <ContextMenu.Item disabled={lastSelection?.nodes?.length <= 0} onClick={e => { if (lastSelection?.nodes?.length > 0) openPopUp(<AddPresetModal lastSelection={lastSelection} />) }}
                           className={` context-item ${lastSelection?.nodes?.length <= 0 && 'context-item-disabled'} `}>
                           <div className="flex flex-row items-center gap-1">
                             <Combine className="w-4 h-4" />
