@@ -47,7 +47,7 @@ export default function MyStorageModal({ dataFilter }: { dataFilter: any }) {
   const fill = dark ? "white" : "black"
 
 
-  const [presets, setPresets] = useState(JSON.parse(localStorage.getItem('presets')))
+  const [presets, setPresets] = useState(JSON.parse(localStorage.getItem('presets')) ?? {})
 
   function setModalOpen(x: boolean) {
     setOpen(x);
